@@ -9,18 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
-:root{
---green1:#0a5c36;
---green2:#1a7a4a;
---green3:#2ecc71;
---green4:#d4f5e2;
---green5:#f0fdf6;
---sidebar-width:260px;
---topbar-height:60px;
---shadow:0 2px 16px rgba(10,92,54,0.10);
---radius:12px;
-}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+:root{--green1:#0a5c36;--green2:#1a7a4a;--green3:#2ecc71;--green4:#d4f5e2;--green5:#f0fdf6;--sidebar-width:260px;--topbar-height:60px;--shadow:0 2px 16px rgba(10,92,54,0.10);--radius:12px;}
 #login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a5c36 0%,#1a7a4a 50%,#2ecc71 100%);padding:20px;}
 .login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
 .login-logo{width:70px;height:70px;background:linear-gradient(135deg,#0a5c36,#2ecc71);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
@@ -65,7 +54,6 @@
 .nav-item.active{background:#d4f5e2;color:#0a5c36;font-weight:700;border-left-color:#2ecc71;}
 .nav-item svg{width:18px;height:18px;flex-shrink:0;fill:#888;}
 .nav-item.active svg{fill:#0a5c36;}
-.nav-badge{margin-left:auto;background:#2ecc71;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .main{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:28px;min-height:calc(100vh - var(--topbar-height));}
 .page-header{margin-bottom:24px;}
 .page-title{font-size:24px;font-weight:800;color:#0a5c36;margin-bottom:4px;}
@@ -122,19 +110,18 @@ tr:hover td{background:#f9fffe;}
 .ai-mode-tabs{display:flex;gap:6px;margin-bottom:16px;}
 .ai-mode-tab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid #d4f5e2;cursor:pointer;color:#666;background:#f0fdf6;transition:all 0.2s;}
 .ai-mode-tab.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
-.ai-output{background:#f0fdf6;border-radius:10px;padding:16px;font-size:13px;color:#333;line-height:1.7;min-height:100px;white-space:pre-wrap;}
-.ai-provider-bar{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
-.ai-provider-chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#d4f5e2;color:#0a5c36;}
-.ai-provider-chip.active{background:#0a5c36;color:#fff;}
+.ai-output{background:#f0fdf6;border-radius:10px;padding:16px;font-size:13px;color:#333;line-height:1.7;min-height:100px;white-space:pre-wrap;max-height:500px;overflow-y:auto;}
 .close-btn{background:none;border:none;cursor:pointer;color:#999;font-size:20px;line-height:1;}
 .close-btn:hover{color:#e74c3c;}
+.ai-meta{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:11px;color:#888;flex-wrap:wrap;}
+.ai-meta-badge{padding:3px 8px;background:#d4f5e2;color:#0a5c36;border-radius:6px;font-weight:600;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal{background:#fff;border-radius:20px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;}
 .modal h2{font-size:20px;font-weight:800;color:#0a5c36;margin-bottom:20px;}
 .form-group{margin-bottom:16px;}
 .form-label{display:block;font-size:13px;font-weight:600;color:#0a5c36;margin-bottom:6px;}
-.form-input{width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;outline:none;color:#333;transition:border 0.2s;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;outline:none;color:#333;transition:border 0.2s;background:#fff;}
 .form-input:focus{border-color:#2ecc71;}
 .form-input:disabled{background:#f5f5f5;color:#999;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;}
@@ -161,14 +148,11 @@ tr:hover td{background:#f9fffe;}
 .loading p{color:#0a5c36;font-weight:600;font-size:15px;}
 .settings-save-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all 0.2s;}
 .settings-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.3);}
-.company-list{margin-bottom:16px;}
 .company-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf6;border-radius:10px;margin-bottom:8px;border:1px solid #d4f5e2;}
 .company-list-item span{font-size:13px;font-weight:600;color:#0a5c36;}
-.company-list-item button{padding:4px 10px;background:transparent;border:1px solid #d4f5e2;border-radius:6px;font-size:11px;color:#666;cursor:pointer;}
-.company-list-item button:hover{border-color:#e74c3c;color:#e74c3c;}
-.section-divider{height:1px;background:#d4f5e2;margin:20px 0;}
 .info-text{font-size:12px;color:#888;line-height:1.6;margin-bottom:12px;}
-.key-saved-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#2ecc71;font-weight:600;margin-left:8px;}
+.ai-selector-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;}
+.ai-selector-row > div{flex:1;min-width:200px;}
 @media(max-width:768px){
 .hamburger{display:flex;}
 .sidebar{transform:translateX(-100%);}
@@ -191,64 +175,37 @@ tr:hover td{background:#f9fffe;}
 </head>
 <body>
 
-<!-- LOADING -->
-<div class="loading" id="loading">
-  <div class="spinner"></div>
-  <p>Loading QuickRank...</p>
-</div>
+<div class="loading" id="loading"><div class="spinner"></div><p>Loading QuickRank...</p></div>
 
-<!-- TOAST -->
 <div class="success-toast" id="toast">
   <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
   <span id="toastMsg">Saved successfully</span>
 </div>
 
-<!-- LOGIN PAGE -->
 <div id="login-page" style="display:none;">
   <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-    </div>
+    <div class="login-logo"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
     <h1>QuickRank</h1>
     <p>Free unlimited keyword rank tracker.<br>Track website & local GMB rankings.</p>
     <div class="features">
-      <div class="feature-item">
-        <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-        Unlimited keywords — 100% free
-      </div>
-      <div class="feature-item">
-        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-        Local GMB map grid rankings
-      </div>
-      <div class="feature-item">
-        <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H5v-2h7v2zm7-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>
-        AI-powered SEO optimization
-      </div>
-      <div class="feature-item">
-        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-        Multi-company agency dashboard
-      </div>
+      <div class="feature-item"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Unlimited keywords — 100% free</div>
+      <div class="feature-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Local GMB map grid rankings</div>
+      <div class="feature-item"><svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H5v-2h7v2zm7-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg>AI-powered SEO optimization</div>
+      <div class="feature-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Multi-company agency dashboard</div>
     </div>
     <button class="google-btn" onclick="signInWithGoogle()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-      Continue with Google
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">Continue with Google
     </button>
     <p class="login-footer">By signing in you agree to our terms. Your data is private and secure.</p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="hamburger" onclick="toggleSidebar()" id="hamburger">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="hamburger" onclick="toggleSidebar()" id="hamburger"><span></span><span></span><span></span></div>
       <div class="topbar-logo">
-        <div class="topbar-logo-icon">
-          <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-        </div>
+        <div class="topbar-logo-icon"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
         <span>QuickRank<sup>PRO</sup></span>
       </div>
       <div class="company-switcher" onclick="toggleCompanyDropdown()" id="companySwitcher">
@@ -268,76 +225,34 @@ tr:hover td{background:#f9fffe;}
     </div>
   </div>
 
-  <!-- SIDEBAR OVERLAY -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-  <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-section">Main</div>
-    <div class="nav-item active" id="nav-ranktracker" onclick="showPage('ranktracker',this)">
-      <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-      Rank Tracker
-    </div>
-    <div class="nav-item" id="nav-landing" onclick="showPage('landing',this)">
-      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-      Landing Pages
-    </div>
-    <div class="nav-item" id="nav-keywords" onclick="showPage('keywords',this)">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      Keyword Research
-    </div>
-    <div class="nav-item" id="nav-competitors" onclick="showPage('competitors',this)">
-      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Competitors
-    </div>
+    <div class="nav-item active" id="nav-ranktracker" onclick="showPage('ranktracker',this)"><svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Rank Tracker</div>
+    <div class="nav-item" id="nav-landing" onclick="showPage('landing',this)"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Landing Pages</div>
+    <div class="nav-item" id="nav-keywords" onclick="showPage('keywords',this)"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>Keyword Research</div>
+    <div class="nav-item" id="nav-competitors" onclick="showPage('competitors',this)"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Competitors</div>
     <div class="sidebar-section">Alerts</div>
-    <div class="nav-item" id="nav-notifications" onclick="showPage('notifications',this)">
-      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-      Notifications
-      <div class="notif-dot"></div>
-    </div>
+    <div class="nav-item" id="nav-notifications" onclick="showPage('notifications',this)"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>Notifications<div class="notif-dot"></div></div>
     <div class="sidebar-section">Config</div>
-    <div class="nav-item" id="nav-settings" onclick="showPage('settings',this)">
-      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-      Settings
-    </div>
+    <div class="nav-item" id="nav-settings" onclick="showPage('settings',this)"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>Settings</div>
   </div>
 
-  <!-- MAIN -->
   <div class="main" id="mainContent">
 
-    <!-- RANK TRACKER -->
     <div id="page-ranktracker">
-      <div class="page-header">
-        <div class="page-title">Rank Tracker</div>
-        <div class="page-subtitle">Track your keyword positions across Google Search & Local Maps</div>
-      </div>
+      <div class="page-header"><div class="page-title">Rank Tracker</div><div class="page-subtitle">Track your keyword positions across Google Search & Local Maps</div></div>
       <div class="tabs">
         <button class="tab active" onclick="showTab('rt','website',this)">🌐 Website Keywords</button>
         <button class="tab" onclick="showTab('rt','local',this)">📍 Local / GMB Rankings</button>
       </div>
       <div id="rt-website">
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Total Keywords</div>
-            <div class="stat-value" id="totalKw">0</div>
-            <div class="stat-change">Tracked keywords</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Top 3</div>
-            <div class="stat-value" id="top3Kw" style="color:#2ecc71">0</div>
-            <div class="stat-change">↑ Positions</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Top 10</div>
-            <div class="stat-value" id="top10Kw" style="color:#1a7a4a">0</div>
-            <div class="stat-change">Page 1</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Avg Position</div>
-            <div class="stat-value" id="avgPos">—</div>
-            <div class="stat-change">All keywords</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">Total Keywords</div><div class="stat-value" id="totalKw">0</div><div class="stat-change">Tracked keywords</div></div>
+          <div class="stat-card"><div class="stat-label">Top 3</div><div class="stat-value" id="top3Kw" style="color:#2ecc71">0</div><div class="stat-change">↑ Positions</div></div>
+          <div class="stat-card"><div class="stat-label">Top 10</div><div class="stat-value" id="top10Kw" style="color:#1a7a4a">0</div><div class="stat-change">Page 1</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Position</div><div class="stat-value" id="avgPos">—</div><div class="stat-change">All keywords</div></div>
         </div>
         <div class="table-card">
           <div class="table-header">
@@ -349,21 +264,12 @@ tr:hover td{background:#f9fffe;}
           </div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>Keyword</th>
-                  <th>Position</th>
-                  <th>Change</th>
-                  <th>URL</th>
-                  <th>Clicks</th>
-                  <th>Impressions</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Keyword</th><th>Position</th><th>Change</th><th>URL</th><th>Clicks</th><th>Impressions</th><th>Actions</th></tr></thead>
               <tbody id="keywordTableBody"></tbody>
             </table>
           </div>
         </div>
+
         <div class="ai-panel" id="aiPanel">
           <div class="ai-panel-header">
             <div class="ai-panel-title">
@@ -376,17 +282,25 @@ tr:hover td{background:#f9fffe;}
             <button class="ai-mode-tab active" onclick="setAiMode('general',this)">General SEO</button>
             <button class="ai-mode-tab" onclick="setAiMode('local',this)">Local SEO</button>
           </div>
-          <div class="ai-output" id="aiOutput">Click "Run AI" to get optimization suggestions for this keyword.</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:8px;">
-            <div class="ai-provider-bar">
-              <span style="font-size:11px;color:#888;font-weight:600;">Provider:</span>
-              <div class="ai-provider-chip" id="chip-gemini">Gemini</div>
-              <div class="ai-provider-chip" id="chip-groq">Groq</div>
-              <div class="ai-provider-chip" id="chip-openai">OpenAI</div>
-              <div class="ai-provider-chip" id="chip-mistral">Mistral</div>
-              <div class="ai-provider-chip" id="chip-claude">Claude</div>
+          <div class="ai-selector-row">
+            <div>
+              <label class="form-label" style="margin-bottom:4px;">🤖 Select AI Model</label>
+              <select class="form-input" id="aiProviderSelect" style="cursor:pointer;">
+                <option value="groq">⚡ Groq (Llama 3.3 70B) — Free, Ultra-Fast</option>
+                <option value="cerebras">🧠 Cerebras (Llama 3.3 70B) — Free, Best Quality</option>
+                <option value="gemini">✨ Gemini 1.5 Flash — Free, Google</option>
+                <option value="openrouter">🌐 OpenRouter (Llama 3.3 Free)</option>
+                <option value="openai">💎 OpenAI GPT-4 — Paid</option>
+                <option value="claude">🎯 Claude 3 Haiku — Paid</option>
+                <option value="mistral">🔮 Mistral — Paid</option>
+              </select>
             </div>
-            <button class="add-btn" onclick="runAI()">▶ Run AI</button>
+            <button class="add-btn" onclick="runAI()" style="height:42px;padding:0 24px;">▶ Run AI</button>
+          </div>
+          <div class="ai-output" id="aiOutput">Select a model above and click "Run AI" to get optimization suggestions.</div>
+          <div class="ai-meta" id="aiMeta" style="display:none;">
+            <span class="ai-meta-badge" id="aiUsedModel">—</span>
+            <span id="aiResponseTime">—</span>
           </div>
         </div>
       </div>
@@ -416,20 +330,17 @@ tr:hover td{background:#f9fffe;}
         </div>
         <div class="table-card">
           <div class="table-header"><span class="table-title">Local Keywords</span></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Keyword</th><th>Map Pack Rank</th><th>Change</th><th>Grid Coverage</th><th>AI Optimize</th></tr></thead>
-              <tbody><tr><td colspan="5"><div class="empty-state">
-                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                <h3>No local keywords yet</h3><p>Add a local keyword to start tracking GMB rankings</p>
-              </div></td></tr></tbody>
-            </table>
-          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Keyword</th><th>Map Pack Rank</th><th>Change</th><th>Grid Coverage</th><th>AI Optimize</th></tr></thead>
+            <tbody><tr><td colspan="5"><div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <h3>No local keywords yet</h3><p>Add a local keyword to start tracking GMB rankings</p>
+            </div></td></tr></tbody>
+          </table></div>
         </div>
       </div>
     </div>
 
-    <!-- LANDING PAGES -->
     <div id="page-landing" style="display:none;">
       <div class="page-header"><div class="page-title">Landing Pages</div><div class="page-subtitle">Monitor your landing page performance</div></div>
       <div class="tabs">
@@ -442,11 +353,10 @@ tr:hover td{background:#f9fffe;}
         <h3>No landing pages tracked</h3><p>Connect Google Search Console to auto-import landing pages</p>
         <button class="add-btn" onclick="showPage('settings',document.getElementById('nav-settings'))">Go to Settings</button>
       </div></div>
-      <div id="lp-serp" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><h3>SERP Benchmark</h3><p>Coming soon</p></div></div>
-      <div id="lp-backlink" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg><h3>Backlink Profile</h3><p>Coming soon</p></div></div>
+      <div id="lp-serp" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>SERP Benchmark</h3><p>Coming soon</p></div></div>
+      <div id="lp-backlink" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>Backlink Profile</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- KEYWORD RESEARCH -->
     <div id="page-keywords" style="display:none;">
       <div class="page-header"><div class="page-title">Keyword Research</div><div class="page-subtitle">Discover new keyword opportunities</div></div>
       <div class="tabs">
@@ -454,12 +364,11 @@ tr:hover td{background:#f9fffe;}
         <button class="tab" onclick="showTab('kr','seed',this)">Seed Keywords</button>
         <button class="tab" onclick="showTab('kr','volume',this)">Volume & Difficulty</button>
       </div>
-      <div id="kr-topics"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><h3>No topics yet</h3><p>Coming soon</p></div></div>
-      <div id="kr-seed" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><h3>Seed Keywords</h3><p>Coming soon</p></div></div>
-      <div id="kr-volume" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><h3>Volume & Difficulty</h3><p>Coming soon</p></div></div>
+      <div id="kr-topics"><div class="empty-state" style="padding:80px 20px;"><h3>No topics yet</h3><p>Coming soon</p></div></div>
+      <div id="kr-seed" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>Seed Keywords</h3><p>Coming soon</p></div></div>
+      <div id="kr-volume" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>Volume & Difficulty</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- COMPETITORS -->
     <div id="page-competitors" style="display:none;">
       <div class="page-header"><div class="page-title">Competitors</div><div class="page-subtitle">Track and analyze your SEO competitors</div></div>
       <div class="tabs">
@@ -467,149 +376,101 @@ tr:hover td{background:#f9fffe;}
         <button class="tab" onclick="showTab('comp','backgap',this)">Backlink Gap</button>
         <button class="tab" onclick="showTab('comp','serpoverlap',this)">SERP Overlap</button>
       </div>
-      <div id="comp-rankcomp"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><h3>No competitors added</h3><p>Coming soon</p><button class="add-btn">+ Add Competitor</button></div></div>
+      <div id="comp-rankcomp"><div class="empty-state" style="padding:80px 20px;"><h3>No competitors added</h3><p>Coming soon</p></div></div>
       <div id="comp-backgap" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>Backlink Gap</h3><p>Coming soon</p></div></div>
       <div id="comp-serpoverlap" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>SERP Overlap</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- NOTIFICATIONS -->
     <div id="page-notifications" style="display:none;">
       <div class="page-header"><div class="page-title">Notifications</div><div class="page-subtitle">Stay updated on ranking changes</div></div>
       <div class="table-card">
         <div class="table-header"><span class="table-title">Recent Alerts</span></div>
-        <div class="empty-state" style="padding:60px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-          <h3>No notifications yet</h3><p>Alerts will appear here when rankings change significantly</p>
-        </div>
+        <div class="empty-state" style="padding:60px 20px;"><h3>No notifications yet</h3><p>Alerts will appear here when rankings change significantly</p></div>
       </div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="page-settings" style="display:none;">
-      <div class="page-header">
-        <div class="page-title">Settings</div>
-        <div class="page-subtitle">Configure companies, APIs and AI providers</div>
-      </div>
+      <div class="page-header"><div class="page-title">Settings</div><div class="page-subtitle">Configure companies, APIs and AI providers</div></div>
       <div class="settings-grid">
 
-        <!-- Company Settings -->
         <div class="settings-card">
           <h3>🏢 Company Settings</h3>
-          <div class="form-group">
-            <label class="form-label">Company Name</label>
-            <input class="form-input" id="s-companyName" placeholder="e.g. SBIS — TIC">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Website URL</label>
-            <input class="form-input" id="s-website" placeholder="https://example.com">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Google Search Console Property</label>
-            <input class="form-input" id="s-gscProperty" placeholder="https://turnkeyinteriorcontractors.com/">
-          </div>
-          <div class="form-group">
-            <label class="form-label">GMB Location Name</label>
-            <input class="form-input" id="s-gmbName" placeholder="Business name on Google Maps">
-          </div>
-          <div class="form-group">
-            <label class="form-label">GMB Address</label>
-            <input class="form-input" id="s-gmbAddress" placeholder="Full address">
-          </div>
+          <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="s-companyName"></div>
+          <div class="form-group"><label class="form-label">Website URL</label><input class="form-input" id="s-website"></div>
+          <div class="form-group"><label class="form-label">Google Search Console Property</label><input class="form-input" id="s-gscProperty"></div>
+          <div class="form-group"><label class="form-label">GMB Location Name</label><input class="form-input" id="s-gmbName"></div>
+          <div class="form-group"><label class="form-label">GMB Address</label><input class="form-input" id="s-gmbAddress"></div>
           <button class="settings-save-btn" onclick="saveCompanySettings()">💾 Save Company Settings</button>
         </div>
 
-        <!-- AI API Keys -->
         <div class="settings-card">
           <h3>🤖 AI Provider Keys</h3>
-          <p class="info-text">Keys are saved securely in Firebase. Never stored in browser or code.</p>
+          <p class="info-text">All keys saved securely in Firebase. <strong>Recommended FREE:</strong> Groq + Cerebras</p>
+          
           <div class="form-group">
-            <div class="provider-label"><div class="provider-status" id="status-gemini"></div>Gemini (Primary — Free)<a href="https://makersuite.google.com/app/apikey" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="AIza..." id="key-gemini">
-              <button class="save-key-btn" onclick="saveKey('gemini')">Save</button>
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-groq"></div>⚡ Groq (Llama 3.3 70B - FREE)<a href="https://console.groq.com/keys" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="gsk_..." id="key-groq"><button class="save-key-btn" onclick="saveKey('groq')">Save</button></div>
           </div>
+
           <div class="form-group">
-            <div class="provider-label"><div class="provider-status" id="status-groq"></div>Groq (Secondary — Free)<a href="https://console.groq.com/keys" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="gsk_..." id="key-groq">
-              <button class="save-key-btn" onclick="saveKey('groq')">Save</button>
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-cerebras"></div>🧠 Cerebras (Llama 3.3 70B - FREE)<a href="https://cloud.cerebras.ai/" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="csk-..." id="key-cerebras"><button class="save-key-btn" onclick="saveKey('cerebras')">Save</button></div>
           </div>
+
           <div class="form-group">
-            <div class="provider-label"><div class="provider-status" id="status-openai"></div>OpenAI</div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="sk-..." id="key-openai">
-              <button class="save-key-btn" onclick="saveKey('openai')">Save</button>
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-gemini"></div>✨ Gemini 1.5 Flash (FREE)<a href="https://aistudio.google.com/app/apikey" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="AIza... or AQ..." id="key-gemini"><button class="save-key-btn" onclick="saveKey('gemini')">Save</button></div>
           </div>
+
           <div class="form-group">
-            <div class="provider-label"><div class="provider-status" id="status-mistral"></div>Mistral</div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="..." id="key-mistral">
-              <button class="save-key-btn" onclick="saveKey('mistral')">Save</button>
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-openrouter"></div>🌐 OpenRouter (Many models FREE)<a href="https://openrouter.ai/keys" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="sk-or-..." id="key-openrouter"><button class="save-key-btn" onclick="saveKey('openrouter')">Save</button></div>
           </div>
+
           <div class="form-group">
-            <div class="provider-label"><div class="provider-status" id="status-claude"></div>Claude (Anthropic)</div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="sk-ant-..." id="key-claude">
-              <button class="save-key-btn" onclick="saveKey('claude')">Save</button>
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-openai"></div>💎 OpenAI (Paid)</div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="sk-..." id="key-openai"><button class="save-key-btn" onclick="saveKey('openai')">Save</button></div>
+          </div>
+
+          <div class="form-group">
+            <div class="provider-label"><div class="provider-status" id="status-claude"></div>🎯 Claude / Anthropic (Paid)</div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="sk-ant-..." id="key-claude"><button class="save-key-btn" onclick="saveKey('claude')">Save</button></div>
+          </div>
+
+          <div class="form-group">
+            <div class="provider-label"><div class="provider-status" id="status-mistral"></div>🔮 Mistral (Paid)</div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="..." id="key-mistral"><button class="save-key-btn" onclick="saveKey('mistral')">Save</button></div>
           </div>
         </div>
 
-        <!-- SerpAPI -->
         <div class="settings-card">
           <h3>🗺️ SerpAPI (Map Grid)</h3>
-          <p class="info-text">Required for local GMB map grid ranking checks.<br>Free tier: 100 searches/month.<br>Get key at <a href="https://serpapi.com" target="_blank" style="color:#2ecc71;">serpapi.com</a></p>
+          <p class="info-text">Required for local GMB map grid. Free: 100/month. <a href="https://serpapi.com" target="_blank" style="color:#2ecc71;">serpapi.com</a></p>
           <div class="form-group">
             <div class="provider-label"><div class="provider-status" id="status-serp"></div>SerpAPI Key</div>
-            <div class="api-key-row">
-              <input class="form-input" type="password" placeholder="Your SerpAPI key" id="key-serp">
-              <button class="save-key-btn" onclick="saveKey('serp')">Save</button>
-            </div>
+            <div class="api-key-row"><input class="form-input" type="password" placeholder="Your SerpAPI key" id="key-serp"><button class="save-key-btn" onclick="saveKey('serp')">Save</button></div>
           </div>
         </div>
 
-        <!-- Notification Settings -->
         <div class="settings-card">
           <h3>🔔 Notification Settings</h3>
-          <div class="form-group">
-            <label class="form-label">Alert when rank drops more than</label>
-            <input class="form-input" type="number" id="s-dropAlert" placeholder="5" value="5">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Alert when rank improves more than</label>
-            <input class="form-input" type="number" id="s-riseAlert" placeholder="3" value="3">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Notification Email</label>
-            <input class="form-input" type="email" id="s-notifEmail" placeholder="your@email.com" value="teamtic.hyd@gmail.com">
-          </div>
+          <div class="form-group"><label class="form-label">Alert when rank drops more than</label><input class="form-input" type="number" id="s-dropAlert" value="5"></div>
+          <div class="form-group"><label class="form-label">Alert when rank improves more than</label><input class="form-input" type="number" id="s-riseAlert" value="3"></div>
+          <div class="form-group"><label class="form-label">Notification Email</label><input class="form-input" type="email" id="s-notifEmail" value="teamtic.hyd@gmail.com"></div>
           <button class="settings-save-btn" onclick="saveNotificationSettings()">💾 Save Notification Settings</button>
         </div>
 
-        <!-- Manage Companies -->
         <div class="settings-card">
           <h3>🏗️ Manage Companies</h3>
-          <p class="info-text">Add and manage multiple businesses from one dashboard.</p>
-          <div class="company-list" id="settingsCompanyList"></div>
-          <button class="add-btn" style="width:100%;" onclick="openAddCompany({stopPropagation:()=>{}})">+ Add New Company</button>
+          <p class="info-text">Add and manage multiple businesses.</p>
+          <div id="settingsCompanyList"></div>
+          <button class="add-btn" style="width:100%;margin-top:8px;" onclick="openAddCompany({stopPropagation:()=>{}})">+ Add New Company</button>
         </div>
 
-        <!-- Account -->
         <div class="settings-card">
           <h3>👤 Account</h3>
-          <div class="form-group">
-            <label class="form-label">Signed in as</label>
-            <input class="form-input" id="s-userEmail" disabled>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Display Name</label>
-            <input class="form-input" id="s-userName" disabled>
-          </div>
-          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Signed in as</label><input class="form-input" id="s-userEmail" disabled></div>
+          <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="s-userName" disabled></div>
           <button class="settings-save-btn" style="background:linear-gradient(135deg,#c0392b,#e74c3c);" onclick="signOut()">Sign Out</button>
         </div>
 
@@ -619,66 +480,35 @@ tr:hover td{background:#f9fffe;}
   </div>
 </div>
 
-<!-- ADD KEYWORD MODAL -->
 <div class="modal-overlay" id="addKeywordModal">
   <div class="modal">
     <h2>➕ Add Keyword</h2>
-    <div class="form-group">
-      <label class="form-label">Keyword</label>
-      <input class="form-input" id="newKeyword" placeholder="e.g. interior contractors hyderabad">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Target URL (optional)</label>
-      <input class="form-input" id="newKeywordUrl" placeholder="https://turnkeyinteriorcontractors.com/page">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Current Position (optional)</label>
-      <input class="form-input" type="number" id="newKeywordPos" placeholder="e.g. 5">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('addKeywordModal')">Cancel</button>
-      <button class="btn-primary" onclick="addKeyword()">Add Keyword</button>
-    </div>
+    <div class="form-group"><label class="form-label">Keyword</label><input class="form-input" id="newKeyword" placeholder="e.g. interior contractors hyderabad"></div>
+    <div class="form-group"><label class="form-label">Target URL (optional)</label><input class="form-input" id="newKeywordUrl" placeholder="https://example.com/page"></div>
+    <div class="form-group"><label class="form-label">Current Position (optional)</label><input class="form-input" type="number" id="newKeywordPos" placeholder="e.g. 5"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('addKeywordModal')">Cancel</button><button class="btn-primary" onclick="addKeyword()">Add Keyword</button></div>
   </div>
 </div>
 
-<!-- ADD COMPANY MODAL -->
 <div class="modal-overlay" id="addCompanyModal">
   <div class="modal">
     <h2>🏢 Add Company</h2>
-    <div class="form-group">
-      <label class="form-label">Company Name</label>
-      <input class="form-input" id="newCompanyName" placeholder="e.g. My Business">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Website URL</label>
-      <input class="form-input" id="newCompanyUrl" placeholder="https://example.com">
-    </div>
-    <div class="form-group">
-      <label class="form-label">GSC Property URL</label>
-      <input class="form-input" id="newCompanyGsc" placeholder="https://example.com/">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('addCompanyModal')">Cancel</button>
-      <button class="btn-primary" onclick="addCompany()">Add Company</button>
-    </div>
+    <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="newCompanyName" placeholder="e.g. My Business"></div>
+    <div class="form-group"><label class="form-label">Website URL</label><input class="form-input" id="newCompanyUrl" placeholder="https://example.com"></div>
+    <div class="form-group"><label class="form-label">GSC Property URL</label><input class="form-input" id="newCompanyGsc" placeholder="https://example.com/"></div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('addCompanyModal')">Cancel</button><button class="btn-primary" onclick="addCompany()">Add Company</button></div>
   </div>
 </div>
 
-<!-- DELETE KEYWORD CONFIRM MODAL -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <h2>🗑️ Delete Keyword</h2>
-    <p style="color:#666;margin-bottom:20px;">Are you sure you want to delete "<span id="deleteKeywordName" style="color:#0a5c36;font-weight:700;"></span>"?</p>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
-      <button class="btn-primary" style="background:linear-gradient(135deg,#c0392b,#e74c3c);" onclick="confirmDelete()">Delete</button>
-    </div>
+    <p style="color:#666;margin-bottom:20px;">Delete "<span id="deleteKeywordName" style="color:#0a5c36;font-weight:700;"></span>"?</p>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button><button class="btn-primary" style="background:linear-gradient(135deg,#c0392b,#e74c3c);" onclick="confirmDelete()">Delete</button></div>
   </div>
 </div>
 
 <script>
-// ===== FIREBASE =====
 const firebaseConfig = {
   apiKey: "AIzaSyCzA50bHzBaIuI2OJINFHMQyFG62wiSp48",
   authDomain: "quickrank-10647.firebaseapp.com",
@@ -691,7 +521,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ===== STATE =====
 let currentUser = null;
 let currentCompanyId = null;
 let currentCompanyName = '';
@@ -699,10 +528,10 @@ let keywords = [];
 let companies = [];
 let aiMode = 'general';
 let currentAiKeyword = '';
+let currentAiUrl = '';
 let deleteKeywordId = null;
 let unsubscribeKeywords = null;
 
-// ===== AUTH =====
 auth.onAuthStateChanged(async user => {
   document.getElementById('loading').style.display = 'none';
   if(user){
@@ -726,21 +555,15 @@ function signInWithGoogle(){
   auth.signInWithPopup(provider).catch(e => showToast('Sign in failed: '+e.message, true));
 }
 
-function signOut(){
-  if(confirm('Sign out of QuickRank?')) auth.signOut();
-}
+function signOut(){ if(confirm('Sign out?')) auth.signOut(); }
 
-// ===== COMPANIES =====
 async function loadCompanies(){
   if(!currentUser) return;
   const snap = await db.collection('users').doc(currentUser.uid).collection('companies').get();
   companies = snap.docs.map(d => ({id:d.id,...d.data()}));
-
   if(companies.length === 0){
-    // Create default company
     await db.collection('users').doc(currentUser.uid).collection('companies').doc('sbis-tic').set({
-      name: 'SBIS — TIC',
-      website: 'https://turnkeyinteriorcontractors.com',
+      name: 'SBIS — TIC', website: 'https://turnkeyinteriorcontractors.com',
       gscProperty: 'https://turnkeyinteriorcontractors.com/',
       gmbName: 'TIC (TURNKEY INTERIOR CONTRACTORS)',
       gmbAddress: '4 Jayabheri Enclave, Gachibowli, Hyderabad',
@@ -748,7 +571,6 @@ async function loadCompanies(){
     });
     companies = [{id:'sbis-tic', name:'SBIS — TIC', website:'https://turnkeyinteriorcontractors.com', gscProperty:'https://turnkeyinteriorcontractors.com/'}];
   }
-
   currentCompanyId = companies[0].id;
   currentCompanyName = companies[0].name;
   renderCompanyDropdown();
@@ -758,20 +580,15 @@ async function loadCompanies(){
 }
 
 function renderCompanyDropdown(){
-  const list = document.getElementById('companyList');
-  list.innerHTML = companies.map((c,i) =>
-    `<div class="company-dropdown-item ${i===0?'active':''}" onclick="switchCompany('${c.id}','${c.name}',event)">🏢 ${c.name}</div>`
+  document.getElementById('companyList').innerHTML = companies.map((c,i) =>
+    `<div class="company-dropdown-item ${c.id===currentCompanyId?'active':''}" onclick="switchCompany('${c.id}','${c.name.replace(/'/g,"\\'")}',event)">🏢 ${c.name}</div>`
   ).join('');
   document.getElementById('activeCompanyName').textContent = currentCompanyName;
 }
 
 function renderSettingsCompanyList(){
-  const el = document.getElementById('settingsCompanyList');
-  el.innerHTML = companies.map(c =>
-    `<div class="company-list-item">
-      <span>🏢 ${c.name}</span>
-      <span style="font-size:11px;color:#888;">${c.website||''}</span>
-    </div>`
+  document.getElementById('settingsCompanyList').innerHTML = companies.map(c =>
+    `<div class="company-list-item"><span>🏢 ${c.name}</span><span style="font-size:11px;color:#888;">${c.website||''}</span></div>`
   ).join('');
 }
 
@@ -781,19 +598,15 @@ function switchCompany(id, name, e){
   currentCompanyName = name;
   document.getElementById('activeCompanyName').textContent = name;
   document.getElementById('companyDropdown').classList.remove('open');
-  document.querySelectorAll('.company-dropdown-item').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
+  renderCompanyDropdown();
   loadCompanySettings();
   loadKeywords();
 }
 
-function toggleCompanyDropdown(){
-  document.getElementById('companyDropdown').classList.toggle('open');
-}
+function toggleCompanyDropdown(){ document.getElementById('companyDropdown').classList.toggle('open'); }
 
 document.addEventListener('click', e => {
-  if(!e.target.closest('#companySwitcher'))
-    document.getElementById('companyDropdown').classList.remove('open');
+  if(!e.target.closest('#companySwitcher')) document.getElementById('companyDropdown').classList.remove('open');
 });
 
 function openAddCompany(e){
@@ -810,7 +623,6 @@ async function addCompany(){
   const url = document.getElementById('newCompanyUrl').value.trim();
   const gsc = document.getElementById('newCompanyGsc').value.trim();
   if(!name) return showToast('Enter company name', true);
-  if(!currentUser) return;
   const compId = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
   try {
     await db.collection('users').doc(currentUser.uid).collection('companies').doc(compId).set({
@@ -821,12 +633,11 @@ async function addCompany(){
     renderCompanyDropdown();
     renderSettingsCompanyList();
     closeModal('addCompanyModal');
-    showToast(`${name} added successfully ✅`);
+    showToast(`${name} added ✅`);
     switchCompany(compId, name, {stopPropagation:()=>{}});
   } catch(e){ showToast('Error: '+e.message, true); }
 }
 
-// ===== COMPANY SETTINGS =====
 async function loadCompanySettings(){
   if(!currentUser || !currentCompanyId) return;
   try {
@@ -843,7 +654,6 @@ async function loadCompanySettings(){
 }
 
 async function saveCompanySettings(){
-  if(!currentUser || !currentCompanyId) return;
   const data = {
     name: document.getElementById('s-companyName').value.trim(),
     website: document.getElementById('s-website').value.trim(),
@@ -865,24 +675,19 @@ async function saveCompanySettings(){
   } catch(e){ showToast('Error: '+e.message, true); }
 }
 
-// ===== NOTIFICATION SETTINGS =====
 async function saveNotificationSettings(){
-  if(!currentUser) return;
-  const data = {
-    dropAlert: parseInt(document.getElementById('s-dropAlert').value) || 5,
-    riseAlert: parseInt(document.getElementById('s-riseAlert').value) || 3,
-    notifEmail: document.getElementById('s-notifEmail').value.trim(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
   try {
-    await db.collection('users').doc(currentUser.uid).collection('config').doc('notifications').set(data);
+    await db.collection('users').doc(currentUser.uid).collection('config').doc('notifications').set({
+      dropAlert: parseInt(document.getElementById('s-dropAlert').value) || 5,
+      riseAlert: parseInt(document.getElementById('s-riseAlert').value) || 3,
+      notifEmail: document.getElementById('s-notifEmail').value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
     showToast('Notification settings saved ✅');
   } catch(e){ showToast('Error: '+e.message, true); }
 }
 
-// ===== AI KEYS =====
 async function saveKey(provider){
-  if(!currentUser) return;
   const val = document.getElementById('key-'+provider).value.trim();
   if(!val) return showToast('Enter a key first', true);
   try {
@@ -890,17 +695,16 @@ async function saveKey(provider){
     document.getElementById('status-'+provider).classList.add('ok');
     document.getElementById('key-'+provider).value = '';
     document.getElementById('key-'+provider).placeholder = '••••••••••• (saved)';
-    showToast(`${provider} key saved securely ✅`);
+    showToast(`${provider} key saved ✅`);
   } catch(e){ showToast('Error: '+e.message, true); }
 }
 
 async function loadAIKeyStatuses(){
-  if(!currentUser) return;
   try {
     const doc = await db.collection('users').doc(currentUser.uid).collection('config').doc('ai_keys').get();
     if(doc.exists){
       const data = doc.data();
-      ['gemini','groq','openai','mistral','claude','serp'].forEach(p => {
+      ['gemini','groq','openai','mistral','claude','serp','cerebras','openrouter'].forEach(p => {
         if(data[p]){
           const el = document.getElementById('status-'+p);
           if(el) el.classList.add('ok');
@@ -912,7 +716,6 @@ async function loadAIKeyStatuses(){
   } catch(e){}
 }
 
-// ===== KEYWORDS =====
 function loadKeywords(){
   if(!currentUser || !currentCompanyId) return;
   if(unsubscribeKeywords) unsubscribeKeywords();
@@ -931,8 +734,7 @@ function renderKeywords(kws){
   if(!kws.length){
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <h3>No keywords yet</h3>
-      <p>Add your first keyword to start tracking rankings</p>
+      <h3>No keywords yet</h3><p>Add your first keyword</p>
       <button class="add-btn" onclick="openAddKeyword()">+ Add Keyword</button>
     </div></td></tr>`;
     return;
@@ -942,9 +744,7 @@ function renderKeywords(kws){
     const posDisplay = pos ? pos : '—';
     const rankClass = !pos ? '' : pos <= 3 ? 'rank-top3' : pos <= 10 ? 'rank-top10' : pos <= 20 ? 'rank-top20' : 'rank-low';
     const change = k.change || 0;
-    const changeHtml = change > 0 ? `<span class="change-up">↑${change}</span>` :
-                       change < 0 ? `<span class="change-down">↓${Math.abs(change)}</span>` :
-                       `<span class="change-same">—</span>`;
+    const changeHtml = change > 0 ? `<span class="change-up">↑${change}</span>` : change < 0 ? `<span class="change-down">↓${Math.abs(change)}</span>` : `<span class="change-same">—</span>`;
     const url = k.url ? `<a href="${k.url}" target="_blank" style="color:#2ecc71;font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">${k.url.replace('https://','')}</a>` : '—';
     return `<tr>
       <td><strong style="color:#0a5c36;">${k.keyword}</strong></td>
@@ -954,9 +754,8 @@ function renderKeywords(kws){
       <td>${k.clicks||0}</td>
       <td>${k.impressions||0}</td>
       <td style="display:flex;gap:6px;align-items:center;">
-        <button class="ai-btn" onclick="openAiPanel('${k.keyword.replace(/'/g,"\\'")}')">
-          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 0-2 0v1.93A8 8 0 0 1 4.07 13H6a1 1 0 0 0 0-2H4.07A8 8 0 0 1 11 4.07V6a1 1 0 0 0 2 0V4.07A8 8 0 0 1 19.93 11H18a1 1 0 0 0 0 2h1.93A8 8 0 0 1 13 19.93z"/></svg>
-          AI
+        <button class="ai-btn" onclick="openAiPanel('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}')">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 0-2 0v1.93A8 8 0 0 1 4.07 13H6a1 1 0 0 0 0-2H4.07A8 8 0 0 1 11 4.07V6a1 1 0 0 0 2 0V4.07A8 8 0 0 1 19.93 11H18a1 1 0 0 0 0 2h1.93A8 8 0 0 1 13 19.93z"/></svg>AI
         </button>
         <button class="ai-btn" style="border-color:#fde8e8;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">🗑</button>
       </td>
@@ -977,8 +776,7 @@ function updateStats(){
 }
 
 function filterKeywords(val){
-  const filtered = keywords.filter(k => k.keyword.toLowerCase().includes(val.toLowerCase()));
-  renderKeywords(filtered);
+  renderKeywords(keywords.filter(k => k.keyword.toLowerCase().includes(val.toLowerCase())));
 }
 
 function openAddKeyword(){
@@ -994,7 +792,6 @@ async function addKeyword(){
   const url = document.getElementById('newKeywordUrl').value.trim();
   const pos = parseInt(document.getElementById('newKeywordPos').value) || null;
   if(!kw) return showToast('Enter a keyword', true);
-  if(!currentUser) return;
   try {
     await db.collection('users').doc(currentUser.uid)
       .collection('companies').doc(currentCompanyId)
@@ -1015,7 +812,7 @@ function openDeleteKeyword(id, name){
 }
 
 async function confirmDelete(){
-  if(!deleteKeywordId || !currentUser) return;
+  if(!deleteKeywordId) return;
   try {
     await db.collection('users').doc(currentUser.uid)
       .collection('companies').doc(currentCompanyId)
@@ -1025,23 +822,19 @@ async function confirmDelete(){
   } catch(e){ showToast('Error: '+e.message, true); }
 }
 
-function openAddLocalKeyword(){
-  showToast('Add your SerpAPI key in Settings first, then add local keywords.', true);
-}
+function openAddLocalKeyword(){ showToast('Add SerpAPI key in Settings first', true); }
 
-// ===== AI PANEL =====
-function openAiPanel(keyword){
+function openAiPanel(keyword, url){
   currentAiKeyword = keyword;
+  currentAiUrl = url || '';
   document.getElementById('aiKeyword').textContent = keyword;
-  document.getElementById('aiOutput').textContent = 'Click "Run AI" to get optimization suggestions.';
-  document.querySelectorAll('.ai-provider-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('aiOutput').textContent = 'Select a model and click "Run AI".';
+  document.getElementById('aiMeta').style.display = 'none';
   document.getElementById('aiPanel').classList.add('open');
   document.getElementById('aiPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-function closeAiPanel(){
-  document.getElementById('aiPanel').classList.remove('open');
-}
+function closeAiPanel(){ document.getElementById('aiPanel').classList.remove('open'); }
 
 function setAiMode(mode, el){
   aiMode = mode;
@@ -1051,99 +844,189 @@ function setAiMode(mode, el){
 
 async function runAI() {
   const output = document.getElementById('aiOutput');
+  const meta = document.getElementById('aiMeta');
+  const usedModel = document.getElementById('aiUsedModel');
+  const responseTime = document.getElementById('aiResponseTime');
+  const provider = document.getElementById('aiProviderSelect').value;
+  
   output.textContent = '⏳ Generating AI suggestions...';
-  document.querySelectorAll('.ai-provider-chip').forEach(c => c.classList.remove('active'));
+  meta.style.display = 'none';
+  
+  const startTime = Date.now();
 
   let aiKeys = {};
   try {
     const snap = await db.collection('users').doc(currentUser.uid).collection('config').doc('ai_keys').get();
     if (snap.exists) aiKeys = snap.data();
-  } catch (e) {
-    console.log('Error loading keys:', e);
-  }
+  } catch (e) {}
 
+  const urlContext = currentAiUrl ? `\n\nTarget URL: ${currentAiUrl}` : '';
   const prompt = aiMode === 'general'
-    ? `You are an expert SEO consultant for a business in Hyderabad, India. For the keyword "${currentAiKeyword}", provide:
+    ? `You are an expert SEO consultant for a business in Hyderabad, India. For the keyword "${currentAiKeyword}"${urlContext}, provide:
+
 1. 📌 Optimized Title Tag (max 60 chars)
 2. 📝 Meta Description (max 155 chars)
-3. ️ H1 Tag suggestion
+3. 🏷️ H1 Tag suggestion
 4. 💡 3 Content Tips
 5. 🔗 5 Related Keywords
+
 Be specific and actionable. Format clearly.`
-    : `You are a Local SEO expert for a business in Hyderabad, India. For the keyword "${currentAiKeyword}", provide:
+    : `You are a Local SEO expert for a business in Hyderabad, India. For the keyword "${currentAiKeyword}"${urlContext}, provide:
+
 1. 📍 GMB Business Description (750 chars)
-2.  2 GMB Post Drafts
-3.  5 Local Keywords with city/area modifiers
+2. 📢 2 GMB Post Drafts
+3. 🔑 5 Local Keywords with city/area modifiers
 4. ⭐ Review Response Template
 5. 🏗️ Local Business Schema Markup (JSON-LD snippet)
+
 Target area: Hyderabad, Telangana, India. Be specific.`;
 
-  // 1. Try Gemini
-  if (aiKeys.gemini) {
-    document.getElementById('chip-gemini').classList.add('active');
-    try {
+  try {
+    let res, data, modelName = '';
+
+    if (provider === 'groq') {
+      if (!aiKeys.groq) { output.textContent = '⚠️ Groq key not set. Go to Settings.'; return; }
+      modelName = 'Groq Llama 3.3 70B';
+      res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.groq}` },
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+      });
+      data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        output.textContent = data.choices[0].message.content;
+        showAiMeta(modelName, startTime);
+        return;
+      }
+      throw new Error(data.error?.message || 'Groq failed');
+    }
+
+    if (provider === 'cerebras') {
+      if (!aiKeys.cerebras) { output.textContent = '⚠️ Cerebras key not set. Go to Settings.'; return; }
+      modelName = 'Cerebras Llama 3.3 70B';
+      res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.cerebras}` },
+        body: JSON.stringify({ model: 'llama-3.3-70b', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+      });
+      data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        output.textContent = data.choices[0].message.content;
+        showAiMeta(modelName, startTime);
+        return;
+      }
+      throw new Error(data.error?.message || data.message || 'Cerebras failed');
+    }
+
+    if (provider === 'gemini') {
+      if (!aiKeys.gemini) { output.textContent = '⚠️ Gemini key not set. Go to Settings.'; return; }
+      modelName = 'Gemini 1.5 Flash';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiKeys.gemini}`;
-      const res = await fetch(url, {
+      res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } })
       });
-      const data = await res.json();
-      console.log('Gemini response:', data);
-      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
+      data = await res.json();
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         output.textContent = data.candidates[0].content.parts[0].text;
+        showAiMeta(modelName, startTime);
         return;
       }
-    } catch (e) {
-      console.log('Gemini error:', e);
+      throw new Error(data.error?.message || 'Gemini failed');
     }
-  }
 
-  // 2. Try Groq
-  if (aiKeys.groq) {
-    document.getElementById('chip-groq').classList.add('active');
-    try {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    if (provider === 'openrouter') {
+      if (!aiKeys.openrouter) { output.textContent = '⚠️ OpenRouter key not set. Go to Settings.'; return; }
+      modelName = 'OpenRouter Llama 3.3 Free';
+      res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${aiKeys.groq}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1000
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.openrouter}` },
+        body: JSON.stringify({ model: 'meta-llama/llama-3.3-70b-instruct:free', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
       });
-      const data = await res.json();
-      console.log('Groq response:', data);
-      if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
         output.textContent = data.choices[0].message.content;
+        showAiMeta(modelName, startTime);
         return;
       }
-    } catch (e) {
-      console.log('Groq error:', e);
+      throw new Error(data.error?.message || 'OpenRouter failed');
     }
-  }
 
-  // Fallback if both fail
-  output.textContent = '⚠️ No AI keys configured or all failed.\n\nGo to Settings → AI Provider Keys → Add Gemini key (free).\n\nGet free Gemini key at: aistudio.google.com/app/apikey';
+    if (provider === 'openai') {
+      if (!aiKeys.openai) { output.textContent = '⚠️ OpenAI key not set. Go to Settings.'; return; }
+      modelName = 'OpenAI GPT-3.5 Turbo';
+      res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.openai}` },
+        body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+      });
+      data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        output.textContent = data.choices[0].message.content;
+        showAiMeta(modelName, startTime);
+        return;
+      }
+      throw new Error(data.error?.message || 'OpenAI failed');
+    }
+
+    if (provider === 'claude') {
+      if (!aiKeys.claude) { output.textContent = '⚠️ Claude key not set. Go to Settings.'; return; }
+      modelName = 'Claude 3 Haiku';
+      res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': aiKeys.claude, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-3-haiku-20240307', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
+      });
+      data = await res.json();
+      if (data.content?.[0]?.text) {
+        output.textContent = data.content[0].text;
+        showAiMeta(modelName, startTime);
+        return;
+      }
+      throw new Error(data.error?.message || 'Claude failed');
+    }
+
+    if (provider === 'mistral') {
+      if (!aiKeys.mistral) { output.textContent = '⚠️ Mistral key not set. Go to Settings.'; return; }
+      modelName = 'Mistral Small';
+      res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.mistral}` },
+        body: JSON.stringify({ model: 'mistral-small-latest', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+      });
+      data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        output.textContent = data.choices[0].message.content;
+        showAiMeta(modelName, startTime);
+        return;
+      }
+      throw new Error(data.error?.message || 'Mistral failed');
+    }
+
+  } catch (e) {
+    console.log('AI Error:', e);
+    output.textContent = '❌ Error: ' + e.message + '\n\nTry a different model or check your API key in Settings.';
+  }
 }
 
-// ===== NAVIGATION =====
+function showAiMeta(modelName, startTime) {
+  const meta = document.getElementById('aiMeta');
+  const usedModel = document.getElementById('aiUsedModel');
+  const responseTime = document.getElementById('aiResponseTime');
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+  usedModel.textContent = '🤖 ' + modelName;
+  responseTime.textContent = '⏱️ ' + elapsed + 's';
+  meta.style.display = 'flex';
+}
+
 function showPage(page, el){
   document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display='none');
   document.getElementById('page-'+page).style.display='block';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(el) el.classList.add('active');
   if(window.innerWidth <= 768) closeSidebar();
-  if(page === 'settings'){
-    loadCompanySettings();
-    loadAIKeyStatuses();
-  }
+  if(page === 'settings'){ loadCompanySettings(); loadAIKeyStatuses(); }
 }
 
 function showTab(prefix, tab, el){
@@ -1153,7 +1036,6 @@ function showTab(prefix, tab, el){
   el.classList.add('active');
 }
 
-// ===== SIDEBAR =====
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -1163,20 +1045,16 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
-// ===== MODALS =====
-function closeModal(id){
-  document.getElementById(id).classList.remove('open');
-}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
 document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
 });
 
-// Enter key on keyword input
 document.getElementById('newKeyword').addEventListener('keypress', e => {
   if(e.key === 'Enter') addKeyword();
 });
 
-// ===== TOAST =====
 function showToast(msg, isError=false){
   const toast = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
