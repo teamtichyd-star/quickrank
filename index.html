@@ -20,172 +20,80 @@
 --shadow:0 2px 16px rgba(10,92,54,0.10);
 --radius:12px;
 }
-
-/* ========== LOGIN PAGE ========== */
-#login-page{
-display:flex;align-items:center;justify-content:center;
-min-height:100vh;background:linear-gradient(135deg,#0a5c36 0%,#1a7a4a 50%,#2ecc71 100%);
-padding:20px;
-}
-.login-card{
-background:#fff;border-radius:24px;padding:48px 40px;
-max-width:420px;width:100%;text-align:center;
-box-shadow:0 20px 60px rgba(0,0,0,0.2);
-}
-.login-logo{
-width:70px;height:70px;background:linear-gradient(135deg,#0a5c36,#2ecc71);
-border-radius:20px;display:flex;align-items:center;justify-content:center;
-margin:0 auto 20px;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a5c36 0%,#1a7a4a 50%,#2ecc71 100%);padding:20px;}
+.login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.login-logo{width:70px;height:70px;background:linear-gradient(135deg,#0a5c36,#2ecc71);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
 .login-logo svg{width:38px;height:38px;fill:#fff;}
 .login-card h1{font-size:28px;font-weight:800;color:#0a5c36;margin-bottom:6px;}
 .login-card p{color:#666;font-size:15px;margin-bottom:32px;line-height:1.5;}
 .features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;text-align:left;}
-.feature-item{display:flex;align-items:center;gap:10px;padding:10px 14px;
-background:#f0fdf6;border-radius:10px;font-size:13px;color:#0a5c36;font-weight:500;}
+.feature-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f0fdf6;border-radius:10px;font-size:13px;color:#0a5c36;font-weight:500;}
 .feature-item svg{width:18px;height:18px;flex-shrink:0;fill:#2ecc71;}
-.google-btn{
-display:flex;align-items:center;justify-content:center;gap:12px;
-width:100%;padding:14px 20px;border:2px solid #e0e0e0;border-radius:12px;
-background:#fff;cursor:pointer;font-size:15px;font-weight:600;color:#333;
-transition:all 0.2s;
-}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;cursor:pointer;font-size:15px;font-weight:600;color:#333;transition:all 0.2s;}
 .google-btn:hover{border-color:#2ecc71;background:#f0fdf6;transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.2);}
 .google-btn img{width:22px;height:22px;}
 .login-footer{margin-top:20px;font-size:12px;color:#999;}
-
-/* ========== APP SHELL ========== */
 #app{display:none;min-height:100vh;background:#f0fdf6;}
-
-/* TOPBAR */
-.topbar{
-position:fixed;top:0;left:0;right:0;height:var(--topbar-height);
-background:#fff;border-bottom:1px solid #d4f5e2;
-display:flex;align-items:center;justify-content:space-between;
-padding:0 20px;z-index:1000;box-shadow:var(--shadow);
-}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:#fff;border-bottom:1px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1000;box-shadow:var(--shadow);}
 .topbar-left{display:flex;align-items:center;gap:14px;}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
 .hamburger span{width:22px;height:2px;background:#0a5c36;border-radius:2px;transition:all 0.3s;}
 .topbar-logo{display:flex;align-items:center;gap:10px;}
-.topbar-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0a5c36,#2ecc71);
-border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.topbar-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0a5c36,#2ecc71);border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .topbar-logo-icon svg{width:20px;height:20px;fill:#fff;}
 .topbar-logo span{font-size:20px;font-weight:800;color:#0a5c36;}
 .topbar-logo sup{font-size:10px;color:#2ecc71;font-weight:700;}
-
-.company-switcher{
-display:flex;align-items:center;gap:8px;
-padding:7px 14px;border:1.5px solid #d4f5e2;border-radius:10px;
-background:#f0fdf6;cursor:pointer;font-size:13px;font-weight:600;color:#0a5c36;
-position:relative;
-}
+.company-switcher{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1.5px solid #d4f5e2;border-radius:10px;background:#f0fdf6;cursor:pointer;font-size:13px;font-weight:600;color:#0a5c36;position:relative;}
 .company-switcher svg{width:16px;height:16px;fill:#2ecc71;}
-.company-dropdown{
-position:absolute;top:calc(100% + 8px);left:0;min-width:220px;
-background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;
-box-shadow:0 8px 24px rgba(10,92,54,0.12);z-index:2000;
-overflow:hidden;display:none;
-}
+.company-dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:220px;background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;box-shadow:0 8px 24px rgba(10,92,54,0.12);z-index:2000;overflow:hidden;display:none;}
 .company-dropdown.open{display:block;}
-.company-dropdown-item{
-padding:11px 16px;font-size:13px;color:#333;cursor:pointer;
-display:flex;align-items:center;gap:10px;transition:background 0.15s;
-}
+.company-dropdown-item{padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s;}
 .company-dropdown-item:hover{background:#f0fdf6;color:#0a5c36;}
 .company-dropdown-item.active{background:#d4f5e2;color:#0a5c36;font-weight:600;}
-.company-dropdown-add{
-padding:11px 16px;font-size:13px;color:#2ecc71;cursor:pointer;
-border-top:1px solid #d4f5e2;display:flex;align-items:center;gap:8px;font-weight:600;
-}
+.company-dropdown-add{padding:11px 16px;font-size:13px;color:#2ecc71;cursor:pointer;border-top:1px solid #d4f5e2;display:flex;align-items:center;gap:8px;font-weight:600;}
 .company-dropdown-add:hover{background:#f0fdf6;}
-
 .topbar-right{display:flex;align-items:center;gap:12px;}
-.user-avatar{
-width:36px;height:36px;border-radius:50%;border:2px solid #2ecc71;
-object-fit:cover;cursor:pointer;
-}
+.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid #2ecc71;object-fit:cover;cursor:pointer;}
 .user-name{font-size:13px;font-weight:600;color:#0a5c36;}
-.logout-btn{
-padding:7px 14px;background:transparent;border:1.5px solid #d4f5e2;
-border-radius:8px;color:#666;font-size:12px;cursor:pointer;
-transition:all 0.2s;font-weight:500;
-}
+.logout-btn{padding:7px 14px;background:transparent;border:1.5px solid #d4f5e2;border-radius:8px;color:#666;font-size:12px;cursor:pointer;transition:all 0.2s;font-weight:500;}
 .logout-btn:hover{border-color:#e74c3c;color:#e74c3c;}
-
-/* SIDEBAR */
-.sidebar{
-position:fixed;top:var(--topbar-height);left:0;
-width:var(--sidebar-width);height:calc(100vh - var(--topbar-height));
-background:#fff;border-right:1px solid #d4f5e2;
-overflow-y:auto;z-index:900;transition:transform 0.3s;
-padding:16px 0;
-}
-.sidebar-section{padding:6px 16px;font-size:10px;font-weight:700;
-color:#999;letter-spacing:1.2px;text-transform:uppercase;margin-top:8px;}
-.nav-item{
-display:flex;align-items:center;gap:12px;
-padding:11px 20px;cursor:pointer;transition:all 0.2s;
-border-left:3px solid transparent;font-size:14px;color:#444;font-weight:500;
-}
+.sidebar{position:fixed;top:var(--topbar-height);left:0;width:var(--sidebar-width);height:calc(100vh - var(--topbar-height));background:#fff;border-right:1px solid #d4f5e2;overflow-y:auto;z-index:900;transition:transform 0.3s;padding:16px 0;}
+.sidebar-section{padding:6px 16px;font-size:10px;font-weight:700;color:#999;letter-spacing:1.2px;text-transform:uppercase;margin-top:8px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;font-size:14px;color:#444;font-weight:500;}
 .nav-item:hover{background:#f0fdf6;color:#0a5c36;border-left-color:#d4f5e2;}
 .nav-item.active{background:#d4f5e2;color:#0a5c36;font-weight:700;border-left-color:#2ecc71;}
-.nav-item svg{width:18px;height:18px;flex-shrink:0;}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;fill:#888;}
 .nav-item.active svg{fill:#0a5c36;}
-.nav-item svg{fill:#888;}
-.nav-badge{margin-left:auto;background:#2ecc71;color:#fff;
-font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
-
-/* MAIN CONTENT */
-.main{
-margin-left:var(--sidebar-width);
-margin-top:var(--topbar-height);
-padding:28px;min-height:calc(100vh - var(--topbar-height));
-}
-
-/* PAGE TABS */
+.nav-badge{margin-left:auto;background:#2ecc71;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.main{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:28px;min-height:calc(100vh - var(--topbar-height));}
 .page-header{margin-bottom:24px;}
 .page-title{font-size:24px;font-weight:800;color:#0a5c36;margin-bottom:4px;}
 .page-subtitle{font-size:14px;color:#888;}
-.tabs{display:flex;gap:4px;background:#f0fdf6;padding:4px;
-border-radius:12px;margin-bottom:24px;flex-wrap:wrap;}
-.tab{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;
-color:#666;cursor:pointer;transition:all 0.2s;border:none;background:transparent;}
+.tabs{display:flex;gap:4px;background:#f0fdf6;padding:4px;border-radius:12px;margin-bottom:24px;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;color:#666;cursor:pointer;transition:all 0.2s;border:none;background:transparent;}
 .tab.active{background:#fff;color:#0a5c36;box-shadow:0 2px 8px rgba(10,92,54,0.12);}
 .tab:hover:not(.active){color:#0a5c36;}
-
-/* CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;}
-.stat-card{background:#fff;border-radius:var(--radius);padding:20px;
-box-shadow:var(--shadow);border:1px solid #d4f5e2;}
+.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid #d4f5e2;}
 .stat-label{font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
 .stat-value{font-size:28px;font-weight:800;color:#0a5c36;margin:6px 0 2px;}
 .stat-change{font-size:12px;color:#2ecc71;font-weight:600;}
 .stat-change.down{color:#e74c3c;}
-
-/* TABLE */
-.table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
-border:1px solid #d4f5e2;overflow:hidden;}
-.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;
-border-bottom:1px solid #d4f5e2;flex-wrap:wrap;gap:10px;}
+.table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;overflow:hidden;}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d4f5e2;flex-wrap:wrap;gap:10px;}
 .table-title{font-size:15px;font-weight:700;color:#0a5c36;}
-.search-input{padding:8px 14px;border:1.5px solid #d4f5e2;border-radius:8px;
-font-size:13px;outline:none;color:#333;transition:border 0.2s;width:200px;}
+.search-input{padding:8px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;outline:none;color:#333;transition:border 0.2s;width:200px;}
 .search-input:focus{border-color:#2ecc71;}
-.add-btn{padding:8px 16px;background:linear-gradient(135deg,#0a5c36,#2ecc71);
-color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;
-cursor:pointer;transition:all 0.2s;}
+.add-btn{padding:8px 16px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.3);}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;
-color:#888;text-transform:uppercase;letter-spacing:0.5px;
-background:#f0fdf6;border-bottom:1px solid #d4f5e2;}
+th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;background:#f0fdf6;border-bottom:1px solid #d4f5e2;}
 td{padding:13px 16px;font-size:13px;color:#333;border-bottom:1px solid #f0fdf6;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#f9fffe;}
-.rank-badge{display:inline-flex;align-items:center;justify-content:center;
-width:36px;height:36px;border-radius:10px;font-weight:800;font-size:14px;}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-weight:800;font-size:14px;}
 .rank-top3{background:#d4f5e2;color:#0a5c36;}
 .rank-top10{background:#e8f8ef;color:#1a7a4a;}
 .rank-top20{background:#fff3cd;color:#856404;}
@@ -193,87 +101,74 @@ width:36px;height:36px;border-radius:10px;font-weight:800;font-size:14px;}
 .change-up{color:#2ecc71;font-weight:700;font-size:13px;}
 .change-down{color:#e74c3c;font-weight:700;font-size:13px;}
 .change-same{color:#999;font-weight:600;font-size:13px;}
-.ai-btn{padding:6px 12px;background:#f0fdf6;border:1.5px solid #d4f5e2;
-border-radius:7px;color:#0a5c36;font-size:12px;font-weight:600;cursor:pointer;
-transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.ai-btn{padding:6px 12px;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:7px;color:#0a5c36;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
 .ai-btn:hover{background:#0a5c36;color:#fff;border-color:#0a5c36;}
-.ai-btn svg{width:13px;height:13px;}
-
-/* EMPTY STATE */
+.ai-btn svg{width:13px;height:13px;fill:currentColor;}
 .empty-state{text-align:center;padding:60px 20px;}
 .empty-state svg{width:64px;height:64px;fill:#d4f5e2;margin-bottom:16px;}
 .empty-state h3{font-size:18px;font-weight:700;color:#0a5c36;margin-bottom:8px;}
 .empty-state p{font-size:14px;color:#888;margin-bottom:20px;}
-
-/* MAP GRID */
-.map-container{background:#fff;border-radius:var(--radius);
-box-shadow:var(--shadow);border:1px solid #d4f5e2;overflow:hidden;margin-bottom:20px;}
-.map-placeholder{height:400px;background:linear-gradient(135deg,#f0fdf6,#d4f5e2);
-display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+.map-container{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;overflow:hidden;margin-bottom:20px;}
+.map-placeholder{height:400px;background:linear-gradient(135deg,#f0fdf6,#d4f5e2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 .map-placeholder svg{width:48px;height:48px;fill:#2ecc71;}
 .map-placeholder p{color:#0a5c36;font-weight:600;font-size:15px;}
 .map-legend{display:flex;gap:16px;padding:12px 20px;flex-wrap:wrap;}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#555;font-weight:500;}
 .legend-dot{width:14px;height:14px;border-radius:50%;}
-
-/* AI PANEL */
-.ai-panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
-border:1px solid #d4f5e2;padding:20px;margin-top:20px;display:none;}
+.ai-panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;padding:20px;margin-top:20px;display:none;}
 .ai-panel.open{display:block;}
 .ai-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.ai-panel-title{font-size:15px;font-weight:700;color:#0a5c36;
-display:flex;align-items:center;gap:8px;}
+.ai-panel-title{font-size:15px;font-weight:700;color:#0a5c36;display:flex;align-items:center;gap:8px;}
 .ai-mode-tabs{display:flex;gap:6px;margin-bottom:16px;}
-.ai-mode-tab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
-border:1.5px solid #d4f5e2;cursor:pointer;color:#666;background:#f0fdf6;transition:all 0.2s;}
+.ai-mode-tab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid #d4f5e2;cursor:pointer;color:#666;background:#f0fdf6;transition:all 0.2s;}
 .ai-mode-tab.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
-.ai-output{background:#f0fdf6;border-radius:10px;padding:16px;
-font-size:13px;color:#333;line-height:1.7;min-height:100px;}
+.ai-output{background:#f0fdf6;border-radius:10px;padding:16px;font-size:13px;color:#333;line-height:1.7;min-height:100px;white-space:pre-wrap;}
 .ai-provider-bar{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
-.ai-provider-chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
-background:#d4f5e2;color:#0a5c36;}
+.ai-provider-chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#d4f5e2;color:#0a5c36;}
 .ai-provider-chip.active{background:#0a5c36;color:#fff;}
 .close-btn{background:none;border:none;cursor:pointer;color:#999;font-size:20px;line-height:1;}
 .close-btn:hover{color:#e74c3c;}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);
-z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:20px;padding:32px;max-width:480px;
-width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal{background:#fff;border-radius:20px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;}
 .modal h2{font-size:20px;font-weight:800;color:#0a5c36;margin-bottom:20px;}
 .form-group{margin-bottom:16px;}
 .form-label{display:block;font-size:13px;font-weight:600;color:#0a5c36;margin-bottom:6px;}
-.form-input{width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;
-font-size:14px;outline:none;color:#333;transition:border 0.2s;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;outline:none;color:#333;transition:border 0.2s;}
 .form-input:focus{border-color:#2ecc71;}
+.form-input:disabled{background:#f5f5f5;color:#999;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;}
-.btn-primary{flex:1;padding:12px;background:linear-gradient(135deg,#0a5c36,#2ecc71);
-color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;}
-.btn-secondary{flex:1;padding:12px;background:#f0fdf6;color:#0a5c36;
-border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
-
-/* NOTIFICATION BADGE */
-.notif-dot{width:8px;height:8px;background:#e74c3c;border-radius:50%;
-margin-left:auto;flex-shrink:0;}
-
-/* SETTINGS */
+.btn-primary{flex:1;padding:12px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-secondary{flex:1;padding:12px;background:#f0fdf6;color:#0a5c36;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
+.notif-dot{width:8px;height:8px;background:#e74c3c;border-radius:50%;margin-left:auto;flex-shrink:0;}
 .settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
-.settings-card{background:#fff;border-radius:var(--radius);padding:24px;
-box-shadow:var(--shadow);border:1px solid #d4f5e2;}
-.settings-card h3{font-size:15px;font-weight:700;color:#0a5c36;margin-bottom:16px;
-padding-bottom:12px;border-bottom:1px solid #d4f5e2;}
+.settings-card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid #d4f5e2;}
+.settings-card h3{font-size:15px;font-weight:700;color:#0a5c36;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #d4f5e2;display:flex;align-items:center;gap:8px;}
 .api-key-row{display:flex;gap:8px;margin-bottom:10px;}
 .api-key-row .form-input{flex:1;}
-.save-key-btn{padding:10px 14px;background:#0a5c36;color:#fff;border:none;
-border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
-.provider-label{font-size:12px;font-weight:700;color:#555;margin-bottom:4px;
-display:flex;align-items:center;gap:6px;}
-.provider-status{width:8px;height:8px;border-radius:50%;background:#d4f5e2;}
+.save-key-btn{padding:10px 14px;background:#0a5c36;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.save-key-btn:hover{background:#1a7a4a;}
+.provider-label{font-size:12px;font-weight:700;color:#555;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.provider-status{width:8px;height:8px;border-radius:50%;background:#ddd;flex-shrink:0;}
 .provider-status.ok{background:#2ecc71;}
-
-/* RESPONSIVE */
+.success-toast{position:fixed;bottom:24px;right:24px;background:#0a5c36;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(10,92,54,0.3);display:none;align-items:center;gap:8px;}
+.success-toast.show{display:flex;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:850;display:none;}
+.sidebar-overlay.open{display:block;}
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f0fdf6;flex-direction:column;gap:16px;}
+.spinner{width:44px;height:44px;border:4px solid #d4f5e2;border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading p{color:#0a5c36;font-weight:600;font-size:15px;}
+.settings-save-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+.settings-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.3);}
+.company-list{margin-bottom:16px;}
+.company-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf6;border-radius:10px;margin-bottom:8px;border:1px solid #d4f5e2;}
+.company-list-item span{font-size:13px;font-weight:600;color:#0a5c36;}
+.company-list-item button{padding:4px 10px;background:transparent;border:1px solid #d4f5e2;border-radius:6px;font-size:11px;color:#666;cursor:pointer;}
+.company-list-item button:hover{border-color:#e74c3c;color:#e74c3c;}
+.section-divider{height:1px;background:#d4f5e2;margin:20px 0;}
+.info-text{font-size:12px;color:#888;line-height:1.6;margin-bottom:12px;}
+.key-saved-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#2ecc71;font-weight:600;margin-left:8px;}
 @media(max-width:768px){
 .hamburger{display:flex;}
 .sidebar{transform:translateX(-100%);}
@@ -284,27 +179,14 @@ display:flex;align-items:center;gap:6px;}
 .stats-grid{grid-template-columns:repeat(2,1fr);}
 .search-input{width:130px;}
 .company-switcher span{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.settings-grid{grid-template-columns:1fr;}
 }
 @media(max-width:480px){
 .stats-grid{grid-template-columns:1fr 1fr;}
 .tabs{gap:2px;}
 .tab{padding:8px 12px;font-size:12px;}
 .modal{padding:24px 18px;}
-.settings-grid{grid-template-columns:1fr;}
 }
-
-/* OVERLAY for mobile sidebar */
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);
-z-index:850;display:none;}
-.sidebar-overlay.open{display:block;}
-
-/* LOADING */
-.loading{display:flex;align-items:center;justify-content:center;
-min-height:100vh;background:#f0fdf6;flex-direction:column;gap:16px;}
-.spinner{width:44px;height:44px;border:4px solid #d4f5e2;
-border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loading p{color:#0a5c36;font-weight:600;font-size:15px;}
 </style>
 </head>
 <body>
@@ -313,6 +195,12 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
 <div class="loading" id="loading">
   <div class="spinner"></div>
   <p>Loading QuickRank...</p>
+</div>
+
+<!-- TOAST -->
+<div class="success-toast" id="toast">
+  <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <span id="toastMsg">Saved successfully</span>
 </div>
 
 <!-- LOGIN PAGE -->
@@ -351,7 +239,6 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
 
 <!-- APP -->
 <div id="app">
-
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
@@ -364,18 +251,13 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
         </div>
         <span>QuickRank<sup>PRO</sup></span>
       </div>
-      <!-- COMPANY SWITCHER -->
       <div class="company-switcher" onclick="toggleCompanyDropdown()" id="companySwitcher">
         <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
-        <span id="activeCompanyName">Select Company</span>
+        <span id="activeCompanyName">Loading...</span>
         <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#888;"><path d="M7 10l5 5 5-5z"/></svg>
         <div class="company-dropdown" id="companyDropdown">
-          <div class="company-dropdown-item active" onclick="switchCompany('sbis','SBIS — TIC',event)">
-            🏢 SBIS — TIC
-          </div>
-          <div class="company-dropdown-add" onclick="openAddCompany(event)">
-            + Add Company
-          </div>
+          <div id="companyList"></div>
+          <div class="company-dropdown-add" onclick="openAddCompany(event)">+ Add Company</div>
         </div>
       </div>
     </div>
@@ -386,45 +268,45 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
     </div>
   </div>
 
-  <!-- SIDEBAR OVERLAY (mobile) -->
+  <!-- SIDEBAR OVERLAY -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-section">Main</div>
-    <div class="nav-item active" onclick="showPage('ranktracker',this)">
+    <div class="nav-item active" id="nav-ranktracker" onclick="showPage('ranktracker',this)">
       <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
       Rank Tracker
     </div>
-    <div class="nav-item" onclick="showPage('landing',this)">
+    <div class="nav-item" id="nav-landing" onclick="showPage('landing',this)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
       Landing Pages
     </div>
-    <div class="nav-item" onclick="showPage('keywords',this)">
+    <div class="nav-item" id="nav-keywords" onclick="showPage('keywords',this)">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       Keyword Research
     </div>
-    <div class="nav-item" onclick="showPage('competitors',this)">
+    <div class="nav-item" id="nav-competitors" onclick="showPage('competitors',this)">
       <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       Competitors
     </div>
     <div class="sidebar-section">Alerts</div>
-    <div class="nav-item" onclick="showPage('notifications',this)">
+    <div class="nav-item" id="nav-notifications" onclick="showPage('notifications',this)">
       <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
       Notifications
       <div class="notif-dot"></div>
     </div>
     <div class="sidebar-section">Config</div>
-    <div class="nav-item" onclick="showPage('settings',this)">
+    <div class="nav-item" id="nav-settings" onclick="showPage('settings',this)">
       <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
       Settings
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <div class="main" id="mainContent">
 
-    <!-- ===== RANK TRACKER PAGE ===== -->
+    <!-- RANK TRACKER -->
     <div id="page-ranktracker">
       <div class="page-header">
         <div class="page-title">Rank Tracker</div>
@@ -434,8 +316,6 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
         <button class="tab active" onclick="showTab('rt','website',this)">🌐 Website Keywords</button>
         <button class="tab" onclick="showTab('rt','local',this)">📍 Local / GMB Rankings</button>
       </div>
-
-      <!-- Website Keywords Tab -->
       <div id="rt-website">
         <div class="stats-grid">
           <div class="stat-card">
@@ -445,17 +325,17 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
           </div>
           <div class="stat-card">
             <div class="stat-label">Top 3</div>
-            <div class="stat-value" style="color:#2ecc71">0</div>
+            <div class="stat-value" id="top3Kw" style="color:#2ecc71">0</div>
             <div class="stat-change">↑ Positions</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Top 10</div>
-            <div class="stat-value" style="color:#1a7a4a">0</div>
+            <div class="stat-value" id="top10Kw" style="color:#1a7a4a">0</div>
             <div class="stat-change">Page 1</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Avg Position</div>
-            <div class="stat-value">—</div>
+            <div class="stat-value" id="avgPos">—</div>
             <div class="stat-change">All keywords</div>
           </div>
         </div>
@@ -468,7 +348,7 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
             </div>
           </div>
           <div class="table-wrap">
-            <table id="keywordTable">
+            <table>
               <thead>
                 <tr>
                   <th>Keyword</th>
@@ -477,23 +357,13 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
                   <th>URL</th>
                   <th>Clicks</th>
                   <th>Impressions</th>
-                  <th>AI Optimize</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="keywordTableBody">
-                <tr><td colspan="7">
-                  <div class="empty-state">
-                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <h3>No keywords yet</h3>
-                    <p>Add your first keyword to start tracking rankings</p>
-                    <button class="add-btn" onclick="openAddKeyword()">+ Add Keyword</button>
-                  </div>
-                </td></tr>
-              </tbody>
+              <tbody id="keywordTableBody"></tbody>
             </table>
           </div>
         </div>
-        <!-- AI Panel -->
         <div class="ai-panel" id="aiPanel">
           <div class="ai-panel-header">
             <div class="ai-panel-title">
@@ -510,7 +380,7 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:8px;">
             <div class="ai-provider-bar">
               <span style="font-size:11px;color:#888;font-weight:600;">Provider:</span>
-              <div class="ai-provider-chip active" id="chip-gemini">Gemini</div>
+              <div class="ai-provider-chip" id="chip-gemini">Gemini</div>
               <div class="ai-provider-chip" id="chip-groq">Groq</div>
               <div class="ai-provider-chip" id="chip-openai">OpenAI</div>
               <div class="ai-provider-chip" id="chip-mistral">Mistral</div>
@@ -520,30 +390,12 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
           </div>
         </div>
       </div>
-
-      <!-- Local GMB Tab -->
       <div id="rt-local" style="display:none;">
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">GMB Keywords</div>
-            <div class="stat-value">0</div>
-            <div class="stat-change">Local tracked</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Avg Local Rank</div>
-            <div class="stat-value">—</div>
-            <div class="stat-change">Map pack position</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Grid Points</div>
-            <div class="stat-value">0</div>
-            <div class="stat-change">Hyderabad area</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Top 3 Grid</div>
-            <div class="stat-value" style="color:#2ecc71">0%</div>
-            <div class="stat-change">Green zones</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">GMB Keywords</div><div class="stat-value">0</div><div class="stat-change">Local tracked</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Local Rank</div><div class="stat-value">—</div><div class="stat-change">Map pack position</div></div>
+          <div class="stat-card"><div class="stat-label">Grid Points</div><div class="stat-value">0</div><div class="stat-change">Hyderabad area</div></div>
+          <div class="stat-card"><div class="stat-label">Top 3 Grid</div><div class="stat-value" style="color:#2ecc71">0%</div><div class="stat-change">Green zones</div></div>
         </div>
         <div class="map-container">
           <div style="padding:16px 20px;border-bottom:1px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
@@ -552,256 +404,154 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
           </div>
           <div class="map-placeholder">
             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            <p>Map grid loads after adding a local keyword + SerpAPI key</p>
+            <p>Map grid loads after adding a local keyword + SerpAPI key in Settings</p>
           </div>
           <div class="map-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div> Top 3</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> 4–10</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div> 11–20</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div> 20+</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#bdc3c7"></div> Not found</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div>Top 3</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div>4–10</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>11–20</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div>20+</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#bdc3c7"></div>Not found</div>
           </div>
         </div>
         <div class="table-card">
-          <div class="table-header">
-            <span class="table-title">Local Keywords</span>
-          </div>
+          <div class="table-header"><span class="table-title">Local Keywords</span></div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>Keyword</th>
-                  <th>Map Pack Rank</th>
-                  <th>Change</th>
-                  <th>Grid Coverage</th>
-                  <th>AI Optimize</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="5">
-                  <div class="empty-state">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    <h3>No local keywords yet</h3>
-                    <p>Add a local keyword to start tracking GMB rankings</p>
-                  </div>
-                </td></tr>
-              </tbody>
+              <thead><tr><th>Keyword</th><th>Map Pack Rank</th><th>Change</th><th>Grid Coverage</th><th>AI Optimize</th></tr></thead>
+              <tbody><tr><td colspan="5"><div class="empty-state">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <h3>No local keywords yet</h3><p>Add a local keyword to start tracking GMB rankings</p>
+              </div></td></tr></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== LANDING PAGES ===== -->
+    <!-- LANDING PAGES -->
     <div id="page-landing" style="display:none;">
-      <div class="page-header">
-        <div class="page-title">Landing Pages</div>
-        <div class="page-subtitle">Monitor your landing page performance and optimization</div>
-      </div>
+      <div class="page-header"><div class="page-title">Landing Pages</div><div class="page-subtitle">Monitor your landing page performance</div></div>
       <div class="tabs">
         <button class="tab active" onclick="showTab('lp','overview',this)">Overview</button>
         <button class="tab" onclick="showTab('lp','serp',this)">SERP Benchmark</button>
         <button class="tab" onclick="showTab('lp','backlink',this)">Backlink Profile</button>
       </div>
-      <div id="lp-overview">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <h3>No landing pages tracked</h3>
-          <p>Connect Google Search Console to auto-import landing pages</p>
-          <button class="add-btn">Connect Search Console</button>
-        </div>
-      </div>
-      <div id="lp-serp" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <h3>SERP Benchmark</h3>
-          <p>Compare your SERP appearance against competitors</p>
-        </div>
-      </div>
-      <div id="lp-backlink" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-          <h3>Backlink Profile</h3>
-          <p>Analyze backlinks pointing to your landing pages</p>
-        </div>
-      </div>
+      <div id="lp-overview"><div class="empty-state" style="padding:80px 20px;">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <h3>No landing pages tracked</h3><p>Connect Google Search Console to auto-import landing pages</p>
+        <button class="add-btn" onclick="showPage('settings',document.getElementById('nav-settings'))">Go to Settings</button>
+      </div></div>
+      <div id="lp-serp" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><h3>SERP Benchmark</h3><p>Coming soon</p></div></div>
+      <div id="lp-backlink" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg><h3>Backlink Profile</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- ===== KEYWORD RESEARCH ===== -->
+    <!-- KEYWORD RESEARCH -->
     <div id="page-keywords" style="display:none;">
-      <div class="page-header">
-        <div class="page-title">Keyword Research</div>
-        <div class="page-subtitle">Discover new keyword opportunities for your business</div>
-      </div>
+      <div class="page-header"><div class="page-title">Keyword Research</div><div class="page-subtitle">Discover new keyword opportunities</div></div>
       <div class="tabs">
         <button class="tab active" onclick="showTab('kr','topics',this)">Topics</button>
         <button class="tab" onclick="showTab('kr','seed',this)">Seed Keywords</button>
         <button class="tab" onclick="showTab('kr','volume',this)">Volume & Difficulty</button>
       </div>
-      <div id="kr-topics">
-        <div class="table-card">
-          <div class="table-header">
-            <span class="table-title">Topic Clusters</span>
-            <button class="add-btn">+ Add Topic</button>
-          </div>
-          <div class="empty-state" style="padding:60px 20px;">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            <h3>No topics yet</h3>
-            <p>Create topic clusters to organize your keyword strategy</p>
-          </div>
-        </div>
-      </div>
-      <div id="kr-seed" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          <h3>Seed Keywords</h3>
-          <p>Enter seed keywords to discover related opportunities</p>
-          <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
-            <input class="search-input" style="width:280px;" placeholder="e.g. interior contractors hyderabad">
-            <button class="add-btn">Research</button>
-          </div>
-        </div>
-      </div>
-      <div id="kr-volume" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <h3>Volume & Difficulty</h3>
-          <p>Analyze search volume and keyword difficulty</p>
-        </div>
-      </div>
+      <div id="kr-topics"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><h3>No topics yet</h3><p>Coming soon</p></div></div>
+      <div id="kr-seed" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><h3>Seed Keywords</h3><p>Coming soon</p></div></div>
+      <div id="kr-volume" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><h3>Volume & Difficulty</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- ===== COMPETITORS ===== -->
+    <!-- COMPETITORS -->
     <div id="page-competitors" style="display:none;">
-      <div class="page-header">
-        <div class="page-title">Competitors</div>
-        <div class="page-subtitle">Track and analyze your SEO competitors</div>
-      </div>
+      <div class="page-header"><div class="page-title">Competitors</div><div class="page-subtitle">Track and analyze your SEO competitors</div></div>
       <div class="tabs">
         <button class="tab active" onclick="showTab('comp','rankcomp',this)">Rank Comparison</button>
         <button class="tab" onclick="showTab('comp','backgap',this)">Backlink Gap</button>
         <button class="tab" onclick="showTab('comp','serpoverlap',this)">SERP Overlap</button>
       </div>
-      <div id="comp-rankcomp">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-          <h3>No competitors added</h3>
-          <p>Add competitor websites to compare rankings</p>
-          <button class="add-btn">+ Add Competitor</button>
-        </div>
-      </div>
-      <div id="comp-backgap" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-          <h3>Backlink Gap</h3>
-          <p>Find backlink opportunities your competitors have but you don't</p>
-        </div>
-      </div>
-      <div id="comp-serpoverlap" style="display:none;">
-        <div class="empty-state" style="padding:80px 20px;">
-          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          <h3>SERP Overlap</h3>
-          <p>See which keywords you share with competitors</p>
-        </div>
-      </div>
+      <div id="comp-rankcomp"><div class="empty-state" style="padding:80px 20px;"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><h3>No competitors added</h3><p>Coming soon</p><button class="add-btn">+ Add Competitor</button></div></div>
+      <div id="comp-backgap" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>Backlink Gap</h3><p>Coming soon</p></div></div>
+      <div id="comp-serpoverlap" style="display:none;"><div class="empty-state" style="padding:80px 20px;"><h3>SERP Overlap</h3><p>Coming soon</p></div></div>
     </div>
 
-    <!-- ===== NOTIFICATIONS ===== -->
+    <!-- NOTIFICATIONS -->
     <div id="page-notifications" style="display:none;">
-      <div class="page-header">
-        <div class="page-title">Notifications</div>
-        <div class="page-subtitle">Stay updated on ranking changes and alerts</div>
-      </div>
+      <div class="page-header"><div class="page-title">Notifications</div><div class="page-subtitle">Stay updated on ranking changes</div></div>
       <div class="table-card">
-        <div class="table-header">
-          <span class="table-title">Recent Alerts</span>
-          <button class="add-btn" onclick="showPage('settings',document.querySelector('.nav-item:last-child'))">⚙ Configure Alerts</button>
-        </div>
+        <div class="table-header"><span class="table-title">Recent Alerts</span></div>
         <div class="empty-state" style="padding:60px 20px;">
           <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-          <h3>No notifications yet</h3>
-          <p>Alerts will appear here when rankings change significantly</p>
+          <h3>No notifications yet</h3><p>Alerts will appear here when rankings change significantly</p>
         </div>
       </div>
     </div>
 
-    <!-- ===== SETTINGS ===== -->
+    <!-- SETTINGS -->
     <div id="page-settings" style="display:none;">
       <div class="page-header">
         <div class="page-title">Settings</div>
-        <div class="page-subtitle">Configure your companies, APIs and AI providers</div>
+        <div class="page-subtitle">Configure companies, APIs and AI providers</div>
       </div>
       <div class="settings-grid">
+
         <!-- Company Settings -->
         <div class="settings-card">
           <h3>🏢 Company Settings</h3>
           <div class="form-group">
             <label class="form-label">Company Name</label>
-            <input class="form-input" placeholder="e.g. SBIS — TIC" value="SBIS — TIC">
+            <input class="form-input" id="s-companyName" placeholder="e.g. SBIS — TIC">
           </div>
           <div class="form-group">
             <label class="form-label">Website URL</label>
-            <input class="form-input" placeholder="https://example.com" value="https://turnkeyinteriorcontractors.com">
+            <input class="form-input" id="s-website" placeholder="https://example.com">
           </div>
           <div class="form-group">
-            <label class="form-label">GSC Property</label>
-            <input class="form-input" placeholder="https://turnkeyinteriorcontractors.com">
+            <label class="form-label">Google Search Console Property</label>
+            <input class="form-input" id="s-gscProperty" placeholder="https://turnkeyinteriorcontractors.com/">
           </div>
           <div class="form-group">
             <label class="form-label">GMB Location Name</label>
-            <input class="form-input" placeholder="Business name on Google Maps" value="TIC (TURNKEY INTERIOR CONTRACTORS)">
+            <input class="form-input" id="s-gmbName" placeholder="Business name on Google Maps">
           </div>
-          <button class="add-btn" style="width:100%;padding:12px;">Save Company Settings</button>
+          <div class="form-group">
+            <label class="form-label">GMB Address</label>
+            <input class="form-input" id="s-gmbAddress" placeholder="Full address">
+          </div>
+          <button class="settings-save-btn" onclick="saveCompanySettings()">💾 Save Company Settings</button>
         </div>
 
         <!-- AI API Keys -->
         <div class="settings-card">
           <h3>🤖 AI Provider Keys</h3>
+          <p class="info-text">Keys are saved securely in Firebase. Never stored in browser or code.</p>
           <div class="form-group">
-            <div class="provider-label">
-              <div class="provider-status" id="status-gemini"></div>
-              Gemini (Primary — Free)
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-gemini"></div>Gemini (Primary — Free)<a href="https://makersuite.google.com/app/apikey" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="AIza..." id="key-gemini">
               <button class="save-key-btn" onclick="saveKey('gemini')">Save</button>
             </div>
           </div>
           <div class="form-group">
-            <div class="provider-label">
-              <div class="provider-status" id="status-groq"></div>
-              Groq (Secondary — Free)
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-groq"></div>Groq (Secondary — Free)<a href="https://console.groq.com/keys" target="_blank" style="margin-left:auto;font-size:11px;color:#2ecc71;">Get key →</a></div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="gsk_..." id="key-groq">
               <button class="save-key-btn" onclick="saveKey('groq')">Save</button>
             </div>
           </div>
           <div class="form-group">
-            <div class="provider-label">
-              <div class="provider-status" id="status-openai"></div>
-              OpenAI
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-openai"></div>OpenAI</div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="sk-..." id="key-openai">
               <button class="save-key-btn" onclick="saveKey('openai')">Save</button>
             </div>
           </div>
           <div class="form-group">
-            <div class="provider-label">
-              <div class="provider-status" id="status-mistral"></div>
-              Mistral
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-mistral"></div>Mistral</div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="..." id="key-mistral">
               <button class="save-key-btn" onclick="saveKey('mistral')">Save</button>
             </div>
           </div>
           <div class="form-group">
-            <div class="provider-label">
-              <div class="provider-status" id="status-claude"></div>
-              Claude (Anthropic)
-            </div>
+            <div class="provider-label"><div class="provider-status" id="status-claude"></div>Claude (Anthropic)</div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="sk-ant-..." id="key-claude">
               <button class="save-key-btn" onclick="saveKey('claude')">Save</button>
@@ -812,13 +562,9 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
         <!-- SerpAPI -->
         <div class="settings-card">
           <h3>🗺️ SerpAPI (Map Grid)</h3>
-          <p style="font-size:13px;color:#888;margin-bottom:16px;line-height:1.6;">
-            Required for local GMB map grid ranking checks.<br>
-            Free tier: 100 searches/month.<br>
-            Get key at <a href="https://serpapi.com" target="_blank" style="color:#2ecc71;">serpapi.com</a>
-          </p>
+          <p class="info-text">Required for local GMB map grid ranking checks.<br>Free tier: 100 searches/month.<br>Get key at <a href="https://serpapi.com" target="_blank" style="color:#2ecc71;">serpapi.com</a></p>
           <div class="form-group">
-            <label class="form-label">SerpAPI Key</label>
+            <div class="provider-label"><div class="provider-status" id="status-serp"></div>SerpAPI Key</div>
             <div class="api-key-row">
               <input class="form-input" type="password" placeholder="Your SerpAPI key" id="key-serp">
               <button class="save-key-btn" onclick="saveKey('serp')">Save</button>
@@ -831,28 +577,52 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
           <h3>🔔 Notification Settings</h3>
           <div class="form-group">
             <label class="form-label">Alert when rank drops more than</label>
-            <input class="form-input" type="number" placeholder="e.g. 5" value="5">
+            <input class="form-input" type="number" id="s-dropAlert" placeholder="5" value="5">
           </div>
           <div class="form-group">
             <label class="form-label">Alert when rank improves more than</label>
-            <input class="form-input" type="number" placeholder="e.g. 3" value="3">
+            <input class="form-input" type="number" id="s-riseAlert" placeholder="3" value="3">
           </div>
           <div class="form-group">
-            <label class="form-label">Email for notifications</label>
-            <input class="form-input" type="email" placeholder="your@email.com">
+            <label class="form-label">Notification Email</label>
+            <input class="form-input" type="email" id="s-notifEmail" placeholder="your@email.com" value="teamtic.hyd@gmail.com">
           </div>
-          <button class="add-btn" style="width:100%;padding:12px;">Save Notification Settings</button>
+          <button class="settings-save-btn" onclick="saveNotificationSettings()">💾 Save Notification Settings</button>
         </div>
+
+        <!-- Manage Companies -->
+        <div class="settings-card">
+          <h3>🏗️ Manage Companies</h3>
+          <p class="info-text">Add and manage multiple businesses from one dashboard.</p>
+          <div class="company-list" id="settingsCompanyList"></div>
+          <button class="add-btn" style="width:100%;" onclick="openAddCompany({stopPropagation:()=>{}})">+ Add New Company</button>
+        </div>
+
+        <!-- Account -->
+        <div class="settings-card">
+          <h3>👤 Account</h3>
+          <div class="form-group">
+            <label class="form-label">Signed in as</label>
+            <input class="form-input" id="s-userEmail" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Name</label>
+            <input class="form-input" id="s-userName" disabled>
+          </div>
+          <div class="section-divider"></div>
+          <button class="settings-save-btn" style="background:linear-gradient(135deg,#c0392b,#e74c3c);" onclick="signOut()">Sign Out</button>
+        </div>
+
       </div>
     </div>
 
-  </div><!-- end main -->
-</div><!-- end app -->
+  </div>
+</div>
 
 <!-- ADD KEYWORD MODAL -->
 <div class="modal-overlay" id="addKeywordModal">
   <div class="modal">
-    <h2>Add Keyword</h2>
+    <h2>➕ Add Keyword</h2>
     <div class="form-group">
       <label class="form-label">Keyword</label>
       <input class="form-input" id="newKeyword" placeholder="e.g. interior contractors hyderabad">
@@ -860,6 +630,10 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
     <div class="form-group">
       <label class="form-label">Target URL (optional)</label>
       <input class="form-input" id="newKeywordUrl" placeholder="https://turnkeyinteriorcontractors.com/page">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Current Position (optional)</label>
+      <input class="form-input" type="number" id="newKeywordPos" placeholder="e.g. 5">
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('addKeywordModal')">Cancel</button>
@@ -871,7 +645,7 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
 <!-- ADD COMPANY MODAL -->
 <div class="modal-overlay" id="addCompanyModal">
   <div class="modal">
-    <h2>Add Company</h2>
+    <h2>🏢 Add Company</h2>
     <div class="form-group">
       <label class="form-label">Company Name</label>
       <input class="form-input" id="newCompanyName" placeholder="e.g. My Business">
@@ -880,6 +654,10 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
       <label class="form-label">Website URL</label>
       <input class="form-input" id="newCompanyUrl" placeholder="https://example.com">
     </div>
+    <div class="form-group">
+      <label class="form-label">GSC Property URL</label>
+      <input class="form-input" id="newCompanyGsc" placeholder="https://example.com/">
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('addCompanyModal')">Cancel</button>
       <button class="btn-primary" onclick="addCompany()">Add Company</button>
@@ -887,8 +665,20 @@ border-top-color:#0a5c36;border-radius:50%;animation:spin 0.8s linear infinite;}
   </div>
 </div>
 
+<!-- DELETE KEYWORD CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h2>🗑️ Delete Keyword</h2>
+    <p style="color:#666;margin-bottom:20px;">Are you sure you want to delete "<span id="deleteKeywordName" style="color:#0a5c36;font-weight:700;"></span>"?</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-primary" style="background:linear-gradient(135deg,#c0392b,#e74c3c);" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ========== FIREBASE CONFIG ==========
+// ===== FIREBASE =====
 const firebaseConfig = {
   apiKey: "AIzaSyCzA50bHzBaIuI2OJINFHMQyFG62wiSp48",
   authDomain: "quickrank-10647.firebaseapp.com",
@@ -901,16 +691,19 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ========== STATE ==========
+// ===== STATE =====
 let currentUser = null;
-let currentCompanyId = 'sbis';
-let currentCompanyName = 'SBIS — TIC';
+let currentCompanyId = null;
+let currentCompanyName = '';
 let keywords = [];
+let companies = [];
 let aiMode = 'general';
 let currentAiKeyword = '';
+let deleteKeywordId = null;
+let unsubscribeKeywords = null;
 
-// ========== AUTH ==========
-auth.onAuthStateChanged(user => {
+// ===== AUTH =====
+auth.onAuthStateChanged(async user => {
   document.getElementById('loading').style.display = 'none';
   if(user){
     currentUser = user;
@@ -918,8 +711,10 @@ auth.onAuthStateChanged(user => {
     document.getElementById('app').style.display = 'block';
     document.getElementById('userName').textContent = user.displayName || 'User';
     document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName||'U')}&background=0a5c36&color=fff`;
-    document.getElementById('activeCompanyName').textContent = currentCompanyName;
-    loadKeywords();
+    document.getElementById('s-userEmail').value = user.email || '';
+    document.getElementById('s-userName').value = user.displayName || '';
+    await loadCompanies();
+    loadAIKeyStatuses();
   } else {
     document.getElementById('login-page').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
@@ -928,78 +723,72 @@ auth.onAuthStateChanged(user => {
 
 function signInWithGoogle(){
   const provider = new firebase.auth.GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/webmasters.readonly');
-  provider.addScope('https://www.googleapis.com/auth/business.manage');
-  auth.signInWithPopup(provider).catch(e => alert('Sign in failed: '+e.message));
+  auth.signInWithPopup(provider).catch(e => showToast('Sign in failed: '+e.message, true));
 }
 
 function signOut(){
   if(confirm('Sign out of QuickRank?')) auth.signOut();
 }
 
-// ========== NAVIGATION ==========
-function showPage(page, el){
-  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display='none');
-  document.getElementById('page-'+page).style.display='block';
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if(el) el.classList.add('active');
-  if(window.innerWidth <= 768) closeSidebar();
+// ===== COMPANIES =====
+async function loadCompanies(){
+  if(!currentUser) return;
+  const snap = await db.collection('users').doc(currentUser.uid).collection('companies').get();
+  companies = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+  if(companies.length === 0){
+    // Create default company
+    await db.collection('users').doc(currentUser.uid).collection('companies').doc('sbis-tic').set({
+      name: 'SBIS — TIC',
+      website: 'https://turnkeyinteriorcontractors.com',
+      gscProperty: 'https://turnkeyinteriorcontractors.com/',
+      gmbName: 'TIC (TURNKEY INTERIOR CONTRACTORS)',
+      gmbAddress: '4 Jayabheri Enclave, Gachibowli, Hyderabad',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    companies = [{id:'sbis-tic', name:'SBIS — TIC', website:'https://turnkeyinteriorcontractors.com', gscProperty:'https://turnkeyinteriorcontractors.com/'}];
+  }
+
+  currentCompanyId = companies[0].id;
+  currentCompanyName = companies[0].name;
+  renderCompanyDropdown();
+  loadCompanySettings();
+  loadKeywords();
+  renderSettingsCompanyList();
 }
 
-function showTab(prefix, tab, el){
-  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(t => t.style.display='none');
-  document.getElementById(prefix+'-'+tab).style.display='block';
-  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+function renderCompanyDropdown(){
+  const list = document.getElementById('companyList');
+  list.innerHTML = companies.map((c,i) =>
+    `<div class="company-dropdown-item ${i===0?'active':''}" onclick="switchCompany('${c.id}','${c.name}',event)">🏢 ${c.name}</div>`
+  ).join('');
+  document.getElementById('activeCompanyName').textContent = currentCompanyName;
 }
 
-// ========== SIDEBAR ==========
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
+function renderSettingsCompanyList(){
+  const el = document.getElementById('settingsCompanyList');
+  el.innerHTML = companies.map(c =>
+    `<div class="company-list-item">
+      <span>🏢 ${c.name}</span>
+      <span style="font-size:11px;color:#888;">${c.website||''}</span>
+    </div>`
+  ).join('');
 }
 
-// ========== COMPANY SWITCHER ==========
-function toggleCompanyDropdown(){
-  document.getElementById('companyDropdown').classList.toggle('open');
-}
 function switchCompany(id, name, e){
   e.stopPropagation();
   currentCompanyId = id;
   currentCompanyName = name;
   document.getElementById('activeCompanyName').textContent = name;
   document.getElementById('companyDropdown').classList.remove('open');
+  document.querySelectorAll('.company-dropdown-item').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  loadCompanySettings();
   loadKeywords();
 }
-function openAddCompany(e){
-  e.stopPropagation();
-  document.getElementById('companyDropdown').classList.remove('open');
-  document.getElementById('addCompanyModal').classList.add('open');
-}
-function addCompany(){
-  const name = document.getElementById('newCompanyName').value.trim();
-  const url = document.getElementById('newCompanyUrl').value.trim();
-  if(!name) return alert('Enter company name');
-  if(!currentUser) return;
-  const compId = name.toLowerCase().replace(/\s+/g,'-');
-  db.collection('users').doc(currentUser.uid)
-    .collection('companies').doc(compId)
-    .set({name, url, createdAt: firebase.firestore.FieldValue.serverTimestamp()})
-    .then(()=>{
-      const dd = document.getElementById('companyDropdown');
-      const addBtn = dd.querySelector('.company-dropdown-add');
-      const item = document.createElement('div');
-      item.className = 'company-dropdown-item';
-      item.innerHTML = `🏢 ${name}`;
-      item.onclick = (e) => switchCompany(compId, name, e);
-      dd.insertBefore(item, addBtn);
-      closeModal('addCompanyModal');
-      switchCompany(compId, name, {stopPropagation:()=>{}});
-    }).catch(e => alert('Error: '+e.message));
+
+function toggleCompanyDropdown(){
+  document.getElementById('companyDropdown').classList.toggle('open');
 }
 
 document.addEventListener('click', e => {
@@ -1007,10 +796,127 @@ document.addEventListener('click', e => {
     document.getElementById('companyDropdown').classList.remove('open');
 });
 
-// ========== KEYWORDS ==========
-function loadKeywords(){
+function openAddCompany(e){
+  e.stopPropagation();
+  document.getElementById('companyDropdown').classList.remove('open');
+  document.getElementById('newCompanyName').value = '';
+  document.getElementById('newCompanyUrl').value = '';
+  document.getElementById('newCompanyGsc').value = '';
+  document.getElementById('addCompanyModal').classList.add('open');
+}
+
+async function addCompany(){
+  const name = document.getElementById('newCompanyName').value.trim();
+  const url = document.getElementById('newCompanyUrl').value.trim();
+  const gsc = document.getElementById('newCompanyGsc').value.trim();
+  if(!name) return showToast('Enter company name', true);
   if(!currentUser) return;
-  db.collection('users').doc(currentUser.uid)
+  const compId = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('companies').doc(compId).set({
+      name, website: url, gscProperty: gsc,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    companies.push({id:compId, name, website:url, gscProperty:gsc});
+    renderCompanyDropdown();
+    renderSettingsCompanyList();
+    closeModal('addCompanyModal');
+    showToast(`${name} added successfully ✅`);
+    switchCompany(compId, name, {stopPropagation:()=>{}});
+  } catch(e){ showToast('Error: '+e.message, true); }
+}
+
+// ===== COMPANY SETTINGS =====
+async function loadCompanySettings(){
+  if(!currentUser || !currentCompanyId) return;
+  try {
+    const doc = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
+    if(doc.exists){
+      const d = doc.data();
+      document.getElementById('s-companyName').value = d.name || '';
+      document.getElementById('s-website').value = d.website || '';
+      document.getElementById('s-gscProperty').value = d.gscProperty || '';
+      document.getElementById('s-gmbName').value = d.gmbName || '';
+      document.getElementById('s-gmbAddress').value = d.gmbAddress || '';
+    }
+  } catch(e){}
+}
+
+async function saveCompanySettings(){
+  if(!currentUser || !currentCompanyId) return;
+  const data = {
+    name: document.getElementById('s-companyName').value.trim(),
+    website: document.getElementById('s-website').value.trim(),
+    gscProperty: document.getElementById('s-gscProperty').value.trim(),
+    gmbName: document.getElementById('s-gmbName').value.trim(),
+    gmbAddress: document.getElementById('s-gmbAddress').value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(!data.name) return showToast('Enter company name', true);
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).update(data);
+    currentCompanyName = data.name;
+    document.getElementById('activeCompanyName').textContent = data.name;
+    const idx = companies.findIndex(c => c.id === currentCompanyId);
+    if(idx > -1) companies[idx] = {...companies[idx], ...data};
+    renderCompanyDropdown();
+    renderSettingsCompanyList();
+    showToast('Company settings saved ✅');
+  } catch(e){ showToast('Error: '+e.message, true); }
+}
+
+// ===== NOTIFICATION SETTINGS =====
+async function saveNotificationSettings(){
+  if(!currentUser) return;
+  const data = {
+    dropAlert: parseInt(document.getElementById('s-dropAlert').value) || 5,
+    riseAlert: parseInt(document.getElementById('s-riseAlert').value) || 3,
+    notifEmail: document.getElementById('s-notifEmail').value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('config').doc('notifications').set(data);
+    showToast('Notification settings saved ✅');
+  } catch(e){ showToast('Error: '+e.message, true); }
+}
+
+// ===== AI KEYS =====
+async function saveKey(provider){
+  if(!currentUser) return;
+  const val = document.getElementById('key-'+provider).value.trim();
+  if(!val) return showToast('Enter a key first', true);
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('config').doc('ai_keys').set({[provider]: val}, {merge:true});
+    document.getElementById('status-'+provider).classList.add('ok');
+    document.getElementById('key-'+provider).value = '';
+    document.getElementById('key-'+provider).placeholder = '••••••••••• (saved)';
+    showToast(`${provider} key saved securely ✅`);
+  } catch(e){ showToast('Error: '+e.message, true); }
+}
+
+async function loadAIKeyStatuses(){
+  if(!currentUser) return;
+  try {
+    const doc = await db.collection('users').doc(currentUser.uid).collection('config').doc('ai_keys').get();
+    if(doc.exists){
+      const data = doc.data();
+      ['gemini','groq','openai','mistral','claude','serp'].forEach(p => {
+        if(data[p]){
+          const el = document.getElementById('status-'+p);
+          if(el) el.classList.add('ok');
+          const input = document.getElementById('key-'+p);
+          if(input) input.placeholder = '••••••••••• (saved)';
+        }
+      });
+    }
+  } catch(e){}
+}
+
+// ===== KEYWORDS =====
+function loadKeywords(){
+  if(!currentUser || !currentCompanyId) return;
+  if(unsubscribeKeywords) unsubscribeKeywords();
+  unsubscribeKeywords = db.collection('users').doc(currentUser.uid)
     .collection('companies').doc(currentCompanyId)
     .collection('keywords').orderBy('createdAt','desc')
     .onSnapshot(snap => {
@@ -1023,39 +929,51 @@ function loadKeywords(){
 function renderKeywords(kws){
   const tbody = document.getElementById('keywordTableBody');
   if(!kws.length){
-    tbody.innerHTML = `<tr><td colspan="7">
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <h3>No keywords yet</h3>
-        <p>Add your first keyword to start tracking rankings</p>
-        <button class="add-btn" onclick="openAddKeyword()">+ Add Keyword</button>
-      </div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <h3>No keywords yet</h3>
+      <p>Add your first keyword to start tracking rankings</p>
+      <button class="add-btn" onclick="openAddKeyword()">+ Add Keyword</button>
+    </div></td></tr>`;
     return;
   }
   tbody.innerHTML = kws.map(k => {
-    const pos = k.position || '—';
-    const rankClass = pos <= 3 ? 'rank-top3' : pos <= 10 ? 'rank-top10' : pos <= 20 ? 'rank-top20' : 'rank-low';
+    const pos = k.position;
+    const posDisplay = pos ? pos : '—';
+    const rankClass = !pos ? '' : pos <= 3 ? 'rank-top3' : pos <= 10 ? 'rank-top10' : pos <= 20 ? 'rank-top20' : 'rank-low';
     const change = k.change || 0;
     const changeHtml = change > 0 ? `<span class="change-up">↑${change}</span>` :
                        change < 0 ? `<span class="change-down">↓${Math.abs(change)}</span>` :
                        `<span class="change-same">—</span>`;
+    const url = k.url ? `<a href="${k.url}" target="_blank" style="color:#2ecc71;font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">${k.url.replace('https://','')}</a>` : '—';
     return `<tr>
-      <td><strong>${k.keyword}</strong></td>
-      <td><span class="rank-badge ${rankClass}">${pos}</span></td>
+      <td><strong style="color:#0a5c36;">${k.keyword}</strong></td>
+      <td><span class="rank-badge ${rankClass}">${posDisplay}</span></td>
       <td>${changeHtml}</td>
-      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#888;">${k.url||'—'}</td>
+      <td>${url}</td>
       <td>${k.clicks||0}</td>
       <td>${k.impressions||0}</td>
-      <td><button class="ai-btn" onclick="openAiPanel('${k.keyword}')">
-        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 0-2 0v1.93A8 8 0 0 1 4.07 13H6a1 1 0 0 0 0-2H4.07A8 8 0 0 1 11 4.07V6a1 1 0 0 0 2 0V4.07A8 8 0 0 1 19.93 11H18a1 1 0 0 0 0 2h1.93A8 8 0 0 1 13 19.93z"/></svg>
-        AI Optimize
-      </button></td>
+      <td style="display:flex;gap:6px;align-items:center;">
+        <button class="ai-btn" onclick="openAiPanel('${k.keyword.replace(/'/g,"\\'")}')">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 0-2 0v1.93A8 8 0 0 1 4.07 13H6a1 1 0 0 0 0-2H4.07A8 8 0 0 1 11 4.07V6a1 1 0 0 0 2 0V4.07A8 8 0 0 1 19.93 11H18a1 1 0 0 0 0 2h1.93A8 8 0 0 1 13 19.93z"/></svg>
+          AI
+        </button>
+        <button class="ai-btn" style="border-color:#fde8e8;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 }
 
 function updateStats(){
-  document.getElementById('totalKw').textContent = keywords.length;
+  const total = keywords.length;
+  const withPos = keywords.filter(k => k.position);
+  const top3 = withPos.filter(k => k.position <= 3).length;
+  const top10 = withPos.filter(k => k.position <= 10).length;
+  const avg = withPos.length ? Math.round(withPos.reduce((s,k) => s+k.position, 0) / withPos.length) : null;
+  document.getElementById('totalKw').textContent = total;
+  document.getElementById('top3Kw').textContent = top3;
+  document.getElementById('top10Kw').textContent = top10;
+  document.getElementById('avgPos').textContent = avg || '—';
 }
 
 function filterKeywords(val){
@@ -1064,42 +982,61 @@ function filterKeywords(val){
 }
 
 function openAddKeyword(){
+  document.getElementById('newKeyword').value = '';
+  document.getElementById('newKeywordUrl').value = '';
+  document.getElementById('newKeywordPos').value = '';
   document.getElementById('addKeywordModal').classList.add('open');
+  setTimeout(() => document.getElementById('newKeyword').focus(), 100);
 }
 
-function addKeyword(){
+async function addKeyword(){
   const kw = document.getElementById('newKeyword').value.trim();
   const url = document.getElementById('newKeywordUrl').value.trim();
-  if(!kw) return alert('Enter a keyword');
+  const pos = parseInt(document.getElementById('newKeywordPos').value) || null;
+  if(!kw) return showToast('Enter a keyword', true);
   if(!currentUser) return;
-  db.collection('users').doc(currentUser.uid)
-    .collection('companies').doc(currentCompanyId)
-    .collection('keywords').add({
-      keyword: kw,
-      url: url,
-      position: null,
-      change: 0,
-      clicks: 0,
-      impressions: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(()=>{
-      document.getElementById('newKeyword').value = '';
-      document.getElementById('newKeywordUrl').value = '';
-      closeModal('addKeywordModal');
-    }).catch(e => alert('Error: '+e.message));
+  try {
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('keywords').add({
+        keyword: kw, url: url, position: pos,
+        change: 0, clicks: 0, impressions: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    closeModal('addKeywordModal');
+    showToast(`"${kw}" added ✅`);
+  } catch(e){ showToast('Error: '+e.message, true); }
+}
+
+function openDeleteKeyword(id, name){
+  deleteKeywordId = id;
+  document.getElementById('deleteKeywordName').textContent = name;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+async function confirmDelete(){
+  if(!deleteKeywordId || !currentUser) return;
+  try {
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('keywords').doc(deleteKeywordId).delete();
+    closeModal('deleteModal');
+    showToast('Keyword deleted ✅');
+  } catch(e){ showToast('Error: '+e.message, true); }
 }
 
 function openAddLocalKeyword(){
-  alert('Local keyword tracking coming soon. Add your SerpAPI key in Settings first.');
+  showToast('Add your SerpAPI key in Settings first, then add local keywords.', true);
 }
 
-// ========== AI PANEL ==========
+// ===== AI PANEL =====
 function openAiPanel(keyword){
   currentAiKeyword = keyword;
   document.getElementById('aiKeyword').textContent = keyword;
   document.getElementById('aiOutput').textContent = 'Click "Run AI" to get optimization suggestions.';
+  document.querySelectorAll('.ai-provider-chip').forEach(c => c.classList.remove('active'));
   document.getElementById('aiPanel').classList.add('open');
-  document.getElementById('aiPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('aiPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function closeAiPanel(){
@@ -1115,39 +1052,40 @@ function setAiMode(mode, el){
 async function runAI(){
   const output = document.getElementById('aiOutput');
   output.textContent = '⏳ Generating AI suggestions...';
-  const providers = ['gemini','groq','openai','mistral','claude'];
   document.querySelectorAll('.ai-provider-chip').forEach(c => c.classList.remove('active'));
-  // Try to get saved keys from Firestore
+
   let aiKeys = {};
   try {
-    const snap = await db.collection('users').doc(currentUser.uid)
-      .collection('config').doc('ai_keys').get();
+    const snap = await db.collection('users').doc(currentUser.uid).collection('config').doc('ai_keys').get();
     if(snap.exists) aiKeys = snap.data();
   } catch(e){}
 
   const prompt = aiMode === 'general'
-    ? `You are an expert SEO consultant. For the keyword "${currentAiKeyword}", provide:
-1. Optimized Title Tag
-2. Meta Description
-3. H1 Tag
-4. 3 Content Tips
-5. 5 Related Keywords
-Be specific and actionable.`
-    : `You are a Local SEO expert for a business in Hyderabad, India. For the keyword "${currentAiKeyword}", provide:
-1. GMB Business Description
-2. 2 GMB Post Drafts
-3. 5 Local Keywords
-4. Review Response Template
-5. Local Business Schema Markup snippet
-Be specific for Hyderabad market.`;
+    ? `You are an expert SEO consultant for a business in Hyderabad, India. For the keyword "${currentAiKeyword}", provide:
 
-  // Try Gemini first (free)
+1. 📌 Optimized Title Tag (max 60 chars)
+2. 📝 Meta Description (max 155 chars)
+3. 🏷️ H1 Tag suggestion
+4. 💡 3 Content Tips
+5. 🔗 5 Related Keywords
+
+Be specific and actionable. Format clearly.`
+    : `You are a Local SEO expert for a business in Hyderabad, India. For the keyword "${currentAiKeyword}", provide:
+
+1. 📍 GMB Business Description (750 chars)
+2. 📢 2 GMB Post Drafts
+3. 🔑 5 Local Keywords with city/area modifiers
+4. ⭐ Review Response Template
+5. 🏗️ Local Business Schema Markup (JSON-LD snippet)
+
+Target area: Hyderabad, Telangana, India. Be specific.`;
+
+  // Try Gemini
   if(aiKeys.gemini){
     document.getElementById('chip-gemini').classList.add('active');
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${aiKeys.gemini}`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
+        method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
       });
       const data = await res.json();
@@ -1158,7 +1096,7 @@ Be specific for Hyderabad market.`;
     } catch(e){}
   }
 
-  // Try Groq second (free)
+  // Try Groq
   if(aiKeys.groq){
     document.getElementById('chip-gemini').classList.remove('active');
     document.getElementById('chip-groq').classList.add('active');
@@ -1166,7 +1104,7 @@ Be specific for Hyderabad market.`;
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${aiKeys.groq}`},
-        body:JSON.stringify({model:'llama3-8b-8192',messages:[{role:'user',content:prompt}],max_tokens:800})
+        body:JSON.stringify({model:'llama3-8b-8192',messages:[{role:'user',content:prompt}],max_tokens:1000})
       });
       const data = await res.json();
       if(data.choices?.[0]?.message?.content){
@@ -1176,31 +1114,114 @@ Be specific for Hyderabad market.`;
     } catch(e){}
   }
 
-  output.textContent = '⚠️ No AI keys configured. Go to Settings → AI Provider Keys and add at least one key (Gemini or Groq are free).';
+  // Try OpenAI
+  if(aiKeys.openai){
+    document.getElementById('chip-groq').classList.remove('active');
+    document.getElementById('chip-openai').classList.add('active');
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${aiKeys.openai}`},
+        body:JSON.stringify({model:'gpt-3.5-turbo',messages:[{role:'user',content:prompt}],max_tokens:1000})
+      });
+      const data = await res.json();
+      if(data.choices?.[0]?.message?.content){
+        output.textContent = data.choices[0].message.content;
+        return;
+      }
+    } catch(e){}
+  }
+
+  // Try Mistral
+  if(aiKeys.mistral){
+    document.getElementById('chip-openai').classList.remove('active');
+    document.getElementById('chip-mistral').classList.add('active');
+    try {
+      const res = await fetch('https://api.mistral.ai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${aiKeys.mistral}`},
+        body:JSON.stringify({model:'mistral-small',messages:[{role:'user',content:prompt}],max_tokens:1000})
+      });
+      const data = await res.json();
+      if(data.choices?.[0]?.message?.content){
+        output.textContent = data.choices[0].message.content;
+        return;
+      }
+    } catch(e){}
+  }
+
+  // Try Claude
+  if(aiKeys.claude){
+    document.getElementById('chip-mistral').classList.remove('active');
+    document.getElementById('chip-claude').classList.add('active');
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':aiKeys.claude,'anthropic-version':'2023-06-01'},
+        body:JSON.stringify({model:'claude-3-haiku-20240307',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+      });
+      const data = await res.json();
+      if(data.content?.[0]?.text){
+        output.textContent = data.content[0].text;
+        return;
+      }
+    } catch(e){}
+  }
+
+  output.textContent = '⚠️ No AI keys configured or all failed.\n\nGo to Settings → AI Provider Keys → Add Gemini key (free).\n\nGet free Gemini key at: makersuite.google.com/app/apikey';
 }
 
-async function saveKey(provider){
-  if(!currentUser) return;
-  const val = document.getElementById('key-'+provider).value.trim();
-  if(!val) return alert('Enter a key first');
-  try {
-    await db.collection('users').doc(currentUser.uid)
-      .collection('config').doc('ai_keys')
-      .set({[provider]: val}, {merge: true});
-    document.getElementById('status-'+provider).classList.add('ok');
-    alert(`${provider} key saved securely ✅`);
-  } catch(e){ alert('Error: '+e.message); }
+// ===== NAVIGATION =====
+function showPage(page, el){
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display='none');
+  document.getElementById('page-'+page).style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(window.innerWidth <= 768) closeSidebar();
+  if(page === 'settings'){
+    loadCompanySettings();
+    loadAIKeyStatuses();
+  }
 }
 
-// ========== MODALS ==========
+function showTab(prefix, tab, el){
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(t => t.style.display='none');
+  document.getElementById(prefix+'-'+tab).style.display='block';
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== SIDEBAR =====
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ===== MODALS =====
 function closeModal(id){
   document.getElementById(id).classList.remove('open');
 }
 document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => {
-    if(e.target === m) m.classList.remove('open');
-  });
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
 });
+
+// Enter key on keyword input
+document.getElementById('newKeyword').addEventListener('keypress', e => {
+  if(e.key === 'Enter') addKeyword();
+});
+
+// ===== TOAST =====
+function showToast(msg, isError=false){
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.style.background = isError ? '#c0392b' : '#0a5c36';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 </script>
 </body>
 </html>
