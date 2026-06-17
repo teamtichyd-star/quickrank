@@ -907,7 +907,7 @@ Target area: Hyderabad, Telangana, India. Be specific.`;
       res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.cerebras}` },
-        body: JSON.stringify({ model: 'llama3.1-8b', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+        body: JSON.stringify({ model: 'gpt-oss-120b', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
       });
       data = await res.json();
       if (data.choices?.[0]?.message?.content) {
