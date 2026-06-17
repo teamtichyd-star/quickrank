@@ -2241,61 +2241,140 @@ async function generateGMBStrategy() {
 
   document.getElementById('ai-strategy-loading').style.display = 'block';
   document.getElementById('ai-strategy-result').style.display  = 'none';
+  document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 1/3: Fetching your real GMB data...</p>';
 
   const company  = getCurrentCompany();
   const gmbName  = company.gmbName  || 'TIC (TURNKEY INTERIOR CONTRACTORS)';
   const gmbAddr  = company.gmbAddress || 'Gachibowli, Hyderabad';
   const website  = company.website  || 'turnkeyinteriorcontractors.com';
-
-  const prompt = `You are a local SEO expert specializing in Google Business Profile optimization.
-Business: ${gmbName}
-Address: ${gmbAddr}
-Website: ${website}
-Target Keyword: "${keyword}"
-Location: Hyderabad, India
-
-Create a detailed, actionable 30-day GMB Push Strategy to rank in Top 3 on Google Maps for this keyword.
-
-Include:
-1. Week 1 Quick Wins (immediate actions)
-2. Week 2-3 Review & Content Strategy  
-3. Week 4 Authority Building
-4. Specific GMB post ideas using the keyword
-5. Review request email/WhatsApp template
-6. Category and attribute optimizations
-7. Expected timeline to reach Top 3
-
-Format with clear headings and bullet points. Be specific to Hyderabad interior contractors market.`;
+  const apiKey   = await getSettingKey('googlePlacesKey');
 
   try {
+    // STEP 1: Get real ranking data
+    const results = await fetchNearbyPlaces(keyword, GMB_ZONES.gachibowli.lat, GMB_ZONES.gachibowli.lng, apiKey);
+    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 2/3: Analyzing top 5 competitors...</p>';
+    
+    const myIndex = findMyBusiness(results, gmbName, company);
+    const myData  = myIndex >= 0 ? results[myIndex] : null;
+    const myRank  = myIndex === -1 ? 'Not in Top 20' : (myIndex + 1);
+    const top5    = results.slice(0, 5);
+    
+    // Build real competitor analysis
+    const top5Text = top5.map((c, i) => 
+      `${i+1}. ${c.name} | Rating: ${c.rating || 'N/A'} | Reviews: ${c.user_ratings_total || 0} | Address: ${(c.formatted_address || '').split(',').slice(0,2).join(',')}`
+    ).join('\n');
+
+    const myRating   = myData ? (myData.rating || 0) : 0;
+    const myReviews  = myData ? (myData.user_ratings_total || 0) : 0;
+    const myAddress  = myData ? myData.formatted_address : gmbAddr;
+    
+    const avgTopRating  = (top5.reduce((a,b)=>a+(b.rating||0),0)/5).toFixed(1);
+    const avgTopReviews = Math.round(top5.reduce((a,b)=>a+(b.user_ratings_total||0),0)/5);
+    const reviewGap     = avgTopReviews - myReviews;
+    const ratingGap     = (avgTopRating - myRating).toFixed(1);
+
+    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 3/3: AI generating personalized strategy...</p>';
+
+    // STEP 2: Build data-rich prompt with REAL numbers
+    const prompt = `You are a local SEO expert. Analyze this REAL data and give a HYPER-SPECIFIC GMB strategy.
+
+=== MY BUSINESS (REAL DATA) ===
+Name: ${gmbName}
+Address: ${myAddress}
+Website: ${website}
+Current Rank for "${keyword}": #${myRank}
+My Rating: ${myRating} stars
+My Reviews: ${myReviews}
+Listed on Google: ${myData ? 'YES - verified' : 'NO - not appearing in top 20 (CRITICAL ISSUE)'}
+
+=== TOP 5 COMPETITORS (REAL DATA) ===
+${top5Text}
+
+=== GAP ANALYSIS (REAL NUMBERS) ===
+Average Top 5 Rating: ${avgTopRating} (gap: ${ratingGap})
+Average Top 5 Reviews: ${avgTopReviews} (you need +${reviewGap} more reviews)
+Rank Gap: You are at #${myRank}, target is #1-3
+
+=== TASK ===
+Give a SPECIFIC 30-day action plan based on this REAL data:
+
+1. CRITICAL ISSUE ANALYSIS - What is the #1 reason I'm at rank ${myRank} and not Top 3? Be specific based on the data above.
+
+2. COMPETITOR ADVANTAGE - What exactly do "${top5[0].name}" and "${top5[1].name}" have that I don't? Analyze their review counts and ratings.
+
+3. EXACT NUMBERS - How many reviews per week do I need to gain to reach ${avgTopReviews} in 30 days?
+
+4. REVIEW CAMPAIGN - Give me a WhatsApp message I can copy-paste TODAY to send to my past 50 clients. Include link placeholder.
+
+5. GMB POSTS - Give me 4 specific post titles I should publish this week, using "${keyword}".
+
+6. CATEGORY FIX - Based on competitor names, what categories should I add to outrank them?
+
+7. WEEKLY MILESTONES - Week 1, Week 2, Week 3, Week 4 - what rank should I be at?
+
+8. REALISTIC TIMELINE - Based on the ${reviewGap} review gap, can I realistically reach Top 3 in 30 days? Give honest assessment.
+
+Be brutally specific. Use the actual numbers above. No generic advice.`;
+
+    // STEP 3: Call AI with real data
     let strategy = '';
     if (provider === 'groq') {
       const key = await getAIKey('groq');
+      if (!key) throw new Error('Groq key missing in Settings');
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], max_tokens: 2500 })
       });
       const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
       strategy = data.choices[0].message.content;
     } else {
       const key = await getAIKey('gemini');
+      if (!key) throw new Error('Gemini key missing in Settings');
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
       const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
       strategy = data.candidates[0].content.parts[0].text;
     }
 
+    // Display with REAL data summary at top
     document.getElementById('ai-strategy-loading').style.display = 'none';
     const el = document.getElementById('ai-strategy-result');
     el.style.display = 'block';
     el.innerHTML = `
+      <div style="background:#fff;border:2px solid #0a5c36;border-radius:12px;padding:16px;margin-bottom:14px;">
+        <h4 style="color:#0a5c36;margin-bottom:10px;">📊 Real-Time Data Used by AI</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:12px;">
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Rank</div>
+            <div style="font-size:20px;font-weight:800;color:${myRank<=3?'#2ecc71':myRank<=10?'#f39c12':'#e74c3c'};">#${myRank}</div>
+          </div>
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Rating</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${myRating} ⭐</div>
+          </div>
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Reviews</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${myReviews}</div>
+          </div>
+          <div style="background:#fff3cd;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Reviews Gap</div>
+            <div style="font-size:20px;font-weight:800;color:#e74c3c;">+${reviewGap}</div>
+          </div>
+          <div style="background:#fff3cd;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Top 5 Avg Rating</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${avgTopRating} ⭐</div>
+          </div>
+        </div>
+      </div>
       <div style="background:#f0fdf6;border:1.5px solid #2ecc71;border-radius:12px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <h4 style="color:#0a5c36;margin:0;">🚀 30-Day GMB Push Strategy — "${keyword}"</h4>
+          <h4 style="color:#0a5c36;margin:0;">🚀 AI Strategy Based on YOUR Real Data — "${keyword}"</h4>
           <button onclick="copyStrategy()" style="padding:6px 14px;background:#0a5c36;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;">Copy</button>
         </div>
         <div id="strategy-text" style="white-space:pre-wrap;font-size:13px;line-height:1.7;color:#333;">${strategy}</div>
@@ -2304,7 +2383,7 @@ Format with clear headings and bullet points. Be specific to Hyderabad interior 
     document.getElementById('ai-strategy-loading').style.display = 'none';
     document.getElementById('ai-strategy-result').style.display  = 'block';
     document.getElementById('ai-strategy-result').innerHTML =
-      `<div style="color:#e74c3c;padding:16px;">AI Error: ${e.message}<br>Check your API key in Settings.</div>`;
+      `<div style="color:#e74c3c;padding:16px;background:#fff3f3;border-radius:8px;">AI Error: ${e.message}</div>`;
   }
 }
 
