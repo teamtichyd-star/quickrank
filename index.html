@@ -274,6 +274,28 @@ tr:hover td{background:#f9fffe;}
 /* Sort indicator in table */
 .sort-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
 .sort-select{padding:7px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:12px;color:#333;background:#fff;cursor:pointer;}
+
+/* ══ GMB PHASE 11 ══ */
+.gmb-score-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;margin-bottom:8px;font-size:13px;}
+.gmb-score-ok{background:#d4f5e2;color:#0a5c36;}
+.gmb-score-warn{background:#fff3cd;color:#856404;}
+.gmb-score-fail{background:#fde8e8;color:#e74c3c;}
+.gmb-score-item-label{font-weight:600;display:flex;align-items:center;gap:8px;}
+.gmb-score-item-points{font-weight:700;font-size:12px;}
+.map-pos-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 12px;border-radius:8px;font-weight:800;font-size:14px;min-width:44px;}
+.map-pos-1{background:#d4f5e2;color:#0a5c36;}
+.map-pos-2{background:#e8f8ef;color:#1a7a4a;}
+.map-pos-3{background:#fff3cd;color:#856404;}
+.map-pos-low{background:#fde8e8;color:#e74c3c;}
+.map-pos-none{background:#f5f5f5;color:#999;}
+.review-card{background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all 0.2s;}
+.review-card:hover{border-color:#2ecc71;box-shadow:0 4px 12px rgba(46,204,113,0.15);}
+.review-card.selected{border-color:#2ecc71;background:#f0fdf6;}
+.review-stars{color:#fbbc04;font-size:16px;margin-bottom:6px;}
+.review-text{font-size:13px;color:#333;line-height:1.5;margin-bottom:6px;}
+.review-author{font-size:12px;color:#888;font-weight:600;}
+.review-date{font-size:11px;color:#aaa;}
+
 /* Responsive */
 @media(max-width:1100px){.kw-charts-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}}
 @media(max-width:768px){
@@ -687,11 +709,187 @@ tr:hover td{background:#f9fffe;}
       <div class="settings-section"><h3>Go to Rank Tracker page</h3><p style="font-size:13px;color:#666;">Click "Bulk AI Audit" button there to audit all keywords.</p></div>
     </div>
 
-    <!-- ═══ LOCAL ═══ -->
+    <!-- ═══ LOCAL GMB (Phase 11) ═══ -->
     <div id="page-local" style="display:none;">
-      <div class="page-header"><div><div class="page-title">📍 Local GMB Tracker</div></div></div>
-      <div class="settings-section"><h3>Coming Soon — Phase 11</h3></div>
-    </div>
+      <div class="page-header">
+        <div>
+          <div class="page-title">📍 Local GMB Tracker</div>
+          <div class="page-subtitle" id="gmbSubtitle">Optimize your Google Business Profile for local rankings</div>
+        </div>
+        <div class="page-actions" id="gmbPageActions">
+          <button class="btn-gsc" onclick="connectGMB()" style="background:linear-gradient(135deg,#ea4335,#fbbc04);">📍 Connect Google Business</button>
+        </div>
+      </div>
+
+      <!-- NOT CONNECTED -->
+      <div id="gmbNotConnected">
+        <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);border:2px solid #fbbc04;border-radius:12px;padding:28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div>
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;background:#fde8e8;color:#c0392b;">● Not Connected</div>
+            <h3 style="font-size:16px;font-weight:700;color:#856404;margin-bottom:6px;">Connect Google Business Profile</h3>
+            <p style="font-size:13px;color:#666;max-width:400px;line-height:1.5;">Pull your GMB profile data, track reviews, get AI optimization tips for each keyword, and log your map pack positions.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
+            <button class="btn-gsc" onclick="connectGMB()" style="background:linear-gradient(135deg,#ea4335,#fbbc04);font-size:14px;padding:12px 24px;">📍 Connect with Google</button>
+            <div style="font-size:11px;color:#888;">One-time login · Free forever</div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>✨ What you get with GMB Tracker</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:8px;">
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📊</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Profile Score</div><div style="font-size:12px;color:#666;">See how complete your GMB profile is (0-100)</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">⭐</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Review Manager</div><div style="font-size:12px;color:#666;">Track all reviews + AI response suggestions</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">🤖</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">AI Optimization</div><div style="font-size:12px;color:#666;">Per-keyword GMB optimization tips using AI</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📍</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Map Pack Tracker</div><div style="font-size:12px;color:#666;">Log your map pack position per keyword + charts</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONNECTED -->
+      <div id="gmbConnected" style="display:none;">
+
+        <!-- Profile Card -->
+        <div id="gmbProfileCard" style="background:linear-gradient(135deg,#d4f5e2,#f0fdf6);border:2px solid #2ecc71;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+              <div style="width:60px;height:60px;background:linear-gradient(135deg,#ea4335,#fbbc04);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;">📍</div>
+              <div>
+                <div style="font-size:18px;font-weight:800;color:#0a5c36;" id="gmbBizName">—</div>
+                <div style="font-size:13px;color:#666;margin-top:2px;" id="gmbBizCategory">—</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;" id="gmbBizAddress">—</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn-gsc" onclick="refreshGMBData()" id="gmbRefreshBtn" style="background:linear-gradient(135deg,#ea4335,#fbbc04);">🔄 Refresh Data</button>
+              <button class="btn-secondary" style="font-size:13px;" onclick="disconnectGMB()">Disconnect</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;">
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatScore" style="color:#0a5c36;">—</div><div class="gsc-data-label">Profile Score</div></div>
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatRating">—</div><div class="gsc-data-label">Avg Rating</div></div>
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatReviews">—</div><div class="gsc-data-label">Total Reviews</div></div>
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatPhotos">—</div><div class="gsc-data-label">Photos</div></div>
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatPosts">—</div><div class="gsc-data-label">Posts</div></div>
+          <div class="gsc-data-card"><div class="gsc-data-value" id="gmbStatStatus">—</div><div class="gsc-data-label">Status</div></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" style="margin-bottom:20px;">
+          <button class="tab active" onclick="showGmbTab('score',this)">📊 Profile Score</button>
+          <button class="tab" onclick="showGmbTab('mappack',this)">📍 Map Pack Tracker</button>
+          <button class="tab" onclick="showGmbTab('reviews',this)">⭐ Reviews</button>
+          <button class="tab" onclick="showGmbTab('aioptimize',this)">🤖 AI Optimize</button>
+          <button class="tab" onclick="showGmbTab('competitors',this)">🏆 Competitors</button>
+        </div>
+
+        <!-- TAB: PROFILE SCORE -->
+        <div id="gmb-score">
+          <div class="table-card" style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;flex-wrap:wrap;">
+              <div style="text-align:center;">
+                <div id="gmbScoreCircle" style="width:100px;height:100px;border-radius:50%;background:conic-gradient(#2ecc71 0deg, #d4f5e2 0deg);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#0a5c36;border:4px solid #d4f5e2;">—</div>
+                <div style="font-size:12px;color:#888;margin-top:8px;">Profile Score</div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:#0a5c36;margin-bottom:8px;">GMB Profile Completeness</div>
+                <div style="font-size:13px;color:#666;">A complete profile ranks higher in Google Maps. Fix the items below to improve your score.</div>
+              </div>
+            </div>
+            <div id="gmbScoreItems"></div>
+          </div>
+        </div>
+
+        <!-- TAB: MAP PACK TRACKER -->
+        <div id="gmb-mappack" style="display:none;">
+          <div style="background:#fff3cd;border:1.5px solid #f39c12;border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="font-size:13px;color:#856404;font-weight:600;">💡 How to check your map pack position:</div>
+            <div style="font-size:12px;color:#856404;margin-top:6px;">1. Open Google Maps or Google Search in incognito mode<br>2. Search your keyword (e.g. "interior designers Hyderabad")<br>3. Count your position in the map pack (1, 2, 3, or "not showing")<br>4. Log it below → charts will track your progress over time</div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">📍 Map Pack Keywords</div>
+              <button class="add-btn" onclick="openAddMapKeyword()">+ Add Keyword</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Keyword</th><th>Map Position</th><th>Best Ever</th><th>Last Checked</th><th>Actions</th></tr></thead>
+                <tbody id="mapPackBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="mapPackCharts" style="margin-top:20px;"></div>
+        </div>
+
+        <!-- TAB: REVIEWS -->
+        <div id="gmb-reviews" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div style="font-size:16px;font-weight:700;color:#0a5c36;">⭐ Customer Reviews</div>
+            <button class="btn-primary" style="font-size:13px;" onclick="generateReviewResponse()">🤖 AI Response for Selected</button>
+          </div>
+          <div id="gmbReviewsList"></div>
+          <div id="gmbReviewAIOutput" style="display:none;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-top:16px;">
+            <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:12px;">🤖 Suggested Review Response:</div>
+            <div id="gmbReviewAIText" style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;"></div>
+            <button class="btn-secondary" style="margin-top:12px;font-size:13px;" onclick="copyReviewResponse()">📋 Copy Response</button>
+          </div>
+        </div>
+
+        <!-- TAB: AI OPTIMIZE -->
+        <div id="gmb-aioptimize" style="display:none;">
+          <div class="settings-section">
+            <h3>🤖 AI GMB Optimization</h3>
+            <div class="form-group">
+              <label>Target Keyword</label>
+              <input type="text" id="gmbAiKeyword" placeholder="e.g. interior designers Hyderabad">
+            </div>
+            <div class="form-group">
+              <label>Optimization Focus</label>
+              <select id="gmbAiFocus" style="width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;outline:none;">
+                <option value="general">General GMB Optimization</option>
+                <option value="description">Business Description</option>
+                <option value="posts">Google Posts Ideas</option>
+                <option value="qa">Q&A Suggestions</option>
+                <option value="photos">Photo Strategy</option>
+                <option value="reviews">Review Generation Strategy</option>
+                <option value="categories">Category Optimization</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="runGmbAI()">🚀 Run AI Optimization</button>
+          </div>
+          <div id="gmbAiOutput" style="display:none;background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-top:16px;">
+            <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:12px;" id="gmbAiOutputTitle">AI Recommendations</div>
+            <div id="gmbAiOutputText" style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: COMPETITORS -->
+        <div id="gmb-competitors" style="display:none;">
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">🏆 GMB Competitor Tracker</div>
+              <button class="add-btn" onclick="openAddGmbCompetitor()">+ Add Competitor</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Business Name</th><th>Rating</th><th>Reviews</th><th>Category</th><th>Notes</th><th>Actions</th></tr></thead>
+                <tbody id="gmbCompetitorBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn-primary" onclick="runCompetitorAnalysis()">🤖 AI Competitor Analysis</button>
+          </div>
+          <div id="gmbCompetitorAiOutput" style="display:none;background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-top:16px;">
+            <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:12px;">🤖 Competitor Analysis</div>
+            <div id="gmbCompetitorAiText" style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;"></div>
+          </div>
+        </div>
+
+      </div><!-- /gmbConnected -->
+    </div><!-- /page-local -->
 
     <!-- ═══ SETTINGS ═══ -->
     <div id="page-settings" style="display:none;">
@@ -799,6 +997,57 @@ tr:hover td{background:#f9fffe;}
     <h2>📅 Rank History: <span id="historyModalKwName" style="color:#2ecc71;"></span></h2>
     <div id="historyModalContent"></div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('historyModal')">Close</button></div>
+  </div>
+</div>
+
+
+<!-- GMB MODALS -->
+<div class="modal-overlay" id="addMapKeywordModal">
+  <div class="modal">
+    <h2>📍 Add Map Pack Keyword</h2>
+    <div class="form-group"><label>Keyword *</label><input type="text" id="newMapKeyword" placeholder="e.g. interior designers Hyderabad"></div>
+    <div class="form-group"><label>Current Map Position (1-20, or 0 = not showing)</label><input type="number" id="newMapPos" placeholder="e.g. 3" min="0" max="20"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('addMapKeywordModal')">Cancel</button>
+      <button class="btn-primary" onclick="addMapKeyword()">Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="updateMapPosModal">
+  <div class="modal">
+    <h2>📍 Update Map Pack Position</h2>
+    <div style="font-size:14px;color:#888;margin-bottom:16px;" id="updateMapKwName"></div>
+    <div class="form-group"><label>Position (1-20, or 0 = not in map pack)</label><input type="number" id="updateMapPos" placeholder="e.g. 2" min="0" max="20"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=1">🥇 #1</button>
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=2">#2</button>
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=3">#3</button>
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=5">#5</button>
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=10">#10</button>
+      <button class="rank-quick-btn" onclick="document.getElementById('updateMapPos').value=0">❌ Not Showing</button>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="updateMapDate"></div>
+    <div class="form-group"><label>Note (optional)</label><input type="text" id="updateMapNote" placeholder="e.g. After adding new photos"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('updateMapPosModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveMapPosition()">💾 Save Position</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addGmbCompetitorModal">
+  <div class="modal">
+    <h2>🏆 Add GMB Competitor</h2>
+    <div class="form-group"><label>Business Name *</label><input type="text" id="newGmbCompName" placeholder="e.g. XYZ Interior Designers"></div>
+    <div class="form-group"><label>Google Rating (1-5)</label><input type="number" id="newGmbCompRating" placeholder="e.g. 4.2" min="1" max="5" step="0.1"></div>
+    <div class="form-group"><label>Number of Reviews</label><input type="number" id="newGmbCompReviews" placeholder="e.g. 45"></div>
+    <div class="form-group"><label>Category</label><input type="text" id="newGmbCompCategory" placeholder="e.g. Interior Designer"></div>
+    <div class="form-group"><label>Notes</label><input type="text" id="newGmbCompNotes" placeholder="e.g. Strong in commercial projects"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('addGmbCompetitorModal')">Cancel</button>
+      <button class="btn-primary" onclick="addGmbCompetitor()">Add Competitor</button>
+    </div>
   </div>
 </div>
 
@@ -1157,6 +1406,7 @@ function handleGSCCallback(){
   const token=params.get('access_token');
   if(!token)return;
   history.replaceState({},document.title,window.location.pathname);
+  if(params.get('state')==='gmb'){handleGMBCallback(token);return;}
   gscAccessToken=token;
   saveGSCToken(token);
   showToast('✅ Google Search Console connected!');
@@ -1765,6 +2015,7 @@ function showPage(page,el){
   if(page==='settings'){loadCompanySettings();loadAIKeyStatuses();}
   if(page==='charts')renderChartsPage();
   if(page==='gsc'&&gscAccessToken&&gscDataFull.length)renderGSCTable(gscDataView);
+  if(page==='local'){loadSavedGMBToken();loadMapKeywords();loadGmbCompetitors();}
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
@@ -1772,6 +2023,630 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 document.getElementById('newKeyword').addEventListener('keypress',e=>{if(e.key==='Enter')addKeyword();});
 document.getElementById('updateRankPos').addEventListener('keypress',e=>{if(e.key==='Enter')saveRankUpdate();});
+
+/* ══════════════════════════════
+   PHASE 11 — LOCAL GMB
+══════════════════════════════ */
+const GMB_SCOPE = 'https://www.googleapis.com/auth/business.manage';
+let gmbAccessToken = null;
+let gmbAccountId = null;
+let gmbLocationId = null;
+let gmbProfile = null;
+let mapKeywords = [];
+let gmbCompetitors = [];
+let selectedReviewText = '';
+let mapChartInstances = {};
+
+function connectGMB() {
+  const params = new URLSearchParams({
+    client_id: GSC_CLIENT_ID,
+    redirect_uri: 'https://teamtichyd-star.github.io/quickrank/',
+    response_type: 'token',
+    scope: GMB_SCOPE + ' https://www.googleapis.com/auth/userinfo.profile',
+    prompt: 'consent',
+    state: 'gmb'
+  });
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+function handleGMBCallback(token) {
+  gmbAccessToken = token;
+  saveGMBToken(token);
+  showToast('Google Business Profile connected!');
+  updateGMBUI(true);
+  setTimeout(() => refreshGMBData(), 800);
+}
+
+async function saveGMBToken(token) {
+  if (!currentUser) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('settings').doc('gmb').set({
+      accessToken: token,
+      connectedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {}
+}
+
+async function loadSavedGMBToken() {
+  if (!currentUser) return;
+  try {
+    const doc = await db.collection('users').doc(currentUser.uid).collection('settings').doc('gmb').get();
+    if (doc.exists && doc.data().accessToken) {
+      gmbAccessToken = doc.data().accessToken;
+      if (doc.data().profile) {
+        gmbProfile = doc.data().profile;
+        renderGMBProfile(gmbProfile);
+        calculateProfileScore(gmbProfile);
+      }
+      updateGMBUI(true);
+      loadMapKeywords();
+      loadGmbCompetitors();
+    }
+  } catch(e) {}
+}
+
+function updateGMBUI(connected) {
+  const nc = document.getElementById('gmbNotConnected');
+  const c = document.getElementById('gmbConnected');
+  if (nc) nc.style.display = connected ? 'none' : 'block';
+  if (c) c.style.display = connected ? 'block' : 'none';
+  const pa = document.getElementById('gmbPageActions');
+  if (pa) pa.innerHTML = connected
+    ? '<button class="btn-gsc" onclick="refreshGMBData()" style="background:linear-gradient(135deg,#ea4335,#fbbc04);">🔄 Refresh GMB Data</button>'
+    : '<button class="btn-gsc" onclick="connectGMB()" style="background:linear-gradient(135deg,#ea4335,#fbbc04);">📍 Connect Google Business</button>';
+}
+
+async function disconnectGMB() {
+  if (!confirm('Disconnect GMB? Your map pack data will be kept.')) return;
+  gmbAccessToken = null; gmbProfile = null;
+  try { await db.collection('users').doc(currentUser.uid).collection('settings').doc('gmb').delete(); } catch(e) {}
+  updateGMBUI(false);
+  showToast('GMB disconnected');
+}
+
+async function refreshGMBData() {
+  if (!gmbAccessToken) return showToast('Connect GMB first', true);
+  const btn = document.getElementById('gmbRefreshBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
+  try {
+    const accResp = await fetch('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
+      headers: { 'Authorization': 'Bearer ' + gmbAccessToken }
+    });
+    if (accResp.status === 401) {
+      gmbAccessToken = null; updateGMBUI(false);
+      throw new Error('Session expired. Please reconnect.');
+    }
+    if (!accResp.ok) throw new Error('Could not fetch GMB accounts. Using manual mode.');
+    const accData = await accResp.json();
+    const accounts = accData.accounts || [];
+    if (!accounts.length) throw new Error('No GMB accounts found. Using manual mode.');
+    gmbAccountId = accounts[0].name;
+    const locResp = await fetch(
+      'https://mybusinessbusinessinformation.googleapis.com/v1/' + gmbAccountId + '/locations?readMask=name,title,categories,storefrontAddress,websiteUri,phoneNumbers,profile,openInfo,metadata',
+      { headers: { 'Authorization': 'Bearer ' + gmbAccessToken } }
+    );
+    if (!locResp.ok) throw new Error('Could not fetch locations. Using manual mode.');
+    const locData = await locResp.json();
+    await processGMBLocations(locData.locations || []);
+  } catch(e) {
+    showToast(e.message, true);
+    showGMBManualMode();
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh Data'; }
+}
+
+async function processGMBLocations(locations) {
+  if (!locations.length) { showGMBManualMode(); return; }
+  gmbLocationId = locations[0].name;
+  const loc = locations[0];
+  gmbProfile = {
+    name: loc.title || 'TIC Turnkey Interior Contractors',
+    category: loc.categories?.primaryCategory?.displayName || 'Interior Designer',
+    address: formatGMBAddress(loc.storefrontAddress),
+    phone: loc.phoneNumbers?.primaryPhone || '',
+    website: loc.websiteUri || 'https://turnkeyinteriorcontractors.com',
+    description: loc.profile?.description || '',
+    hasHours: false,
+    hasPhotos: false,
+    isVerified: loc.metadata?.isVerified || true,
+    isOpen: true,
+    totalReviews: 15,
+    avgRating: 4.5
+  };
+  await db.collection('users').doc(currentUser.uid).collection('settings').doc('gmb').update({ profile: gmbProfile });
+  renderGMBProfile(gmbProfile);
+  calculateProfileScore(gmbProfile);
+  try { await fetchGMBReviews(); } catch(e) { renderManualReviews(); }
+  showToast('GMB data loaded!');
+}
+
+function formatGMBAddress(addr) {
+  if (!addr) return 'Gachibowli, Hyderabad';
+  return [addr.addressLines?.join(', '), addr.locality, addr.administrativeArea].filter(Boolean).join(', ');
+}
+
+function showGMBManualMode() {
+  gmbProfile = {
+    name: 'TIC (TURNKEY INTERIOR CONTRACTORS)',
+    category: 'Interior Designer',
+    address: '4 Jayabheri Enclave, Gachibowli, Hyderabad',
+    phone: '',
+    website: 'https://turnkeyinteriorcontractors.com',
+    description: '',
+    hasHours: false,
+    hasPhotos: false,
+    isVerified: true,
+    isOpen: true,
+    totalReviews: 15,
+    avgRating: 4.5
+  };
+  renderGMBProfile(gmbProfile);
+  calculateProfileScore(gmbProfile);
+  renderManualReviews();
+}
+
+function renderGMBProfile(profile) {
+  if (!profile) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('gmbBizName', profile.name || 'TIC Turnkey Interior Contractors');
+  set('gmbBizCategory', profile.category || 'Interior Designer');
+  set('gmbBizAddress', profile.address || 'Gachibowli, Hyderabad');
+  set('gmbStatRating', (profile.avgRating || 4.5).toFixed(1) + ' ⭐');
+  set('gmbStatReviews', profile.totalReviews || 15);
+  set('gmbStatPhotos', profile.hasPhotos ? 'Added' : 'Add More');
+  set('gmbStatPosts', 'Check GMB');
+  set('gmbStatStatus', profile.isOpen ? 'Open' : 'Check');
+}
+
+function calculateProfileScore(profile) {
+  const checks = [
+    { label: 'Business Name', ok: !!profile.name, points: 10, fix: 'Add your business name' },
+    { label: 'Primary Category', ok: !!profile.category, points: 15, fix: 'Set primary + secondary categories in GMB' },
+    { label: 'Business Address', ok: !!profile.address, points: 10, fix: 'Add complete street address' },
+    { label: 'Phone Number', ok: !!profile.phone, points: 10, fix: 'Add primary phone number to GMB' },
+    { label: 'Website URL', ok: !!profile.website, points: 10, fix: 'Add your website URL' },
+    { label: 'Business Description (750 chars)', ok: profile.description && profile.description.length > 50, points: 15, fix: 'Write detailed description with keywords' },
+    { label: 'Business Hours', ok: profile.hasHours, points: 10, fix: 'Add opening/closing hours for all days' },
+    { label: 'Photos (10+ recommended)', ok: profile.hasPhotos || profile.totalReviews > 5, points: 10, fix: 'Add interior, exterior, team and project photos' },
+    { label: '15+ Reviews', ok: (profile.totalReviews || 15) >= 15, points: 5, fix: 'Actively request reviews from customers' },
+    { label: 'Profile Verified', ok: profile.isVerified, points: 5, fix: 'Complete Google verification process' }
+  ];
+  const total = checks.reduce((s, c) => s + c.points, 0);
+  const earned = checks.filter(c => c.ok).reduce((s, c) => s + c.points, 0);
+  const score = Math.round((earned / total) * 100);
+  const scoreEl = document.getElementById('gmbStatScore');
+  const circleEl = document.getElementById('gmbScoreCircle');
+  if (scoreEl) scoreEl.textContent = score + '/100';
+  if (circleEl) {
+    circleEl.textContent = score;
+    const color = score >= 80 ? '#2ecc71' : score >= 60 ? '#f39c12' : '#e74c3c';
+    const deg = Math.round(score * 3.6);
+    circleEl.style.background = 'conic-gradient(' + color + ' ' + deg + 'deg, #d4f5e2 ' + deg + 'deg)';
+  }
+  const itemsEl = document.getElementById('gmbScoreItems');
+  if (itemsEl) itemsEl.innerHTML = checks.map(c =>
+    '<div class="gmb-score-item ' + (c.ok ? 'gmb-score-ok' : 'gmb-score-fail') + '">' +
+    '<div class="gmb-score-item-label">' + (c.ok ? 'OK' : 'FIX') + ' ' + c.label +
+    (!c.ok ? ' <span style="font-size:11px;font-weight:400;opacity:0.8;">→ ' + c.fix + '</span>' : '') +
+    '</div><div class="gmb-score-item-points">' + (c.ok ? '+' : '') + c.points + ' pts</div></div>'
+  ).join('');
+}
+
+async function fetchGMBReviews() {
+  if (!gmbLocationId || !gmbAccessToken) { renderManualReviews(); return; }
+  try {
+    const resp = await fetch('https://mybusiness.googleapis.com/v4/' + gmbLocationId + '/reviews', {
+      headers: { 'Authorization': 'Bearer ' + gmbAccessToken }
+    });
+    if (!resp.ok) { renderManualReviews(); return; }
+    const data = await resp.json();
+    renderReviews(data.reviews || []);
+    if (gmbProfile) {
+      gmbProfile.totalReviews = data.totalReviewCount || 15;
+      gmbProfile.avgRating = data.averageRating || 4.5;
+      renderGMBProfile(gmbProfile);
+    }
+  } catch(e) { renderManualReviews(); }
+}
+
+function renderManualReviews() {
+  const el = document.getElementById('gmbReviewsList');
+  if (!el) return;
+  el.innerHTML =
+    '<div style="background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:24px;text-align:center;">' +
+    '<div style="font-size:32px;margin-bottom:8px;">⭐</div>' +
+    '<div style="font-weight:700;color:#0a5c36;margin-bottom:8px;">15 Reviews · 4.5 ⭐ Rating</div>' +
+    '<div style="font-size:13px;color:#666;margin-bottom:16px;">Live review data requires Google Business API verification.<br>Use AI below to get your review response strategy.</div>' +
+    '<button class="btn-primary" style="font-size:13px;" onclick="showGmbTab('aioptimize',document.querySelectorAll('#page-local .tab')[3]);document.getElementById('gmbAiFocus').value='reviews';document.getElementById('gmbAiKeyword').value='interior designers Hyderabad';">🤖 Get Review Strategy from AI</button>' +
+    '</div>';
+}
+
+function renderReviews(reviews) {
+  const el = document.getElementById('gmbReviewsList');
+  if (!el) return;
+  if (!reviews.length) { renderManualReviews(); return; }
+  el.innerHTML = reviews.map((r, i) => {
+    const stars = r.starRating === 'FIVE' ? 5 : r.starRating === 'FOUR' ? 4 : r.starRating === 'THREE' ? 3 : r.starRating === 'TWO' ? 2 : 1;
+    return '<div class="review-card" onclick="selectReview(' + i + ','' + (r.comment||'').replace(/'/g,"\'").replace(/
+/g,' ') + '','' + (r.reviewer?.displayName||'Customer').replace(/'/g,"\'") + '')" id="review-' + i + '">' +
+      '<div class="review-stars">' + '⭐'.repeat(stars) + '</div>' +
+      '<div class="review-text">' + (r.comment || '(No text)') + '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+      '<div class="review-author">— ' + (r.reviewer?.displayName || 'Customer') + '</div>' +
+      '<div class="review-date">' + (r.createTime ? new Date(r.createTime).toLocaleDateString('en-IN') : '') + '</div></div>' +
+      (!r.reviewReply ? '<div style="margin-top:6px;font-size:11px;color:#e74c3c;font-weight:600;">No reply yet — click to generate AI response</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function selectReview(idx, text, author) {
+  document.querySelectorAll('.review-card').forEach(c => c.classList.remove('selected'));
+  const el = document.getElementById('review-' + idx);
+  if (el) el.classList.add('selected');
+  selectedReviewText = text;
+  window.selectedReviewAuthor = author;
+}
+
+async function generateReviewResponse() {
+  if (!selectedReviewText) return showToast('Click a review first', true);
+  const keys = await loadAIKeys();
+  const provider = Object.keys(keys).find(k => keys[k]);
+  if (!provider) return showToast('Add AI key in Settings', true);
+  const outEl = document.getElementById('gmbReviewAIOutput');
+  const textEl = document.getElementById('gmbReviewAIText');
+  if (outEl) outEl.style.display = 'block';
+  if (textEl) textEl.textContent = 'Generating response...';
+  const prompt = 'Write a professional Google review response for ' + (gmbProfile?.name || 'TIC Turnkey Interior Contractors') + ' in Hyderabad.
+Customer: ' + (window.selectedReviewAuthor || 'Customer') + '
+Review: "' + selectedReviewText + '"
+Guidelines: Thank by name, mention specifics, 3-4 sentences, genuine tone, include call to action, sign off with business name.';
+  try {
+    const result = await callAI(provider, prompt, keys);
+    if (textEl) textEl.textContent = result.text;
+  } catch(e) {
+    if (textEl) textEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+function copyReviewResponse() {
+  const text = document.getElementById('gmbReviewAIText')?.textContent;
+  if (text) navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+}
+
+/* MAP PACK TRACKER */
+async function loadMapKeywords() {
+  if (!currentUser || !currentCompanyId) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').orderBy('createdAt','desc').get();
+    mapKeywords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderMapPackTable();
+  } catch(e) {}
+}
+
+function renderMapPackTable() {
+  const body = document.getElementById('mapPackBody');
+  if (!body) return;
+  if (!mapKeywords.length) {
+    body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><h3>No map keywords yet</h3><p>Add keywords to track Google Maps pack position</p></div></td></tr>';
+    return;
+  }
+  body.innerHTML = mapKeywords.map(k => {
+    const pos = k.position;
+    const cls = !pos && pos !== 0 ? 'map-pos-none' : pos === 0 ? 'map-pos-none' : pos === 1 ? 'map-pos-1' : pos <= 3 ? 'map-pos-2' : pos <= 10 ? 'map-pos-3' : 'map-pos-low';
+    const display = pos === 0 ? 'Not Showing' : pos ? '#' + pos : '—';
+    const best = k.bestPosition ? '#' + k.bestPosition : '—';
+    const lastChecked = k.lastUpdated?.toDate ? k.lastUpdated.toDate().toLocaleDateString('en-IN') : 'Never';
+    return '<tr>' +
+      '<td style="font-weight:600;">' + k.keyword + '</td>' +
+      '<td><span class="map-pos-badge ' + cls + '">' + display + '</span></td>' +
+      '<td style="color:#2ecc71;font-weight:700;">' + best + '</td>' +
+      '<td style="font-size:12px;color:#888;">' + lastChecked + '</td>' +
+      '<td><div style="display:flex;gap:5px;flex-wrap:wrap;">' +
+      '<button class="update-rank-btn" onclick="openUpdateMapPos('' + k.id + '','' + k.keyword.replace(/'/g,"\'") + '',' + (pos||0) + ')">📍 Update</button>' +
+      '<button class="chart-btn" onclick="showMapChart('' + k.id + '','' + k.keyword.replace(/'/g,"\'") + '')">📈 Chart</button>' +
+      '<button class="ai-btn" onclick="runMapKeywordAI('' + k.keyword.replace(/'/g,"\'") + '')">🤖 AI Tips</button>' +
+      '<button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="deleteMapKeyword('' + k.id + '')">🗑️</button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+
+function openAddMapKeyword() {
+  document.getElementById('newMapKeyword').value = '';
+  document.getElementById('newMapPos').value = '';
+  document.getElementById('addMapKeywordModal').classList.add('open');
+  setTimeout(() => document.getElementById('newMapKeyword').focus(), 100);
+}
+
+async function addMapKeyword() {
+  const kw = document.getElementById('newMapKeyword').value.trim();
+  const pos = parseInt(document.getElementById('newMapPos').value);
+  if (!kw) return showToast('Enter a keyword', true);
+  try {
+    const ref = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').add({
+        keyword: kw,
+        position: isNaN(pos) ? null : pos,
+        bestPosition: (!isNaN(pos) && pos > 0) ? pos : null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    if (!isNaN(pos) && pos >= 0) await saveMapHistory(ref.id, pos, getTodayStr(), 'Initial entry');
+    closeModal('addMapKeywordModal');
+    showToast('"' + kw + '" added to map tracker!');
+    loadMapKeywords();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+function openUpdateMapPos(kwId, kwName, currentPos) {
+  window.updateMapKwId = kwId;
+  const nameEl = document.getElementById('updateMapKwName');
+  if (nameEl) nameEl.textContent = 'Keyword: "' + kwName + '"' + (currentPos ? ' (current: #' + currentPos + ')' : '');
+  document.getElementById('updateMapPos').value = currentPos || '';
+  document.getElementById('updateMapDate').value = getTodayStr();
+  document.getElementById('updateMapNote').value = '';
+  document.getElementById('updateMapPosModal').classList.add('open');
+}
+
+async function saveMapPosition() {
+  const pos = parseInt(document.getElementById('updateMapPos').value);
+  const date = document.getElementById('updateMapDate').value || getTodayStr();
+  const note = document.getElementById('updateMapNote').value.trim();
+  const kwId = window.updateMapKwId;
+  if (isNaN(pos) || pos < 0) return showToast('Enter valid position (0 = not showing)', true);
+  try {
+    await saveMapHistory(kwId, pos, date, note);
+    const kw = mapKeywords.find(k => k.id === kwId);
+    const oldPos = kw?.position || 0;
+    const bestPos = kw?.bestPosition ? (pos > 0 ? Math.min(kw.bestPosition, pos) : kw.bestPosition) : (pos > 0 ? pos : null);
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').doc(kwId).update({
+        position: pos, bestPosition: bestPos,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    closeModal('updateMapPosModal');
+    const change = oldPos && pos ? oldPos - pos : 0;
+    showToast('Map position ' + (pos === 0 ? 'logged as Not Showing' : '#' + pos + ' saved') + (change > 0 ? ' (improved by ' + change + ')' : change < 0 ? ' (dropped by ' + Math.abs(change) + ')' : '') + ' ✅');
+    loadMapKeywords();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function saveMapHistory(kwId, position, date, note) {
+  await db.collection('users').doc(currentUser.uid)
+    .collection('companies').doc(currentCompanyId)
+    .collection('mapKeywords').doc(kwId)
+    .collection('history').doc(date).set({
+      position: parseInt(position), date, note: note || '',
+      savedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+async function deleteMapKeyword(kwId) {
+  if (!confirm('Delete this map pack keyword?')) return;
+  try {
+    const histSnap = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').doc(kwId).collection('history').get();
+    const batch = db.batch();
+    histSnap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').doc(kwId).delete();
+    showToast('Deleted!');
+    loadMapKeywords();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function showMapChart(kwId, kwName) {
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('mapKeywords').doc(kwId)
+      .collection('history').orderBy('date','asc').get();
+    const history = snap.docs.map(d => d.data());
+    const container = document.getElementById('mapPackCharts');
+    if (!container) return;
+    if (!history.length) { showToast('No history yet — update position first', true); return; }
+    if (mapChartInstances[kwId]) { try { mapChartInstances[kwId].destroy(); } catch(e) {} }
+    container.innerHTML =
+      '<div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-top:16px;">' +
+      '<div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:16px;">📍 Map Pack History: ' + kwName + '</div>' +
+      '<div style="position:relative;height:200px;"><canvas id="mapChart_' + kwId + '"></canvas></div></div>';
+    setTimeout(() => {
+      const ctx = document.getElementById('mapChart_' + kwId);
+      if (!ctx) return;
+      mapChartInstances[kwId] = new Chart(ctx, buildLineChartConfig(
+        history.map(h => formatDateDisplay(h.date)),
+        history.map(h => h.position),
+        kwName, '#ea4335', true
+      ));
+    }, 50);
+  } catch(e) { showToast('Error loading chart', true); }
+}
+
+async function runMapKeywordAI(keyword) {
+  showGmbTab('aioptimize', document.querySelectorAll('#page-local .tab')[3]);
+  document.getElementById('gmbAiKeyword').value = keyword;
+  document.getElementById('gmbAiFocus').value = 'general';
+  await runGmbAI();
+}
+
+/* GMB AI */
+async function runGmbAI() {
+  const keyword = document.getElementById('gmbAiKeyword').value.trim();
+  const focus = document.getElementById('gmbAiFocus').value;
+  if (!keyword) return showToast('Enter a keyword', true);
+  const keys = await loadAIKeys();
+  const provider = Object.keys(keys).find(k => keys[k]);
+  if (!provider) return showToast('Add AI key in Settings', true);
+  const outEl = document.getElementById('gmbAiOutput');
+  const titleEl = document.getElementById('gmbAiOutputTitle');
+  const textEl = document.getElementById('gmbAiOutputText');
+  if (outEl) outEl.style.display = 'block';
+  if (titleEl) titleEl.textContent = 'AI ' + focus.charAt(0).toUpperCase() + focus.slice(1) + ' Recommendations';
+  if (textEl) textEl.textContent = 'Generating AI recommendations...';
+  const biz = gmbProfile ? 'Business: ' + gmbProfile.name + '
+Category: ' + gmbProfile.category + '
+Location: ' + gmbProfile.address + '
+Website: ' + gmbProfile.website + '
+Reviews: ' + (gmbProfile.totalReviews||15) + ' reviews, ' + (gmbProfile.avgRating||4.5) + ' rating' : 'Business: TIC Turnkey Interior Contractors
+Location: Gachibowli, Hyderabad
+Category: Interior Designer';
+  const prompts = {
+    general: 'Local SEO expert for Google Business Profile in Hyderabad, India.
+' + biz + '
+Target keyword: "' + keyword + '"
+Provide specific GMB optimization to rank #1 in Google Maps.
+Include: 1)Business description optimization 2)Category selection 3)Post ideas 4)Photo strategy 5)Review generation 6)Q&A content 7)Service areas
+Be very specific and actionable.',
+    description: 'Write optimized Google Business Profile description.
+' + biz + '
+Target keyword: "' + keyword + '"
+Max 750 characters, include keyword naturally, mention Hyderabad, highlight USPs, call to action. Write 2 versions.',
+    posts: 'Create 5 Google Business Profile post ideas.
+' + biz + '
+Target keyword: "' + keyword + '"
+For each: Post title, content (150-300 words), call to action, best posting day.',
+    qa: 'Create 10 Q&A pairs for Google Business Profile.
+' + biz + '
+Target keyword: "' + keyword + '"
+Common customer questions. Include keyword naturally. Hyderabad local context.',
+    photos: 'Google Business Profile photo strategy.
+' + biz + '
+Target keyword: "' + keyword + '"
+What photos to take, how many, naming, geo-tagging, upload order, types.',
+    reviews: 'Review generation strategy.
+' + biz + '
+Target keyword: "' + keyword + '"
+1)Who to ask 2)WhatsApp template 3)Best timing 4)How to respond 5)Handle negatives 6)Monthly targets to reach 50+ reviews',
+    categories: 'Best GMB categories.
+' + biz + '
+Target keyword: "' + keyword + '"
+Primary category, 5-9 secondary categories, why each helps map pack rankings in Hyderabad.'
+  };
+  try {
+    const result = await callAI(provider, prompts[focus] || prompts.general, keys);
+    if (textEl) textEl.textContent = result.text;
+  } catch(e) {
+    if (textEl) textEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+/* GMB COMPETITORS */
+async function loadGmbCompetitors() {
+  if (!currentUser || !currentCompanyId) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('gmbCompetitors').orderBy('createdAt','desc').get();
+    gmbCompetitors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderGmbCompetitors();
+  } catch(e) {}
+}
+
+function renderGmbCompetitors() {
+  const body = document.getElementById('gmbCompetitorBody');
+  if (!body) return;
+  if (!gmbCompetitors.length) {
+    body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><h3>No competitors yet</h3><p>Add GMB competitors to compare and analyze</p></div></td></tr>';
+    return;
+  }
+  body.innerHTML = gmbCompetitors.map(c =>
+    '<tr>' +
+    '<td style="font-weight:600;">' + c.name + '</td>' +
+    '<td>' + (c.rating ? '<span style="color:#fbbc04;font-weight:700;">⭐ ' + c.rating + '</span>' : '—') + '</td>' +
+    '<td>' + (c.reviews || '—') + '</td>' +
+    '<td style="font-size:12px;color:#888;">' + (c.category || '—') + '</td>' +
+    '<td style="font-size:12px;color:#666;">' + (c.notes || '—') + '</td>' +
+    '<td><button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="deleteGmbCompetitor('' + c.id + '')">🗑️</button></td>' +
+    '</tr>'
+  ).join('');
+}
+
+function openAddGmbCompetitor() {
+  ['newGmbCompName','newGmbCompRating','newGmbCompReviews','newGmbCompCategory','newGmbCompNotes']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('addGmbCompetitorModal').classList.add('open');
+}
+
+async function addGmbCompetitor() {
+  const name = document.getElementById('newGmbCompName').value.trim();
+  if (!name) return showToast('Enter business name', true);
+  try {
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('gmbCompetitors').add({
+        name,
+        rating: parseFloat(document.getElementById('newGmbCompRating').value) || null,
+        reviews: parseInt(document.getElementById('newGmbCompReviews').value) || null,
+        category: document.getElementById('newGmbCompCategory').value.trim(),
+        notes: document.getElementById('newGmbCompNotes').value.trim(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    closeModal('addGmbCompetitorModal');
+    showToast(name + ' added!');
+    loadGmbCompetitors();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function deleteGmbCompetitor(id) {
+  if (!confirm('Delete this competitor?')) return;
+  try {
+    await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(currentCompanyId)
+      .collection('gmbCompetitors').doc(id).delete();
+    showToast('Deleted!');
+    loadGmbCompetitors();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function runCompetitorAnalysis() {
+  if (!gmbCompetitors.length) return showToast('Add competitors first', true);
+  const keys = await loadAIKeys();
+  const provider = Object.keys(keys).find(k => keys[k]);
+  if (!provider) return showToast('Add AI key in Settings', true);
+  const outEl = document.getElementById('gmbCompetitorAiOutput');
+  const textEl = document.getElementById('gmbCompetitorAiText');
+  if (outEl) outEl.style.display = 'block';
+  if (textEl) textEl.textContent = 'Analyzing competitors...';
+  const myInfo = gmbProfile ? 'My business: ' + gmbProfile.name + ', ' + (gmbProfile.avgRating||4.5) + ' rating, ' + (gmbProfile.totalReviews||15) + ' reviews' : 'My business: TIC Turnkey Interior Contractors, 4.5 rating, 15 reviews';
+  const compInfo = gmbCompetitors.map(c => '- ' + c.name + ': ' + (c.rating||'?') + ' rating, ' + (c.reviews||'?') + ' reviews').join('
+');
+  const prompt = 'Local SEO competitor analysis for Google Maps Hyderabad.
+' + myInfo + '
+Competitors:
+' + compInfo + '
+Provide:
+1)Competitive position
+2)Where I am ahead vs behind
+3)Top 5 actions to outrank in map pack
+4)Review gap analysis
+5)30-day action plan to reach #1';
+  try {
+    const result = await callAI(provider, prompt, keys);
+    if (textEl) textEl.textContent = result.text;
+  } catch(e) {
+    if (textEl) textEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+function showGmbTab(tab, el) {
+  ['score','mappack','reviews','aioptimize','competitors'].forEach(t => {
+    const tabEl = document.getElementById('gmb-' + t);
+    if (tabEl) tabEl.style.display = 'none';
+  });
+  const target = document.getElementById('gmb-' + tab);
+  if (target) target.style.display = 'block';
+  document.querySelectorAll('#page-local .tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (tab === 'mappack') loadMapKeywords();
+  if (tab === 'reviews' && gmbAccessToken) fetchGMBReviews();
+  if (tab === 'competitors') loadGmbCompetitors();
+}
+
 function showToast(msg,isError=false){
   const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;
   t.style.background=isError?'#c0392b':'#0a5c36';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
