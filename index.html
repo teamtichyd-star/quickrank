@@ -2438,9 +2438,23 @@ async function getSettingKey(keyName) {
   const user = firebase.auth().currentUser;
   if (!user) return null;
   try {
+    // First check apikeys settings doc
     const doc = await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('apikeys').get();
-    if (doc.exists) return doc.data()[keyName] || null;
-  } catch(e) { return null; }
+    if (doc.exists && doc.data()[keyName]) return doc.data()[keyName];
+    
+    // Fallback: check current company doc (where saveCompanySettings stores Places Key)
+    const companyId = (typeof selectedCompanyId !== 'undefined' && selectedCompanyId) ? selectedCompanyId : (typeof currentCompanyId !== 'undefined' ? currentCompanyId : null);
+    if (companyId) {
+      const compDoc = await firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(companyId).get();
+      if (compDoc.exists && compDoc.data()[keyName]) return compDoc.data()[keyName];
+    }
+    
+    // Fallback: scan all companies for the key
+    const companies = await firebase.firestore().collection('users').doc(user.uid).collection('companies').limit(5).get();
+    for (const c of companies.docs) {
+      if (c.data()[keyName]) return c.data()[keyName];
+    }
+  } catch(e) { console.log('getSettingKey error:', e); return null; }
   return null;
 }
 // ============================================================
