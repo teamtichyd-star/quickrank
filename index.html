@@ -907,7 +907,7 @@ Target area: Hyderabad, Telangana, India. Be specific.`;
       res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.cerebras}` },
-        body: JSON.stringify({ model: 'llama-4-scout-17b-16e-instruct', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+        body: JSON.stringify({ model: 'llama3.1-8b', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
       });
       data = await res.json();
       if (data.choices?.[0]?.message?.content) {
@@ -921,7 +921,7 @@ Target area: Hyderabad, Telangana, India. Be specific.`;
     if (provider === 'gemini') {
       if (!aiKeys.gemini) { output.textContent = '⚠️ Gemini key not set. Go to Settings.'; return; }
       modelName = 'Gemini 1.5 Flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aiKeys.gemini}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${aiKeys.gemini}`;
       res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -942,7 +942,7 @@ Target area: Hyderabad, Telangana, India. Be specific.`;
       res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKeys.openrouter}` },
-        body: JSON.stringify({ model: 'google/gemma-2-9b-it:free', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
+        body: JSON.stringify({ model: 'deepseek/deepseek-chat-v3.1:free', messages: [{ role: 'user', content: prompt }], max_tokens: 1500 })
       });
       data = await res.json();
       if (data.choices?.[0]?.message?.content) {
