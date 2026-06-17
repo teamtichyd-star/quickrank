@@ -2379,10 +2379,12 @@ async function addMapKeyword() {
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
-function openUpdateMapPos(kwId, kwName, currentPos) {
+function openUpdateMapPos(kwIdOrEl, kwName, currentPos) {
+  const kwId = typeof kwIdOrEl === 'string' ? kwIdOrEl : kwIdOrEl.dataset ? kwIdOrEl.dataset.id : kwIdOrEl;
+  const kName = typeof kwName === 'string' ? kwName : (kwIdOrEl.dataset ? kwIdOrEl.dataset.kw : '');
   window.updateMapKwId = kwId;
   const nameEl = document.getElementById('updateMapKwName');
-  if (nameEl) nameEl.textContent = 'Keyword: "' + kwName + '"' + (currentPos ? ' (current: #' + currentPos + ')' : '');
+  if (nameEl) nameEl.textContent = 'Keyword: "' + kName + '"' + (currentPos ? ' (current: #' + currentPos + ')' : '');
   document.getElementById('updateMapPos').value = currentPos || '';
   document.getElementById('updateMapDate').value = getTodayStr();
   document.getElementById('updateMapNote').value = '';
