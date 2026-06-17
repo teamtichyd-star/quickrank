@@ -2270,7 +2270,7 @@ Format with clear headings and bullet points. Be specific to Hyderabad interior 
   try {
     let strategy = '';
     if (provider === 'groq') {
-      const key = await getSettingKey('groqKey');
+      const key = await getAIKey('groq');
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
@@ -2279,7 +2279,7 @@ Format with clear headings and bullet points. Be specific to Hyderabad interior 
       const data = await res.json();
       strategy = data.choices[0].message.content;
     } else {
-      const key = await getSettingKey('geminiKey');
+      const key = await getAIKey('gemini');
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
