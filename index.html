@@ -2042,12 +2042,13 @@ async function saveCompetitorSnapshot() {
   if (competitorData.length === 0) return showToast('Load competitors first', true);
   const user = firebase.auth().currentUser;
   if (!user) return showToast('Not logged in', true);
-  const company = localStorage.getItem('activeCompany') || 'default';
+  const settings = await loadCompSettings();
+  if (!settings || !settings._companyId) return showToast('No company found', true);
   const today = new Date().toISOString().split('T')[0];
   const kw = document.getElementById('comp-keyword').value.trim();
   const snapshot = { date: today, keyword: kw, me: myBusinessData, competitors: competitorData, timestamp: Date.now() };
   try {
-    await firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(company).collection('competitorSnapshots').doc(today).set(snapshot);
+    await firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(settings._companyId).collection('competitorSnapshots').doc(today).set(snapshot);
     showToast('Snapshot saved for ' + today);
   } catch (e) {
     showToast('Save failed: ' + e.message, true);
@@ -2057,15 +2058,15 @@ async function saveCompetitorSnapshot() {
 async function loadCompSettings() {
   const user = firebase.auth().currentUser;
   if (!user) return null;
-  const company = localStorage.getItem('activeCompany') || 'default';
   try {
-    const doc = await firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(company).get();
-    if (!doc.exists) return null;
-    const data = doc.data();
+    const snap = await firebase.firestore().collection('users').doc(user.uid).collection('companies').limit(1).get();
+    if (snap.empty) return null;
+    const data = snap.docs[0].data();
+    data._companyId = snap.docs[0].id;
     const keysDoc = await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('aikeys').get();
     if (keysDoc.exists) Object.assign(data, keysDoc.data());
     return data;
-  } catch (e) { return null; }
+  } catch (e) { console.error('loadCompSettings error:', e); return null; }
 }
 
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
