@@ -1931,6 +1931,62 @@ const GMB_ZONES = {
 };
 
 // Switch GMB Tabs
+
+async function refreshCompetitors() {
+    const body = document.getElementById('competitor-list-body');
+    body.innerHTML = '<tr><td colspan="5" class="text-center">🔍 Searching Google Maps for rivals...</td></tr>';
+    
+    try {
+        const settings = await getSettings();
+        const apiKey = settings.aikeys?.google_places;
+        const lat = settings.gmb_lat || 17.4506074;
+        const lng = settings.gmb_lng || 78.3624082;
+        
+        const proxy = "https://corsproxy.io/?";
+        const url = `${proxy}https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=interior_designer&key=${apiKey}`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.results) {
+            const rivals = data.results.filter(p => p.place_id !== settings.gmb_place_id).slice(0, 5);
+            body.innerHTML = '';
+            
+            rivals.forEach(rival => {
+                const dist = calculateDistance(lat, lng, rival.geometry.location.lat, rival.geometry.location.lng).toFixed(1);
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${rival.name}</strong></td>
+                        <td>⭐ ${rival.rating || 'N/A'}</td>
+                        <td>💬 ${rival.user_ratings_total || 0}</td>
+                        <td>📍 ${dist} km</td>
+                        <td><button class="btn btn-xs btn-success" onclick="analyzeRival('${rival.place_id}')">Analyze</button></td>
+                    </tr>`;
+                
+                // Save to Firebase
+                const company = localStorage.getItem('currentCompany') || 'default';
+                const uid = auth.currentUser.uid;
+                db.ref(\`users/\${uid}/companies/\${company}/competitors/\${rival.place_id}\`).update({
+                    name: rival.name,
+                    rating: rival.rating || 0,
+                    reviews: rival.user_ratings_total || 0,
+                    lastSeen: new Date().toISOString()
+                });
+            });
+        }
+    } catch (e) {
+        body.innerHTML = '<tr><td colspan="5" class="text-danger">Error fetching competitors. Check API Key.</td></tr>';
+    }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; 
+    const dLat = (lat2-lat1) * Math.PI / 180;
+    const dLon = (lon2-lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 function switchGMBTab(n) {
   document.querySelectorAll('.gmb-tab-content').forEach(t => t.style.display = 'none');
   document.querySelectorAll('.gmb-tab-btn').forEach(b => {
