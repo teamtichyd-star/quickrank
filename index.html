@@ -820,7 +820,7 @@ tr:hover td{background:#f9fffe;}
         <div class="form-group"><label>GMB Address</label><input type="text" id="s-gmbAddress"></div>
         <div class="form-group">
           <label>GMB Place ID <span style="color:#888;font-weight:400;font-size:12px;">(one-time setup for 100% accuracy)</span></label>
-          <input type="text" id="s-gmbPlaceId" placeholder="e.g. 0x3bcb90dbf89af2c5:0xdc8d463088d38d66">
+          <input type="text" id="s-gmbPlaceId" placeholder="e.g. ChIJxfKa-NuQyzsRZo3TiDBGjdw">
           <small style="color:#666;display:block;margin-top:4px;font-size:11px;">
             Get from Google Maps embed code → look for <code>!1s0x...</code><br>
             Or from URL after searching your business → <code>!3m1!4b1!4m6!3m5!1s[YOUR_ID]</code>
@@ -1806,7 +1806,7 @@ async function loadCompanySettings(){
   try{const doc=await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
     if(doc.exists){const d=doc.data();document.getElementById('s-companyName').value=d.name||'';document.getElementById('s-website').value=d.website||'';document.getElementById('s-gscProperty').value=d.gscProperty||'';document.getElementById('s-gmbName').value=d.gmbName||'';document.getElementById('s-gmbAddress').value=d.gmbAddress||'';
       document.getElementById('s-googlePlacesKey').value=d.googlePlacesKey||'';
-      document.getElementById('s-gmbPlaceId').value=d.gmbPlaceId||'0x3bcb90dbf89af2c5:0xdc8d463088d38d66';
+      document.getElementById('s-gmbPlaceId').value=d.gmbPlaceId||'ChIJxfKa-NuQyzsRZo3TiDBGjdw';
       document.getElementById('s-gmbLat').value=d.gmbLat||'17.4506074';
       document.getElementById('s-gmbLng').value=d.gmbLng||'78.3624082';}
   }catch(e){}
