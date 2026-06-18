@@ -2084,9 +2084,7 @@ async function runGridCheck() {
   for (const pt of points) {
     try {
       const places = await fetchNearbyPlaces(keyword, pt.lat, pt.lng, apiKey);
-      const idx = places.findIndex(p =>
-        p.name.toLowerCase().includes(gmbName.split('(')[0].trim().toLowerCase())
-      );
+      const idx = findMyBusiness(places, gmbName, company);
       results.push({ ...pt, rank: idx === -1 ? 20 : idx + 1 });
     } catch(e) {
       results.push({ ...pt, rank: 99 });
@@ -2100,11 +2098,15 @@ async function runGridCheck() {
 
 function renderGrid(results, size, keyword, label) {
   const container = document.getElementById('map-grid-container');
-  let html = `
-    <h4 style="color:#0a5c36;margin-bottom:12px;">${size}×${size} Grid — ${label} — "${keyword}"</h4>
-    <div style="display:inline-grid;grid-template-columns:repeat(${size},1fr);gap:6px;margin-bottom:16px;">`;
-
   const half = Math.floor(size / 2);
+
+  // Find center point lat/lng from results
+  const centerPt = results.find(p => p.row === 0 && p.col === 0);
+  const centerLat = centerPt ? centerPt.lat : 17.4401;
+  const centerLng = centerPt ? centerPt.lng : 78.3489;
+
+  // Build grid overlay HTML
+  let gridCells = '';
   for (let r = -half; r <= half; r++) {
     for (let c = -half; c <= half; c++) {
       const pt = results.find(p => p.row === r && p.col === c);
@@ -2115,18 +2117,74 @@ function renderGrid(results, size, keyword, label) {
                : rank <= 10 ? '#f39c12'
                : '#e74c3c';
       const label2 = isCenter ? '★' : rank >= 20 ? '20+' : rank;
-      html += `
-        <div style="width:56px;height:56px;background:${bg};border-radius:10px;display:flex;align-items:center;
-          justify-content:center;color:#fff;font-weight:800;font-size:${isCenter?'20px':'15px'};
-          cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);"
-          title="Rank: ${rank} | Row:${r} Col:${c}"
-          onclick="showGridPointDetail(${rank},'${keyword}')">
-          ${label2}
-        </div>`;
+      const opacity = isCenter ? '0.95' : '0.82';
+      gridCells += `<div style="width:52px;height:52px;background:${bg};border-radius:10px;display:flex;
+        align-items:center;justify-content:center;color:#fff;font-weight:800;
+        font-size:${isCenter?'18px':'14px'};cursor:pointer;
+        box-shadow:0 2px 10px rgba(0,0,0,0.25);opacity:${opacity};
+        border:2px solid rgba(255,255,255,0.6);transition:transform 0.15s;"
+        title="Rank #${rank} | Zone: Row${r} Col${c}"
+        onmouseover="this.style.transform='scale(1.15)'"
+        onmouseout="this.style.transform='scale(1)'"
+        onclick="showGridPointDetail(${rank},'${keyword}',${pt?pt.lat:centerLat},${pt?pt.lng:centerLng})">${label2}</div>`;
     }
   }
-  html += `</div>`;
-  container.innerHTML = html;
+
+  // Legend
+  const legend = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;">
+    <span><span style="display:inline-block;width:14px;height:14px;background:#0a5c36;border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Your Business</span>
+    <span><span style="display:inline-block;width:14px;height:14px;background:#2ecc71;border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Top 3</span>
+    <span><span style="display:inline-block;width:14px;height:14px;background:#f39c12;border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Rank 4-10</span>
+    <span><span style="display:inline-block;width:14px;height:14px;background:#e74c3c;border-radius:3px;margin-right:4px;vertical-align:middle;"></span>Rank 11+</span>
+  </div>`;
+
+  // Stats summary
+  const top3 = results.filter(p => p.rank <= 3).length;
+  const top10 = results.filter(p => p.rank > 3 && p.rank <= 10).length;
+  const low = results.filter(p => p.rank > 10).length;
+  const total = results.length;
+
+  const stats = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;">
+    <div style="background:#d4f5e2;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#0a5c36;">
+      🟢 Top 3: ${top3}/${total} zones
+    </div>
+    <div style="background:#fff8e6;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#b7770d;">
+      🟡 Page 1: ${top10}/${total} zones
+    </div>
+    <div style="background:#fff3f3;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#c0392b;">
+      🔴 Low Rank: ${low}/${total} zones
+    </div>
+  </div>`;
+
+  container.innerHTML = `
+    <h4 style="color:#0a5c36;margin-bottom:6px;">${size}×${size} Rank Grid — ${label} — "${keyword}"</h4>
+    <p style="font-size:12px;color:#666;margin-bottom:10px;">Each cell = one search zone. Number = your Google Maps rank in that area.</p>
+    ${stats}
+    <div style="position:relative;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.15);margin-bottom:12px;">
+      <iframe
+        id="grid-map-iframe"
+        width="100%"
+        height="${size === 5 ? 340 : 420}"
+        style="border:none;display:block;"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=${centerLat},${centerLng}&z=${size===5?14:12}&output=embed">
+      </iframe>
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;
+        display:inline-grid;grid-template-columns:repeat(${size},1fr);
+        gap:4px;padding:${size===5?'18px':'14px'};
+        pointer-events:none;box-sizing:border-box;">
+        ${gridCells.replace(/onclick=/g, 'data-onclick=').replace(/onmouseover=/g, 'data-onmouseover=').replace(/onmouseout=/g, 'data-onmouseout=')}
+      </div>
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;
+        display:inline-grid;grid-template-columns:repeat(${size},1fr);
+        gap:4px;padding:${size===5?'18px':'14px'};
+        pointer-events:all;box-sizing:border-box;">
+        ${gridCells}
+      </div>
+    </div>
+    ${legend}
+  `;
 }
 
 function showGridPointDetail(rank, keyword) {
@@ -2567,14 +2625,32 @@ function getCurrentCompanyId() {
   return 'default';
 }
 
-// Smart business matcher (Phase 11)
+// Smart business matcher (Phase 11.6 - dynamic, no hardcoded names)
 function findMyBusiness(results, gmbName, company) {
   if (!results || results.length === 0) return -1;
-  const website = (company.website || '').toLowerCase().replace(/https?:\/\//,'').replace(/\/$/,'').replace('www.','');
+  const name = (gmbName || '').toLowerCase().trim();
+  const website = (company.website || '').toLowerCase()
+    .replace(/https?:\/\//,'').replace(/\/$/,'').replace('www.','');
+
+  // Build name tokens (words of 4+ chars) from GMB name
+  const tokens = name.split(/[\s(),-]+/).filter(t => t.length >= 4);
+
   for (let i = 0; i < results.length; i++) {
     const rName = (results[i].name || '').toLowerCase();
-    if (rName.includes('turnkey interior') || rName.includes('tic turnkey')) return i;
-    if (results[i].website && website && results[i].website.toLowerCase().includes(website)) return i;
+    const rWebsite = (results[i].website || '').toLowerCase();
+
+    // 1. Exact match
+    if (rName === name) return i;
+
+    // 2. Website match
+    if (website && rWebsite && rWebsite.includes(website)) return i;
+
+    // 3. Token match - if 2+ tokens match, it's likely our business
+    const matchCount = tokens.filter(t => rName.includes(t)).length;
+    if (matchCount >= 2) return i;
+
+    // 4. Single strong token match (unique business words)
+    if (tokens.length === 1 && matchCount === 1) return i;
   }
   return -1;
 }
