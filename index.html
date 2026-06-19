@@ -1931,6 +1931,13 @@ async function loadCompanySettings(){
       document.getElementById('s-gmbLat').value=d.gmbLat||'17.4506074';
       document.getElementById('s-gmbLng').value=d.gmbLng||'78.3624082';}
   }catch(e){}
+  // Show current company ID and auto-suggest new slug
+  const idDisplay = document.getElementById('currentCompanyIdDisplay');
+  if(idDisplay) idDisplay.textContent = currentCompanyId || 'unknown';
+  const newIdInput = document.getElementById('s-newCompanyId');
+  if(newIdInput && !newIdInput.value && currentCompanyName){
+    newIdInput.value = slugify(currentCompanyName);
+  }
 }
 function slugify(str){
   return str.toLowerCase().trim()
