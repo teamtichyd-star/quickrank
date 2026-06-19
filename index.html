@@ -904,6 +904,42 @@ tr:hover td{background:#f9fffe;}
         </div>
         <button class="btn-primary" onclick="saveCompanySettings()">Save Settings</button>
       </div>
+
+      <div class="settings-section">
+        <h3>🔄 Migrate Company ID</h3>
+        <p style="font-size:13px;color:#666;margin-bottom:12px;">
+          Your current company doc ID is: <code id="currentCompanyIdDisplay" style="background:#f0fdf6;padding:2px 8px;border-radius:4px;color:#0a5c36;font-weight:600;">loading...</code><br>
+          <span style="font-size:12px;color:#999;">If this looks like an old slug (e.g. "sb-interior-solutions"), migrate to a clean ID based on your current company name.</span>
+        </p>
+        <div class="form-group">
+          <label>New Company ID <span style="color:#888;font-weight:400;font-size:12px;">(auto-generated, editable)</span></label>
+          <input type="text" id="s-newCompanyId" placeholder="e.g. tic-turnkey-interior-contractors" style="font-family:monospace;">
+          <small style="color:#666;font-size:11px;display:block;margin-top:4px;">Lowercase letters, numbers and hyphens only. No spaces.</small>
+        </div>
+        <button class="btn-primary" style="background:#e67e22;border-color:#e67e22;" onclick="showMigrateModal()">🔄 Migrate Company ID</button>
+      </div>
+
+      <!-- Migrate Confirmation Modal -->
+      <div id="migrateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;">
+        <div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+          <h3 style="color:#e67e22;margin-bottom:12px;">⚠️ Confirm Migration</h3>
+          <p style="font-size:14px;color:#444;margin-bottom:8px;">This will:</p>
+          <ul style="font-size:13px;color:#555;margin-bottom:16px;padding-left:20px;line-height:1.8;">
+            <li>Create new company doc: <strong id="modal-newId" style="color:#0a5c36;"></strong></li>
+            <li>Copy all company data + subcollections</li>
+            <li>Delete old doc: <strong id="modal-oldId" style="color:#e74c3c;"></strong></li>
+            <li>Reload the app automatically</li>
+          </ul>
+          <p style="font-size:12px;color:#e74c3c;background:#fff5f5;padding:10px;border-radius:6px;margin-bottom:20px;">
+            ⚠️ This cannot be undone. Make sure your new ID is correct before proceeding.
+          </p>
+          <div style="display:flex;gap:12px;">
+            <button class="btn-primary" style="background:#e67e22;border-color:#e67e22;flex:1;" onclick="confirmMigrate()">Yes, Migrate Now</button>
+            <button class="btn-primary" style="background:#fff;color:#444;border:1.5px solid #ddd;flex:1;" onclick="closeMigrateModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div class="settings-section">
         <h3>🔗 Google Search Console</h3>
         <div id="settingsGscStatus" style="margin-bottom:16px;font-size:13px;color:#888;">Checking...</div>
@@ -1896,6 +1932,71 @@ async function loadCompanySettings(){
       document.getElementById('s-gmbLng').value=d.gmbLng||'78.3624082';}
   }catch(e){}
 }
+function slugify(str){
+  return str.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g,'')
+    .replace(/\s+/g,'-')
+    .replace(/-+/g,'-')
+    .replace(/^-|-$/g,'');
+}
+
+function showMigrateModal(){
+  const newId = document.getElementById('s-newCompanyId').value.trim();
+  if(!newId) return showToast('Enter a new company ID first', true);
+  if(!/^[a-z0-9-]+$/.test(newId)) return showToast('ID must be lowercase letters, numbers and hyphens only', true);
+  if(newId === currentCompanyId) return showToast('New ID is same as current ID', true);
+  document.getElementById('modal-newId').textContent = newId;
+  document.getElementById('modal-oldId').textContent = currentCompanyId;
+  const modal = document.getElementById('migrateModal');
+  modal.style.display = 'flex';
+}
+
+function closeMigrateModal(){
+  document.getElementById('migrateModal').style.display = 'none';
+}
+
+async function confirmMigrate(){
+  const newId = document.getElementById('s-newCompanyId').value.trim();
+  const oldId = currentCompanyId;
+  const uid = currentUser.uid;
+  closeMigrateModal();
+  showToast('Migrating... please wait');
+
+  try {
+    // 1. Get old company doc data
+    const oldRef = db.collection('users').doc(uid).collection('companies').doc(oldId);
+    const oldDoc = await oldRef.get();
+    if(!oldDoc.exists) return showToast('Old company doc not found', true);
+    const companyData = oldDoc.data();
+
+    // 2. Create new company doc
+    const newRef = db.collection('users').doc(uid).collection('companies').doc(newId);
+    await newRef.set(companyData);
+
+    // 3. Copy subcollections: rankHistory, competitorSnapshots
+    const subcollections = ['rankHistory', 'competitorSnapshots'];
+    for(const sub of subcollections){
+      const subSnap = await oldRef.collection(sub).get();
+      if(!subSnap.empty){
+        for(const subDoc of subSnap.docs){
+          await newRef.collection(sub).doc(subDoc.id).set(subDoc.data());
+        }
+        showToast('Copied ' + subSnap.size + ' docs from ' + sub);
+      }
+    }
+
+    // 4. Delete old doc (subcollections must be deleted via console - Firestore limitation)
+    await oldRef.delete();
+
+    showToast('Migration complete! Reloading...');
+    setTimeout(()=>{ window.location.reload(); }, 2000);
+
+  } catch(e){
+    showToast('Migration error: ' + e.message, true);
+    console.error('Migration error:', e);
+  }
+}
+
 async function saveCompanySettings(){
   const data={name:document.getElementById('s-companyName').value.trim(),website:document.getElementById('s-website').value.trim(),gscProperty:document.getElementById('s-gscProperty').value.trim(),gmbName:document.getElementById('s-gmbName').value.trim(),gmbAddress:document.getElementById('s-gmbAddress').value.trim(),
       googlePlacesKey:document.getElementById('s-googlePlacesKey').value.trim(),
