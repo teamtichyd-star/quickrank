@@ -2790,11 +2790,14 @@ async function calculateGMBScore() {
   document.getElementById('score-result').style.display  = 'none';
 
   const apiKey  = await getSettingKey('googlePlacesKey');
-  const company = getCurrentCompany();
+  // Get full company data from Firestore for accurate Place ID matching
+  const company = await getCompanyData();
   const gmbName = company.gmbName || 'TIC (TURNKEY INTERIOR CONTRACTORS)';
+  const lat = parseFloat(company.gmbLat) || 17.4506074;
+  const lng = parseFloat(company.gmbLng) || 78.3624082;
 
   try {
-    const results = await fetchNearbyPlaces(keyword, GMB_ZONES.gachibowli.lat, GMB_ZONES.gachibowli.lng, apiKey);
+    const results = await fetchNearbyPlaces(keyword, lat, lng, apiKey);
     const myIndex = findMyBusiness(results, gmbName, company);
     const myData  = myIndex >= 0 ? results[myIndex] : null;
     const top3    = results.slice(0, 3);
@@ -3141,6 +3144,21 @@ function exportHistoryPDF() {
 }
 
 // ---- HELPERS ----
+async function getCompanyData() {
+  // Fetch full company doc from Firestore including gmbPlaceId, gmbLat, gmbLng
+  const user = firebase.auth().currentUser;
+  if (!user) return {};
+  const companyId = getCurrentCompanyId();
+  if (!companyId || companyId === 'default') return {};
+  try {
+    const doc = await firebase.firestore()
+      .collection('users').doc(user.uid)
+      .collection('companies').doc(companyId).get();
+    if (doc.exists) return { ...doc.data(), _companyId: companyId };
+  } catch(e) { console.log('getCompanyData error:', e); }
+  return {};
+}
+
 function getCurrentCompany() {
   // Pull from your existing company state
   if (typeof currentCompany !== 'undefined' && currentCompany) return currentCompany;
