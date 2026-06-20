@@ -3224,8 +3224,8 @@ function findMyBusiness(results, gmbName, company) {
     for (let i = 0; i < results.length; i++) {
       const rPid = (results[i].place_id || '').toLowerCase();
       const rRef = (results[i].reference || '').toLowerCase();
-      if (rPid && placeId.includes(rPid)) return i;
-      if (rRef && placeId.includes(rRef)) return i;
+      if (rPid && rPid === placeId) return i;
+      if (rRef && rRef === placeId) return i;
     }
   }
 
