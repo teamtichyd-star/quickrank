@@ -2795,9 +2795,7 @@ async function calculateGMBScore() {
 
   try {
     const results = await fetchNearbyPlaces(keyword, GMB_ZONES.gachibowli.lat, GMB_ZONES.gachibowli.lng, apiKey);
-    const myIndex = results.findIndex(r =>
-      r.name.toLowerCase().includes(gmbName.split('(')[0].trim().toLowerCase())
-    );
+    const myIndex = findMyBusiness(results, gmbName, company);
     const myData  = myIndex >= 0 ? results[myIndex] : null;
     const top3    = results.slice(0, 3);
     renderOptimizationScore(myData, top3, gmbName);
@@ -3041,9 +3039,8 @@ async function saveGMBRankToFirestore(keyword, results, gmbName) {
   const user = firebase.auth().currentUser;
   if (!user) return;
   const companyId = getCurrentCompanyId();
-  const myIndex   = results.findIndex(r =>
-    r.name.toLowerCase().includes(gmbName.split('(')[0].trim().toLowerCase())
-  );
+  const company = await getCompanyData();
+  const myIndex = findMyBusiness(results, gmbName, company);
   const rank = myIndex === -1 ? 20 : myIndex + 1;
   const date = new Date().toISOString().split('T')[0];
   try {
@@ -3084,9 +3081,9 @@ async function loadRankHistory() {
     .collection('companies').doc(companyId)
     .collection('gmbHistory')
     .where('keyword','==',keyword)
-    .orderBy('savedAt','asc').get();
+    .get();
 
-  const rows  = snap.docs.map(d => d.data());
+  const rows  = snap.docs.map(d => d.data()).sort((a,b) => a.date.localeCompare(b.date));
   const labels = rows.map(r => r.date);
   const data   = rows.map(r => r.rank);
 
