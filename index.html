@@ -1988,7 +1988,7 @@ function formatAIOutput(text){
     html += '<div class="ai-score-circle" style="background:' + scoreColor + ';">' + score + '</div>';
     html += '<div><div style="font-weight:700;color:#333;font-size:14px;">SEO Score: ' + score + '/100 <span style="color:' + scoreColor + ';">(' + scoreLabel + ')</span></div>';
     if(critical !== null){
-      html += '<div class="ai-critical-badge" style="display:inline-block;margin-top:6px;">⚠️ ' + critical + ' Critical Issue' + (critical !== 1 ? 's' : '') + ' Found</div>';
+      html += '<div class="ai-critical-badge" style="display:inline-block;margin-top:6px;">&#9888; ' + critical + ' Critical Issue' + (critical !== 1 ? 's' : '') + ' Found</div>';
     }
     html += '</div></div>';
   }
