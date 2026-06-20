@@ -2803,6 +2803,8 @@ async function calculateGMBScore() {
     if(results.length > 0) console.log('OPT SCORE DEBUG - first result place_id:', results[0].place_id, 'name:', results[0].name);
     const myIndex = findMyBusiness(results, gmbName, company);
     console.log('OPT SCORE DEBUG - myIndex:', myIndex);
+    console.log('OPT SCORE DEBUG - all place_ids:', results.map(r => r.place_id).join(','));
+    console.log('OPT SCORE DEBUG - all names:', results.map(r => r.name).join(' | '));
     const myData  = myIndex >= 0 ? results[myIndex] : null;
     const top3    = results.slice(0, 3);
     renderOptimizationScore(myData, top3, gmbName);
