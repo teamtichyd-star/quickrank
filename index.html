@@ -2011,11 +2011,20 @@ async function runAI(){
 function watchdogInvestigate(keyword){
   showPage('ranktracker', document.getElementById('nav-ranktracker'));
   setTimeout(function(){
-    // Try to find URL from GSC data
+    // Try to find URL from tracked keywords first
     var url = '';
-    if(gscDataFull && gscDataFull.length > 0){
-      var match = gscDataFull.find(function(k){ return k.keyword === keyword; });
-      if(match && match.url) url = match.url;
+    var tracked = document.querySelectorAll('#keywordsBody tr');
+    tracked.forEach(function(row){
+      var kwCell = row.querySelector('td:first-child');
+      var urlCell = row.querySelector('td:nth-child(2) a');
+      if(kwCell && kwCell.textContent.trim() === keyword && urlCell){
+        url = urlCell.href || '';
+      }
+    });
+    // Fallback to company website
+    if(!url){
+      var siteInput = document.getElementById('s-website');
+      if(siteInput && siteInput.value) url = siteInput.value;
     }
     openAiPanel(keyword, url);
     showToast('AI panel ready for: ' + keyword);
