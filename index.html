@@ -1437,13 +1437,21 @@ function handleGSCCallback(){
 }
 async function saveGSCToken(token){
   if(!currentUser)return;
-  try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('gsc').set({accessToken:token,connectedAt:firebase.firestore.FieldValue.serverTimestamp(),property:gscProperty});}catch(e){}
+  const expiresAt = Date.now() + 55 * 60 * 1000; // 55 minutes from now
+  try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('gsc').set({accessToken:token,connectedAt:firebase.firestore.FieldValue.serverTimestamp(),property:gscProperty,expiresAt});}catch(e){}
 }
 async function loadSavedGSCToken(){
   if(!currentUser)return;
   try{
     const doc=await db.collection('users').doc(currentUser.uid).collection('settings').doc('gsc').get();
     if(doc.exists&&doc.data().accessToken){
+      // Check if token is expired
+      const expiresAt = doc.data().expiresAt || 0;
+      if(expiresAt && Date.now() > expiresAt){
+        updateGSCUI(false);
+        showToast('GSC session expired - please reconnect', true);
+        return;
+      }
       gscAccessToken=doc.data().accessToken;
       if(doc.data().lastSync){
         document.getElementById('gscLastSyncTime').textContent=doc.data().lastSync;
@@ -3109,7 +3117,14 @@ async function loadRankHistory() {
     .where('keyword','==',keyword)
     .get();
 
-  const rows  = snap.docs.map(d => d.data()).sort((a,b) => a.date.localeCompare(b.date));
+  // Filter out rank=20 entries (old saves where business was not found)
+  const allRows = snap.docs.map(d => d.data()).sort((a,b) => a.date.localeCompare(b.date));
+  const rows = allRows.filter(r => r.rank < 20);
+  if(rows.length === 0){
+    document.getElementById('history-empty').style.display = 'block';
+    document.getElementById('history-empty').textContent = 'No valid rank data yet. Run Rank Checker to start tracking.';
+    return;
+  }
   const labels = rows.map(r => r.date);
   const data   = rows.map(r => r.rank);
 
