@@ -1487,7 +1487,7 @@ async function fetchGSCRows(days){
   const resp=await fetch(`https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(gscProperty)}/searchAnalytics/query`,{
     method:'POST',
     headers:{'Authorization':`Bearer ${gscAccessToken}`,'Content-Type':'application/json'},
-    body:JSON.stringify({startDate:fmt(start),endDate:fmt(end),dimensions:['query'],rowLimit:1000})
+    body:JSON.stringify({startDate:fmt(start),endDate:fmt(end),dimensions:['query','page'],rowLimit:1000})
   });
   if(resp.status===401){gscAccessToken=null;updateGSCUI(false);throw new Error('GSC session expired. Please reconnect.');}
   if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'GSC API error');}
@@ -1527,7 +1527,7 @@ async function syncGSC(){
     fill.style.width='35%';txt.textContent=`Found ${rows.length} keywords. Matching with your tracker...`;
 
     // Build gscDataFull
-    gscDataFull=rows.map(r=>({keyword:r.keys[0],position:Math.round(r.position*10)/10,clicks:r.clicks,impressions:r.impressions,ctr:r.ctr}));
+    gscDataFull=rows.map(r=>({keyword:r.keys[0],url:r.keys[1]||'',position:Math.round(r.position*10)/10,clicks:r.clicks,impressions:r.impressions,ctr:r.ctr}));
     gscDataView=[...gscDataFull];
 
     fill.style.width='55%';txt.textContent='Updating keyword positions in tracker...';
@@ -2011,16 +2011,12 @@ async function runAI(){
 function watchdogInvestigate(keyword){
   showPage('ranktracker', document.getElementById('nav-ranktracker'));
   setTimeout(function(){
-    // Try to find URL from tracked keywords first
+    // Get URL from gscDataFull (now includes page dimension)
     var url = '';
-    var tracked = document.querySelectorAll('#keywordsBody tr');
-    tracked.forEach(function(row){
-      var kwCell = row.querySelector('td:first-child');
-      var urlCell = row.querySelector('td:nth-child(2) a');
-      if(kwCell && kwCell.textContent.trim() === keyword && urlCell){
-        url = urlCell.href || '';
-      }
-    });
+    if(gscDataFull && gscDataFull.length > 0){
+      var match = gscDataFull.find(function(k){ return k.keyword === keyword; });
+      if(match && match.url) url = match.url;
+    }
     // Fallback to company website
     if(!url){
       var siteInput = document.getElementById('s-website');
