@@ -171,7 +171,7 @@ tr:hover td{background:#f9fffe;}
 .preview-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:3px;}
 .preview-value{color:#333;line-height:1.4;}
 .preview-empty{color:#e74c3c;font-style:italic;}
-.ai-output-box{background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:10px;padding:16px;min-height:120px;font-size:13px;color:#333;white-space:pre-wrap;line-height:1.6;}
+.ai-output-box{background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:10px;padding:20px;min-height:120px;font-size:13px;color:#333;line-height:1.7;}.ai-output-box h4{color:#0a5c36;font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:4px;border-bottom:1.5px solid #d4f5e2;}.ai-output-box h4:first-child{margin-top:0;}.ai-output-box ul{padding-left:0;margin:8px 0;list-style:none;}.ai-output-box li{padding:7px 12px;margin-bottom:6px;background:#fff;border-radius:8px;border-left:3px solid #2ecc71;font-size:13px;line-height:1.6;}.ai-output-box .ai-score-bar{display:flex;align-items:center;gap:12px;background:#fff;border-radius:10px;padding:14px 18px;margin-top:16px;border:1.5px solid #d4f5e2;}.ai-score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;}.ai-critical-badge{background:#fff5f5;border:1.5px solid #fecaca;border-radius:8px;padding:6px 12px;font-size:12px;color:#e74c3c;font-weight:700;}
 .ai-meta{font-size:11px;color:#888;margin-top:8px;}
 /* Audit */
 .audit-progress{display:none;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-bottom:16px;}
@@ -1916,17 +1916,109 @@ function buildPrompt(keyword,url,pageData,mode){
   };
   return modes[mode]||modes.general;
 }
+function formatAIOutput(text){
+  // Extract score and critical issues
+  var scoreMatch = text.match(/SEO_SCORE:\s*(\d+)/i);
+  var critMatch = text.match(/CRITICAL_ISSUES:\s*(\d+)/i);
+  var score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+  var critical = critMatch ? parseInt(critMatch[1]) : null;
+
+  // Remove score lines from text
+  var cleaned = text.replace(/SEO_SCORE:\s*\d+/gi,'').replace(/CRITICAL_ISSUES:\s*\d+/gi,'').trim();
+
+  // Convert markdown-style text to HTML sections
+  var html = '';
+
+  // Split by numbered sections like "1)" or "**Section**"
+  var lines = cleaned.split('
+');
+  var currentSection = '';
+  var items = [];
+
+  lines.forEach(function(line){
+    line = line.trim();
+    if(!line) return;
+
+    // Detect bold headers **text** or numbered section headers
+    if(line.match(/^\*\*[^*]+\*\*:?\s*$/) || line.match(/^#+\s/) ){
+      // Save previous section
+      if(currentSection && items.length > 0){
+        html += '<h4>' + currentSection + '</h4><ul>';
+        items.forEach(function(item){ html += '<li>' + item + '</li>'; });
+        html += '</ul>';
+        items = [];
+      }
+      currentSection = line.replace(/\*\*/g,'').replace(/^#+\s/,'').replace(/:$/,'').trim();
+    }
+    // Detect list items - lines starting with number, bullet, or **bold text**:
+    else if(line.match(/^\d+\.\s+\*\*/) || line.match(/^[-*]\s+\*\*/) || line.match(/^\d+\.\s+/)){
+      var itemText = line
+        .replace(/^\d+\.\s+/,'')
+        .replace(/^[-*]\s+/,'')
+        .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#0a5c36;">$1</strong>');
+      items.push(itemText);
+    }
+    // Regular text - treat as section intro or add to last item
+    else if(line.match(/^\*\*[^*]+\*\*/)){
+      var boldText = line.replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#0a5c36;">$1</strong>');
+      items.push(boldText);
+    } else {
+      if(items.length > 0){
+        items[items.length-1] += ' ' + line;
+      } else if(currentSection){
+        items.push(line);
+      } else {
+        html += '<p style="color:#555;margin-bottom:12px;">' + line + '</p>';
+      }
+    }
+  });
+
+  // Save last section
+  if(currentSection && items.length > 0){
+    html += '<h4>' + currentSection + '</h4><ul>';
+    items.forEach(function(item){ html += '<li>' + item + '</li>'; });
+    html += '</ul>';
+  }
+
+  // Add score bar at bottom
+  if(score !== null){
+    var scoreColor = score >= 70 ? '#2ecc71' : score >= 40 ? '#e67e22' : '#e74c3c';
+    var scoreLabel = score >= 70 ? 'Good' : score >= 40 ? 'Needs Work' : 'Poor';
+    html += '<div class="ai-score-bar">';
+    html += '<div class="ai-score-circle" style="background:' + scoreColor + ';">' + score + '</div>';
+    html += '<div><div style="font-weight:700;color:#333;font-size:14px;">SEO Score: ' + score + '/100 <span style="color:' + scoreColor + ';">(' + scoreLabel + ')</span></div>';
+    if(critical !== null){
+      html += '<div class="ai-critical-badge" style="display:inline-block;margin-top:6px;">⚠️ ' + critical + ' Critical Issue' + (critical !== 1 ? 's' : '') + ' Found</div>';
+    }
+    html += '</div></div>';
+  }
+
+  return html || '<p>' + cleaned + '</p>';
+}
+
 async function runAI(){
   const provider=document.getElementById('aiProviderSelect').value;
   const out=document.getElementById('aiOutput');const meta=document.getElementById('aiMeta');
-  out.textContent='⏳ Running AI analysis...';meta.style.display='none';
-  try{const keys=await loadAIKeys();const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode),keys);out.textContent=r.text;meta.textContent=`Model: ${r.model} · Provider: ${provider}`;meta.style.display='block';}
-  catch(e){out.textContent='❌ Error: '+e.message;}
+  out.innerHTML='<div style="color:#888;padding:20px;text-align:center;">⏳ Running AI analysis...</div>';meta.style.display='none';
+  try{
+    const keys=await loadAIKeys();
+    const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode),keys);
+    out.innerHTML=formatAIOutput(r.text);
+    meta.textContent='Model: '+r.model+' · Provider: '+provider;
+    meta.style.display='block';
+  }
+  catch(e){out.innerHTML='<div style="color:#e74c3c;padding:12px;">❌ Error: '+e.message+'</div>';}
 }
 function watchdogInvestigate(keyword){
   showPage('ranktracker', document.getElementById('nav-ranktracker'));
   setTimeout(function(){
-    openAiPanel(keyword, '');
+    // Try to find URL from GSC data
+    var url = '';
+    if(gscDataFull && gscDataFull.length > 0){
+      var match = gscDataFull.find(function(k){ return k.keyword === keyword; });
+      if(match && match.url) url = match.url;
+    }
+    openAiPanel(keyword, url);
     showToast('AI panel ready for: ' + keyword);
   }, 200);
 }
