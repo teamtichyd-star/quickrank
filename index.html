@@ -2798,7 +2798,11 @@ async function calculateGMBScore() {
 
   try {
     const results = await fetchNearbyPlaces(keyword, lat, lng, apiKey);
+    console.log('OPT SCORE DEBUG - company:', JSON.stringify({gmbPlaceId: company.gmbPlaceId, gmbLat: company.gmbLat, gmbLng: company.gmbLng, gmbName: company.gmbName}));
+    console.log('OPT SCORE DEBUG - results count:', results.length);
+    if(results.length > 0) console.log('OPT SCORE DEBUG - first result place_id:', results[0].place_id, 'name:', results[0].name);
     const myIndex = findMyBusiness(results, gmbName, company);
+    console.log('OPT SCORE DEBUG - myIndex:', myIndex);
     const myData  = myIndex >= 0 ? results[myIndex] : null;
     const top3    = results.slice(0, 3);
     renderOptimizationScore(myData, top3, gmbName);
