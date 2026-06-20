@@ -2804,9 +2804,16 @@ async function calculateGMBScore() {
     if (placeId) {
       try {
         const detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' + placeId + '&fields=name,rating,user_ratings_total,formatted_address,website,place_id,geometry&key=' + apiKey;
-        const detailResp = await fetch(detailUrl);
-        const detailData = await detailResp.json();
-        if (detailData.result) {
+        const proxies = ['https://corsproxy.io/?', 'https://api.allorigins.win/raw?url='];
+        let detailData = null;
+        for (const proxy of proxies) {
+          try {
+            const resp = await fetch(proxy + encodeURIComponent(detailUrl));
+            detailData = await resp.json();
+            if (detailData && detailData.result) break;
+          } catch(pe) { continue; }
+        }
+        if (detailData && detailData.result) {
           myData = detailData.result;
         }
       } catch(e2) {
