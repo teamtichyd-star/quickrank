@@ -1991,7 +1991,7 @@ async function runWatchdog(){
       var c = colorMap[a.type];
       var btn = '';
       if(a.action && a.keyword){
-        btn = '<button onclick="watchdogInvestigate('' + a.keyword.replace(/'/g, "\'") + '')" style="margin-top:10px;padding:6px 14px;background:' + c.title + ';color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">' + a.action + ' &rarr;</button>';
+        btn = '<button onclick="watchdogInvestigate(\'' + a.keyword.replace(/'/g, "\\'") + '\'')" style="margin-top:10px;padding:6px 14px;background:' + c.title + ';color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">' + a.action + ' &rarr;</button>';
       }
       return '<div style="background:' + c.bg + ';border:1.5px solid ' + c.border + ';border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;"><div style="flex:1;"><div style="font-weight:700;color:' + c.title + ';font-size:14px;margin-bottom:4px;">' + a.title + '</div><div style="font-size:13px;color:#444;line-height:1.6;">' + a.msg + '</div>' + btn + '</div></div>';
     }).join('');
