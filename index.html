@@ -2798,15 +2798,25 @@ async function calculateGMBScore() {
 
   try {
     const results = await fetchNearbyPlaces(keyword, lat, lng, apiKey);
-    console.log('OPT SCORE DEBUG - company:', JSON.stringify({gmbPlaceId: company.gmbPlaceId, gmbLat: company.gmbLat, gmbLng: company.gmbLng, gmbName: company.gmbName}));
-    console.log('OPT SCORE DEBUG - results count:', results.length);
-    if(results.length > 0) console.log('OPT SCORE DEBUG - first result place_id:', results[0].place_id, 'name:', results[0].name);
-    const myIndex = findMyBusiness(results, gmbName, company);
-    console.log('OPT SCORE DEBUG - myIndex:', myIndex);
-    console.log('OPT SCORE DEBUG - all place_ids:', results.map(r => r.place_id).join(','));
-    console.log('OPT SCORE DEBUG - all names:', results.map(r => r.name).join(' | '));
-    const myData  = myIndex >= 0 ? results[myIndex] : null;
-    const top3    = results.slice(0, 3);
+    const top3 = results.slice(0, 3);
+    let myData = null;
+    const placeId = company.gmbPlaceId || '';
+    if (placeId) {
+      try {
+        const detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' + placeId + '&fields=name,rating,user_ratings_total,formatted_address,website,place_id,geometry&key=' + apiKey;
+        const detailResp = await fetch(detailUrl);
+        const detailData = await detailResp.json();
+        if (detailData.result) {
+          myData = detailData.result;
+        }
+      } catch(e2) {
+        const myIndex = findMyBusiness(results, gmbName, company);
+        myData = myIndex >= 0 ? results[myIndex] : null;
+      }
+    } else {
+      const myIndex = findMyBusiness(results, gmbName, company);
+      myData = myIndex >= 0 ? results[myIndex] : null;
+    }
     renderOptimizationScore(myData, top3, gmbName);
   } catch(e) {
     document.getElementById('score-loading').style.display = 'none';
