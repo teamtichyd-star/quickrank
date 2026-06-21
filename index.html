@@ -1889,64 +1889,35 @@ async function fetchViaJina(url){
   }catch(e){ console.log('Jina error:',e); return null; }
 }
 
-// Fetch via Google PageSpeed - technical scores, no API key needed
-async function fetchViaPageSpeed(url){
-  try{
-    const apiUrl = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url='+encodeURIComponent(url)+'&strategy=mobile&category=SEO&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES';
-    const r = await fetch(apiUrl, {signal:AbortSignal.timeout(20000)});
-    if(!r.ok) return null;
-    const data = await r.json();
-    if(!data||!data.lighthouseResult) return null;
-    const lhr = data.lighthouseResult;
-    const audits = lhr.audits||{};
-    const cats = lhr.categories||{};
-    const perfScore = Math.round((cats.performance&&cats.performance.score||0)*100);
-    const seoScore  = Math.round((cats.seo&&cats.seo.score||0)*100);
-    const a11yScore = Math.round((cats.accessibility&&cats.accessibility.score||0)*100);
-    const bpScore   = Math.round((cats['best-practices']&&cats['best-practices'].score||0)*100);
-    const lcp = audits['largest-contentful-paint']?audits['largest-contentful-paint'].displayValue||'':'';
-    const cls = audits['cumulative-layout-shift']?audits['cumulative-layout-shift'].displayValue||'':'';
-    const tbt = audits['total-blocking-time']?audits['total-blocking-time'].displayValue||'':'';
-    const fcp = audits['first-contentful-paint']?audits['first-contentful-paint'].displayValue||'':'';
-    const failedAudits = Object.values(audits)
-      .filter(a=>a.score!==null&&a.score!==undefined&&a.score<0.9&&a.title)
-      .map(a=>a.title).slice(0,8);
-    const imgsNoAlt = audits['image-alt']&&audits['image-alt'].details&&audits['image-alt'].details.items
-      ? audits['image-alt'].details.items.length : 0;
-    return {perfScore,seoScore,a11yScore,bpScore,lcp,cls,tbt,fcp,failedAudits,imgsNoAlt,source:'pagespeed'};
-  }catch(e){ console.log('PageSpeed error:',e); return null; }
-}
 
 async function fetchAndParsePage(url){
   // Run both in parallel
-  const [jinaRes, psRes] = await Promise.allSettled([fetchViaJina(url), fetchViaPageSpeed(url)]);
-  const jina = jinaRes.status==='fulfilled' ? jinaRes.value : null;
-  const ps   = psRes.status==='fulfilled'   ? psRes.value   : null;
-  if(!jina && !ps) return null;
+  const jina = await fetchViaJina(url);
+  if(!jina) return null;
   return {
-    title:         jina?jina.title:'',
-    titleLen:      jina?jina.titleLen:0,
-    metaDesc:      jina?jina.metaDesc:'',
-    metaDescLen:   jina?jina.metaDescLen:0,
-    h1:            jina?jina.h1:[],
-    h2:            jina?jina.h2:[],
-    h3:            jina?jina.h3:[],
-    wordCount:     jina?jina.wordCount:0,
-    internalLinks: jina?jina.internalLinks:0,
-    externalLinks: jina?jina.externalLinks:0,
-    bodyText:      jina?jina.bodyText:'',
+    title:         jina.title,
+    titleLen:      jina.titleLen,
+    metaDesc:      jina.metaDesc,
+    metaDescLen:   jina.metaDescLen,
+    h1:            jina.h1,
+    h2:            jina.h2,
+    h3:            jina.h3,
+    wordCount:     jina.wordCount,
+    internalLinks: jina.internalLinks,
+    externalLinks: jina.externalLinks,
+    bodyText:      jina.bodyText,
     images:        0,
-    imgsNoAlt:     ps?ps.imgsNoAlt:(jina?0:0),
-    perfScore:     ps?ps.perfScore:null,
-    seoScore:      ps?ps.seoScore:null,
-    a11yScore:     ps?ps.a11yScore:null,
-    bpScore:       ps?ps.bpScore:null,
-    lcp:           ps?ps.lcp:'',
-    cls:           ps?ps.cls:'',
-    tbt:           ps?ps.tbt:'',
-    fcp:           ps?ps.fcp:'',
-    failedAudits:  ps?ps.failedAudits:[],
-    source:        (jina?'jina':'')+(ps?'+pagespeed':'')
+    imgsNoAlt:     0,
+    perfScore:     null,
+    seoScore:      null,
+    a11yScore:     null,
+    bpScore:       null,
+    lcp:           '',
+    cls:           '',
+    tbt:           '',
+    fcp:           '',
+    failedAudits:  [],
+    source:        'jina'
   };
 }
 function getBestKeywordUrl(keyword, fallbackUrl){
@@ -1998,21 +1969,14 @@ async function fetchPageContent(){
   if(data){
     fetchedPageData=data;
 
-    // Build score badges
-    const scoreBadge = (score, label) => {
-      if(score === null) return '';
-      const col = score >= 80 ? '#2ecc71' : score >= 50 ? '#e67e22' : '#e74c3c';
-      return '<span style="background:'+col+';color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-right:6px;">'+label+': '+score+'</span>';
-    };
-
-    const titleStatus = data.titleLen === 0 ? 'Missing!' : data.titleLen < 30 ? 'Too short' : data.titleLen > 60 ? 'Too long' : 'Good';
+        const titleStatus = data.titleLen === 0 ? 'Missing!' : data.titleLen < 30 ? 'Too short' : data.titleLen > 60 ? 'Too long' : 'Good';
     const titleColor = data.titleLen === 0 ? '#e74c3c' : data.titleLen < 30 || data.titleLen > 60 ? '#e67e22' : '#2ecc71';
     const metaStatus = data.metaDescLen === 0 ? 'Missing!' : data.metaDescLen < 120 ? 'Too short' : data.metaDescLen > 160 ? 'Too long' : 'Good';
     const metaColor = data.metaDescLen === 0 ? '#e74c3c' : data.metaDescLen < 120 || data.metaDescLen > 160 ? '#e67e22' : '#2ecc71';
 
     preview.innerHTML =
       // Score row
-      (data.perfScore !== null ? '<div style="margin-bottom:10px;">'+scoreBadge(data.perfScore,'Perf')+scoreBadge(data.seoScore,'SEO')+scoreBadge(data.a11yScore,'A11y')+scoreBadge(data.bpScore,'BP')+'<span style="font-size:11px;color:#888;">via Google PageSpeed</span></div>' : '') +
+
       // Title
       '<div class="preview-item"><div class="preview-label">📌 Title <span style="color:'+titleColor+';font-weight:700;">('+data.titleLen+' chars — '+titleStatus+')</span></div><div class="preview-value">'+(data.title||'<span class="preview-empty">Missing — add title tag!</span>')+'</div></div>' +
       // Meta
@@ -2033,7 +1997,7 @@ async function fetchPageContent(){
       (data.failedAudits && data.failedAudits.length > 0 ? '<div class="preview-item"><div class="preview-label">Failed Audits ('+data.failedAudits.length+')</div><div class="preview-value" style="color:#e74c3c;">'+data.failedAudits.join(' · ')+'</div></div>' : '');
 
     preview.classList.add('open');
-    status.textContent='✅ Full audit complete! Source: ' + data.source + ' — Click Run AI for recommendations.';
+    status.textContent='✅ Page fetched! Content analyzed — click Run AI for specific recommendations.';
     status.className='fetch-status success';
   }else{
     status.textContent='⚠️ Could not fetch page. AI will use GSC data instead — click Run AI.';
@@ -2078,12 +2042,6 @@ CONTENT (via Jina.ai):
 - Internal Links: ${pageData.internalLinks} | External: ${pageData.externalLinks}
 - Images missing alt: ${pageData.imgsNoAlt}
 
-TECHNICAL (via Google PageSpeed):
-- Performance: ${pageData.perfScore!==null?pageData.perfScore+'/100':'N/A'}
-- SEO Score: ${pageData.seoScore!==null?pageData.seoScore+'/100':'N/A'}
-- Accessibility: ${pageData.a11yScore!==null?pageData.a11yScore+'/100':'N/A'}
-- LCP: ${pageData.lcp||'N/A'} | CLS: ${pageData.cls||'N/A'} | TBT: ${pageData.tbt||'N/A'} | FCP: ${pageData.fcp||'N/A'}
-- Failed Audits: ${pageData.failedAudits&&pageData.failedAudits.length?pageData.failedAudits.join(', '):'None'}
 
 PAGE CONTENT SAMPLE:
 ${pageData.bodyText?pageData.bodyText.slice(0,800):'Not available'}`;
