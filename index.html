@@ -1854,21 +1854,100 @@ const CORS_PROXIES=[
   url=>`https://thingproxy.freeboard.io/fetch/${url}`,
   url=>`https://cors.eu.org/${url}`
 ];
+// Fetch via Jina.ai Reader - full page content, no CORS, no API key needed
+async function fetchViaJina(url){
+  try{
+    const r = await fetch('https://r.jina.ai/' + url, {
+      signal: AbortSignal.timeout(15000),
+      headers: {'Accept': 'text/plain'}
+    });
+    if(!r.ok) return null;
+    const text = await r.text();
+    if(!text || text.length < 100) return null;
+    const lines = text.split('\n');
+    let title = '', metaDesc = '';
+    const titleMatch = text.match(/^Title:\s*(.+)$/m);
+    const descMatch = text.match(/^(?:Description|Meta Description):\s*(.+)$/m);
+    if(titleMatch) title = titleMatch[1].trim();
+    if(descMatch) metaDesc = descMatch[1].trim();
+    const h1s = [...text.matchAll(/^#\s+(.+)$/gm)].map(m=>m[1].trim());
+    const h2s = [...text.matchAll(/^##\s+(.+)$/gm)].map(m=>m[1].trim()).slice(0,8);
+    const h3s = [...text.matchAll(/^###\s+(.+)$/gm)].map(m=>m[1].trim()).slice(0,8);
+    const bodyText = text.replace(/[#*\[\]()]/g,' ').replace(/\s+/g,' ').trim();
+    const wordCount = bodyText.split(' ').filter(w=>w.length>2).length;
+    const linkMatches = [...text.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)];
+    const allLinks = linkMatches.map(m=>m[2]);
+    let hostname = '';
+    try{ hostname = new URL(url).hostname; }catch(e){}
+    const internalLinks = allLinks.filter(l=>l.startsWith('/')||l.includes(hostname)).length;
+    const externalLinks = allLinks.length - internalLinks;
+    return {title, titleLen:title.length, metaDesc, metaDescLen:metaDesc.length,
+      h1:h1s, h2:h2s, h3:h3s, wordCount, internalLinks, externalLinks,
+      bodyText:bodyText.slice(0,3000), images:0, imgsNoAlt:0,
+      perfScore:null, seoScore:null, lcp:'', cls:'', tbt:'', fcp:'', failedAudits:[],
+      source:'jina'};
+  }catch(e){ console.log('Jina error:',e); return null; }
+}
+
+// Fetch via Google PageSpeed - technical scores, no API key needed
+async function fetchViaPageSpeed(url){
+  try{
+    const apiUrl = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url='+encodeURIComponent(url)+'&strategy=mobile&category=SEO&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES';
+    const r = await fetch(apiUrl, {signal:AbortSignal.timeout(20000)});
+    if(!r.ok) return null;
+    const data = await r.json();
+    if(!data||!data.lighthouseResult) return null;
+    const lhr = data.lighthouseResult;
+    const audits = lhr.audits||{};
+    const cats = lhr.categories||{};
+    const perfScore = Math.round((cats.performance&&cats.performance.score||0)*100);
+    const seoScore  = Math.round((cats.seo&&cats.seo.score||0)*100);
+    const a11yScore = Math.round((cats.accessibility&&cats.accessibility.score||0)*100);
+    const bpScore   = Math.round((cats['best-practices']&&cats['best-practices'].score||0)*100);
+    const lcp = audits['largest-contentful-paint']?audits['largest-contentful-paint'].displayValue||'':'';
+    const cls = audits['cumulative-layout-shift']?audits['cumulative-layout-shift'].displayValue||'':'';
+    const tbt = audits['total-blocking-time']?audits['total-blocking-time'].displayValue||'':'';
+    const fcp = audits['first-contentful-paint']?audits['first-contentful-paint'].displayValue||'':'';
+    const failedAudits = Object.values(audits)
+      .filter(a=>a.score!==null&&a.score!==undefined&&a.score<0.9&&a.title)
+      .map(a=>a.title).slice(0,8);
+    const imgsNoAlt = audits['image-alt']&&audits['image-alt'].details&&audits['image-alt'].details.items
+      ? audits['image-alt'].details.items.length : 0;
+    return {perfScore,seoScore,a11yScore,bpScore,lcp,cls,tbt,fcp,failedAudits,imgsNoAlt,source:'pagespeed'};
+  }catch(e){ console.log('PageSpeed error:',e); return null; }
+}
+
 async function fetchAndParsePage(url){
-  for(const pf of CORS_PROXIES){
-    try{
-      const r=await fetch(pf(url),{signal:AbortSignal.timeout(8000)});if(!r.ok)continue;
-      const j=await r.json().catch(null);const html=j?(j.contents||j.body||''):await r.text();if(!html)continue;
-      const doc=new DOMParser().parseFromString(html,'text/html');
-      const title=doc.querySelector('title')?.textContent?.trim()||'';
-      const metaDesc=doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()||'';
-      const h1=Array.from(doc.querySelectorAll('h1')).map(el=>el.textContent.trim()).filter(Boolean);
-      const h2=Array.from(doc.querySelectorAll('h2')).map(el=>el.textContent.trim()).filter(Boolean).slice(0,8);
-      const images=Array.from(doc.querySelectorAll('img'));
-      return{title,titleLen:title.length,metaDesc,metaDescLen:metaDesc.length,h1,h2,images:images.length,imgsNoAlt:images.filter(img=>!img.getAttribute('alt')?.trim()).length,bodyText:doc.body?.textContent?.replace(/\s+/g,' ').trim().slice(0,2000)||''};
-    }catch(e){continue;}
-  }
-  return null;
+  // Run both in parallel
+  const [jinaRes, psRes] = await Promise.allSettled([fetchViaJina(url), fetchViaPageSpeed(url)]);
+  const jina = jinaRes.status==='fulfilled' ? jinaRes.value : null;
+  const ps   = psRes.status==='fulfilled'   ? psRes.value   : null;
+  if(!jina && !ps) return null;
+  return {
+    title:         jina?jina.title:'',
+    titleLen:      jina?jina.titleLen:0,
+    metaDesc:      jina?jina.metaDesc:'',
+    metaDescLen:   jina?jina.metaDescLen:0,
+    h1:            jina?jina.h1:[],
+    h2:            jina?jina.h2:[],
+    h3:            jina?jina.h3:[],
+    wordCount:     jina?jina.wordCount:0,
+    internalLinks: jina?jina.internalLinks:0,
+    externalLinks: jina?jina.externalLinks:0,
+    bodyText:      jina?jina.bodyText:'',
+    images:        0,
+    imgsNoAlt:     ps?ps.imgsNoAlt:(jina?0:0),
+    perfScore:     ps?ps.perfScore:null,
+    seoScore:      ps?ps.seoScore:null,
+    a11yScore:     ps?ps.a11yScore:null,
+    bpScore:       ps?ps.bpScore:null,
+    lcp:           ps?ps.lcp:'',
+    cls:           ps?ps.cls:'',
+    tbt:           ps?ps.tbt:'',
+    fcp:           ps?ps.fcp:'',
+    failedAudits:  ps?ps.failedAudits:[],
+    source:        (jina?'jina':'')+(ps?'+pagespeed':'')
+  };
 }
 function getBestKeywordUrl(keyword, fallbackUrl){
   let bestUrl = fallbackUrl || '';
@@ -1914,16 +1993,52 @@ async function fetchPageContent(){
   const status=document.getElementById('fetchStatus');const preview=document.getElementById('pagePreview');
   if(!url||!url.startsWith('http')){status.textContent='⚠️ Enter valid URL';status.className='fetch-status error';return;}
   status.textContent='⏳ Fetching...';status.className='fetch-status';preview.classList.remove('open');fetchedPageData=null;
+  status.textContent='⏳ Fetching page + running PageSpeed audit...';
   const data=await fetchAndParsePage(url);
-  if(data && data.title){
+  if(data){
     fetchedPageData=data;
-    preview.innerHTML=`
-      <div class="preview-item"><div class="preview-label">📌 Title (${data.titleLen} chars)</div><div class="preview-value">${data.title||'<span class="preview-empty">Missing</span>'}</div></div>
-      <div class="preview-item"><div class="preview-label">📝 Meta (${data.metaDescLen} chars)</div><div class="preview-value">${data.metaDesc||'<span class="preview-empty">Missing</span>'}</div></div>
-      <div class="preview-item"><div class="preview-label">H1 (${data.h1.length})</div><div class="preview-value">${data.h1.join(' | ')||'<span class="preview-empty">None</span>'}</div></div>
-      <div class="preview-item"><div class="preview-label">Images</div><div class="preview-value">${data.images} total · ${data.imgsNoAlt} missing alt</div></div>`;
-    preview.classList.add('open');status.textContent='✅ Fetched!';status.className='fetch-status success';
-  }else{status.textContent='⚠️ Page blocked CORS (common). AI will use GSC data instead — click Run AI.';status.className='fetch-status error';}
+
+    // Build score badges
+    const scoreBadge = (score, label) => {
+      if(score === null) return '';
+      const col = score >= 80 ? '#2ecc71' : score >= 50 ? '#e67e22' : '#e74c3c';
+      return '<span style="background:'+col+';color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-right:6px;">'+label+': '+score+'</span>';
+    };
+
+    const titleStatus = data.titleLen === 0 ? 'Missing!' : data.titleLen < 30 ? 'Too short' : data.titleLen > 60 ? 'Too long' : 'Good';
+    const titleColor = data.titleLen === 0 ? '#e74c3c' : data.titleLen < 30 || data.titleLen > 60 ? '#e67e22' : '#2ecc71';
+    const metaStatus = data.metaDescLen === 0 ? 'Missing!' : data.metaDescLen < 120 ? 'Too short' : data.metaDescLen > 160 ? 'Too long' : 'Good';
+    const metaColor = data.metaDescLen === 0 ? '#e74c3c' : data.metaDescLen < 120 || data.metaDescLen > 160 ? '#e67e22' : '#2ecc71';
+
+    preview.innerHTML =
+      // Score row
+      (data.perfScore !== null ? '<div style="margin-bottom:10px;">'+scoreBadge(data.perfScore,'Perf')+scoreBadge(data.seoScore,'SEO')+scoreBadge(data.a11yScore,'A11y')+scoreBadge(data.bpScore,'BP')+'<span style="font-size:11px;color:#888;">via Google PageSpeed</span></div>' : '') +
+      // Title
+      '<div class="preview-item"><div class="preview-label">📌 Title <span style="color:'+titleColor+';font-weight:700;">('+data.titleLen+' chars — '+titleStatus+')</span></div><div class="preview-value">'+(data.title||'<span class="preview-empty">Missing — add title tag!</span>')+'</div></div>' +
+      // Meta
+      '<div class="preview-item"><div class="preview-label">📝 Meta Description <span style="color:'+metaColor+';font-weight:700;">('+data.metaDescLen+' chars — '+metaStatus+')</span></div><div class="preview-value">'+(data.metaDesc||'<span class="preview-empty">Missing — add meta description!</span>')+'</div></div>' +
+      // H1
+      '<div class="preview-item"><div class="preview-label">H1 Tags ('+data.h1.length+')'+(data.h1.length===0?' <span style="color:#e74c3c;font-weight:700;">Missing!</span>':data.h1.length>1?' <span style="color:#e67e22;font-weight:700;">Multiple H1s!</span>':'')+'</div><div class="preview-value">'+(data.h1.join(' | ')||'<span class="preview-empty">No H1 found</span>')+'</div></div>' +
+      // H2
+      (data.h2 && data.h2.length > 0 ? '<div class="preview-item"><div class="preview-label">H2 Tags ('+data.h2.length+')</div><div class="preview-value">'+data.h2.slice(0,4).join(' | ')+'</div></div>' : '') +
+      // Word count
+      (data.wordCount > 0 ? '<div class="preview-item"><div class="preview-label">Word Count</div><div class="preview-value"><span style="font-weight:700;color:'+(data.wordCount<500?'#e74c3c':data.wordCount<1000?'#e67e22':'#2ecc71')+';">'+data.wordCount+' words</span> '+(data.wordCount<500?'— Too thin! Add more content':data.wordCount<1000?'— Could be longer':'— Good length')+'</div></div>' : '') +
+      // Links
+      (data.internalLinks !== undefined ? '<div class="preview-item"><div class="preview-label">Links</div><div class="preview-value">'+data.internalLinks+' internal · '+data.externalLinks+' external</div></div>' : '') +
+      // Images
+      '<div class="preview-item"><div class="preview-label">Images Missing Alt</div><div class="preview-value"><span style="color:'+(data.imgsNoAlt>0?'#e74c3c':'#2ecc71')+';font-weight:700;">'+data.imgsNoAlt+' images</span> missing alt tags</div></div>' +
+      // Core Web Vitals
+      (data.lcp ? '<div class="preview-item"><div class="preview-label">Core Web Vitals</div><div class="preview-value">LCP: '+data.lcp+' · CLS: '+data.cls+' · TBT: '+data.tbt+' · FCP: '+data.fcp+'</div></div>' : '') +
+      // Failed audits
+      (data.failedAudits && data.failedAudits.length > 0 ? '<div class="preview-item"><div class="preview-label">Failed Audits ('+data.failedAudits.length+')</div><div class="preview-value" style="color:#e74c3c;">'+data.failedAudits.join(' · ')+'</div></div>' : '');
+
+    preview.classList.add('open');
+    status.textContent='✅ Full audit complete! Source: ' + data.source + ' — Click Run AI for recommendations.';
+    status.className='fetch-status success';
+  }else{
+    status.textContent='⚠️ Could not fetch page. AI will use GSC data instead — click Run AI.';
+    status.className='fetch-status error';
+  }
 }
 async function loadAIKeys(){if(!currentUser)return{};try{const d=await db.collection('users').doc(currentUser.uid).collection('settings').doc('aikeys').get();return d.exists?d.data():{};}catch(e){return{};}}
 async function callAI(provider,prompt,keys){
@@ -1947,16 +2062,56 @@ async function callAI(provider,prompt,keys){
   return{text:body.choices?.[0]?.message?.content||'',model:body.model||cfg.model};
 }
 function buildPrompt(keyword,url,pageData,mode){
-  const pp = pageData
-    ? `ACTUAL PAGE DATA: Title="${pageData.title}" (${pageData.titleLen} chars) | Meta="${pageData.metaDesc}" | H1="${pageData.h1.join(' | ')}" | Images=${pageData.images} (${pageData.imgsNoAlt} missing alt) | URL=${url}`
-    : (url ? `Target URL: ${url} (not fetched yet - click Fetch Page for better analysis)` : 'No URL provided');
+  let pp = '';
+  if(pageData){
+    const kwCount = pageData.bodyText ? (pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length - 1) : 0;
+    const kwDensity = pageData.wordCount > 0 ? ((kwCount / pageData.wordCount) * 100).toFixed(2) : '0';
+    pp = `COMPLETE ON-PAGE SEO AUDIT for ${url}:
+
+CONTENT (via Jina.ai):
+- Title: "${pageData.title}" (${pageData.titleLen} chars) ${pageData.titleLen===0?'MISSING!':pageData.titleLen<30?'TOO SHORT':pageData.titleLen>60?'TOO LONG':'OK'}
+- Meta: "${pageData.metaDesc}" (${pageData.metaDescLen} chars) ${pageData.metaDescLen===0?'MISSING!':pageData.metaDescLen<120?'TOO SHORT':pageData.metaDescLen>160?'TOO LONG':'OK'}
+- H1 (${pageData.h1.length}): ${pageData.h1.join(' | ')||'NONE - CRITICAL!'}
+- H2 (${pageData.h2?pageData.h2.length:0}): ${pageData.h2?pageData.h2.slice(0,5).join(' | '):'None'}
+- Word Count: ${pageData.wordCount} words ${pageData.wordCount<500?'TOO THIN - needs 800+':pageData.wordCount<1000?'could be longer':'good'}
+- Keyword "${keyword}" appears: ${kwCount} times (density: ${kwDensity}%)
+- Internal Links: ${pageData.internalLinks} | External: ${pageData.externalLinks}
+- Images missing alt: ${pageData.imgsNoAlt}
+
+TECHNICAL (via Google PageSpeed):
+- Performance: ${pageData.perfScore!==null?pageData.perfScore+'/100':'N/A'}
+- SEO Score: ${pageData.seoScore!==null?pageData.seoScore+'/100':'N/A'}
+- Accessibility: ${pageData.a11yScore!==null?pageData.a11yScore+'/100':'N/A'}
+- LCP: ${pageData.lcp||'N/A'} | CLS: ${pageData.cls||'N/A'} | TBT: ${pageData.tbt||'N/A'} | FCP: ${pageData.fcp||'N/A'}
+- Failed Audits: ${pageData.failedAudits&&pageData.failedAudits.length?pageData.failedAudits.join(', '):'None'}
+
+PAGE CONTENT SAMPLE:
+${pageData.bodyText?pageData.bodyText.slice(0,800):'Not available'}`;
+  } else {
+    pp = url ? `Target URL: ${url} (fetch failed - using keyword+GSC data)` : 'No URL - keyword analysis only';
+  }
 
   let gscContext = '';
   if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
     const gscRow = gscDataFull.find(function(k){ return k.keyword === keyword; });
     if(gscRow){
-      gscContext = ' | CURRENT RANKINGS: Position #' + Math.round(gscRow.position) + ', Clicks=' + gscRow.clicks + ', Impressions=' + gscRow.impressions + ', CTR=' + (gscRow.ctr*100).toFixed(1) + '%';
+      gscContext = `\nGSC DATA: Position #${Math.round(gscRow.position)}, Clicks=${gscRow.clicks}, Impressions=${gscRow.impressions}, CTR=${(gscRow.ctr*100).toFixed(1)}%`;
     }
+  }
+
+  const modes={
+    general:`You are an expert SEO consultant. Analyze this SPECIFIC situation and give SPECIFIC fixes (not generic advice).\n\nKeyword: "${keyword}"\n${pp}${gscContext}\n\nIMPORTANT: Reference SPECIFIC issues found in the audit data above. Give exact fixes with implementation details.\n\n**Assessment**\n(specific assessment citing real numbers from audit)\n\n**Top 5 Quick Wins**\n1. (exact fix with implementation)\n2. 3. 4. 5.\n\n**Content Recommendations**\n1. (specific content fix)\n2. 3. 4. 5.\n\n**Technical Issues**\n1. (specific technical fix from audit data)\n2. 3. 4. 5.\n\n**Local SEO Actions**\n1. (specific local action)\n2. 3. 4. 5.\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+
+    local:`You are a Local SEO expert for Hyderabad, India. Give SPECIFIC local SEO advice.\n\nKeyword: "${keyword}"\nBusiness: Turnkey Interior Contractors, Gachibowli, Hyderabad\n${pp}${gscContext}\n\n**GMB Optimization**\n1-5. (exact GMB field changes)\n\n**Local Citations**\n1-5. (specific Indian directories with tips)\n\n**Location Keywords**\n1-5. (exact keyword variations with area names)\n\n**Map Pack Strategy**\n1-5. (specific steps)\n\n**Review Campaign**\n(exact WhatsApp template to send clients)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+
+    content:`You are a Content SEO expert. Analyze the ACTUAL content data provided.\n\nKeyword: "${keyword}"\n${pp}${gscContext}\n\nBased on the audit data, give SPECIFIC content fixes:\n\n**Content Gaps**\n1-5. (specific missing topics)\n\n**Ideal Word Count**\n(exact number with reasoning)\n\n**Semantic Keywords**\n(10 exact LSI keywords to include)\n\n**Exact Content Structure**\nH1: (exact suggested H1)\nH2s: (list exact H2 headings)\n\n**Featured Snippet**\n(exact content to target snippet)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+
+    technical:`You are a Technical SEO expert. Analyze the PageSpeed audit data provided.\n\nKeyword: "${keyword}"\nURL: ${url||'not provided'}\n${pp}${gscContext}\n\nGive SPECIFIC fixes based on the audit data above:\n\n**Page Speed Fixes**\n1-3. (specific fixes based on scores)\n\n**Core Web Vitals**\n(specific LCP/CLS/TBT fixes based on actual values)\n\n**Schema Markup**\n(exact JSON-LD schema code for this business)\n\n**Crawlability**\n1-3. (specific fixes)\n\n**Internal Linking**\n1-3. (specific pages to link)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+
+    competitor:`You are a Competitor Intelligence expert.\n\nKeyword: "${keyword}"\nLocation: Hyderabad, India\n${gscContext}\n\n**Top 5 Competitors Ranking**\n(name real businesses ranking for this keyword in Hyderabad)\n\n**Why They Win**\n1-3. (specific tactics)\n\n**Your Advantage**\n1-3. (specific differentiation for Turnkey Interior Contractors)\n\n**Keyword Difficulty: [1-10]**\n\n**30-Day Action Plan**\nWeek 1: Week 2: Week 3: Week 4:\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`
+  };
+  return modes[mode]||modes.general;
+}
   }
 
   const context = pp + gscContext;
