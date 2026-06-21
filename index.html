@@ -2835,7 +2835,22 @@ async function refreshKeywordRank(kwId, keyword, silent) {
     const lat = parseFloat(company.gmbLat) || 17.4506074;
     const lng = parseFloat(company.gmbLng) || 78.3624082;
     const results = await fetchNearbyPlaces(keyword, lat, lng, apiKey);
-    const myIndex = findMyBusiness(results, company.gmbName || '', company);
+
+    // Try Place ID match first (most accurate)
+    let myIndex = -1;
+    const placeId = (company.gmbPlaceId || '').toLowerCase().trim();
+    if(placeId) {
+      for(let i = 0; i < results.length; i++) {
+        const rPid = (results[i].place_id || '').toLowerCase();
+        if(rPid && rPid === placeId) { myIndex = i; break; }
+      }
+    }
+
+    // Fallback to fuzzy match if Place ID not found in results
+    if(myIndex === -1) {
+      myIndex = findMyBusiness(results, company.gmbName || '', company);
+    }
+
     const rank = myIndex === -1 ? 99 : myIndex + 1;
     const ref = firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(companyId).collection('locationKeywords').doc(kwId);
     const doc = await ref.get();
