@@ -1918,13 +1918,26 @@ async function callAI(provider,prompt,keys){
   return{text:body.choices?.[0]?.message?.content||'',model:body.model||cfg.model};
 }
 function buildPrompt(keyword,url,pageData,mode){
-  const pp=pageData?`PAGE:\n- Title: ${pageData.title} (${pageData.titleLen}c)\n- Meta: ${pageData.metaDesc}\n- H1: ${pageData.h1.join(', ')}\n- Images: ${pageData.images}, ${pageData.imgsNoAlt} missing alt`:'';
+  const pp = pageData
+    ? `ACTUAL PAGE DATA: Title="${pageData.title}" (${pageData.titleLen} chars) | Meta="${pageData.metaDesc}" | H1="${pageData.h1.join(' | ')}" | Images=${pageData.images} (${pageData.imgsNoAlt} missing alt) | URL=${url}`
+    : (url ? `Target URL: ${url} (not fetched yet - click Fetch Page for better analysis)` : 'No URL provided');
+
+  let gscContext = '';
+  if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
+    const gscRow = gscDataFull.find(function(k){ return k.keyword === keyword; });
+    if(gscRow){
+      gscContext = ' | CURRENT RANKINGS: Position #' + Math.round(gscRow.position) + ', Clicks=' + gscRow.clicks + ', Impressions=' + gscRow.impressions + ', CTR=' + (gscRow.ctr*100).toFixed(1) + '%';
+    }
+  }
+
+  const context = pp + gscContext;
+
   const modes={
-    general:`SEO expert. Analyze: "${keyword}" ${url?`URL: ${url}`:''} ${pp}\nProvide: 1)Assessment 2)Top 5 quick wins 3)Content recs 4)Technical issues 5)Local SEO Hyderabad\nEnd: SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
-    local:`Local SEO Hyderabad. "${keyword}" ${pp}\nProvide: 1)GMB optimization 2)Local citations 3)Hyderabad keywords 4)Map pack 5)Reviews\nEnd: SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
-    content:`Content SEO. "${keyword}" ${pp}\nProvide: 1)Content gaps 2)Word count 3)Semantic kws 4)Structure 5)Featured snippet\nEnd: SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
-    technical:`Technical SEO. "${keyword}" ${url?`URL: ${url}`:''} ${pp}\nProvide: 1)Speed 2)Core Web Vitals 3)Schema 4)Crawlability 5)Internal linking\nEnd: SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
-    competitor:`Competitor analysis. "${keyword}" Hyderabad.\nProvide: 1)Top competitors 2)Their strategy 3)Differentiation 4)Difficulty 5)Action plan\nEnd: SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`
+    general:`You are an expert SEO consultant. Analyze this SPECIFIC situation and give SPECIFIC actionable advice (not generic).\n\nKeyword: "${keyword}"\n${context}\n\nIMPORTANT: If page data is provided above, reference SPECIFIC issues found on that exact page. Give exact fixes, not general advice.\n\nFormat response as:\n**Assessment**\n(specific assessment based on real data)\n\n**Top 5 Quick Wins**\n1. (exact specific fix with implementation detail)\n2. 3. 4. 5.\n\n**Content Recommendations**\n1. (specific content gap or fix)\n2. 3. 4. 5.\n\n**Technical Issues**\n1. (specific technical problem found)\n2. 3. 4. 5.\n\n**Local SEO Actions**\n1. (specific local action)\n2. 3. 4. 5.\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+    local:`You are a Local SEO expert for Hyderabad, India. Give SPECIFIC local SEO advice.\n\nKeyword: "${keyword}"\nBusiness: Turnkey Interior Contractors, Gachibowli, Hyderabad\n${context}\n\n**GMB Optimization**\n1-5. (exact GMB field changes to make right now)\n\n**Local Citations**\n1-5. (specific Indian directories: JustDial, Sulekha, IndiaMart etc with exact listing tips)\n\n**Location Keywords**\n1-5. (exact keyword variations: area names, landmarks near Gachibowli)\n\n**Map Pack Strategy**\n1-5. (specific steps to enter map pack for this keyword)\n\n**Review Campaign**\n(exact WhatsApp message template to send to past clients)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+    content:`You are a Content SEO expert. Give SPECIFIC content advice.\n\nKeyword: "${keyword}"\n${context}\n\nIf page data is provided, analyze the ACTUAL title, meta, H1 and give specific fixes. Otherwise give specific recommendations.\n\n**Content Gaps**\n1-5. (specific missing sections or topics for this exact keyword)\n\n**Ideal Word Count**\n(exact number with reasoning based on competitor pages)\n\n**Semantic Keywords**\n(10 exact LSI keywords to naturally include)\n\n**Exact Content Structure**\nH1: (exact suggested H1 tag)\nH2s: (list exact H2 headings to use)\n\n**Featured Snippet**\n(exact paragraph or list format to target the snippet for this keyword)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+    technical:`You are a Technical SEO expert. Give SPECIFIC technical fixes.\n\nKeyword: "${keyword}"\nURL: ${url||'not provided'}\n${context}\n\nIf page data is provided above, identify SPECIFIC issues on that exact page (title length, missing alt tags, etc).\n\n**Page Speed Fixes**\n1-3. (specific fixes for this page)\n\n**Core Web Vitals**\n(specific LCP, CLS, FID issues and fixes)\n\n**Schema Markup**\n(exact JSON-LD schema code to add for this business type)\n\n**Crawlability**\n1-3. (specific crawl issues to fix)\n\n**Internal Linking**\n1-3. (specific pages on the site to link from/to for this keyword)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`,
+    competitor:`You are a Competitor Intelligence expert for Hyderabad SEO.\n\nKeyword: "${keyword}"\n${context}\n\nResearch and provide REAL competitor data (not made up).\n\n**Top 5 Competitors Currently Ranking**\n(name actual businesses/websites ranking for this keyword in Hyderabad)\n\n**Why They Are Winning**\n1-3. (specific SEO tactics they use - backlinks, content, GMB etc)\n\n**Your Competitive Advantage**\n1-3. (specific angles for Turnkey Interior Contractors to differentiate)\n\n**Keyword Difficulty: [1-10]**\n(with specific reasoning)\n\n**30-Day Action Plan**\nWeek 1: (3 specific tasks)\nWeek 2: (3 specific tasks)\nWeek 3: (3 specific tasks)\nWeek 4: (3 specific tasks)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`
   };
   return modes[mode]||modes.general;
 }
