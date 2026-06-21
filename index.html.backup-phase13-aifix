@@ -1135,7 +1135,6 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('s-userEmail').value=user.email||'';
     document.getElementById('s-userName').value=user.displayName||'';
     await loadCompanies();
-    openParentIfChild('ranktracker');
     loadAIKeyStatuses();
     handleGSCCallback();
   } else {
@@ -1258,7 +1257,7 @@ function renderKeywords(kwList){
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
           <button class="update-rank-btn" onclick="openUpdateRank('${k.id}','${k.keyword.replace(/'/g,"\\'")}',${pos||0})">📍 Update</button>
           <button class="chart-btn" onclick="openHistoryModal('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">📈 History</button>
-          <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}')">
+          <button class="ai-btn" onclick="openAiPanel('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}')">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>AI
           </button>
           <button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">🗑️</button>
@@ -1864,28 +1863,6 @@ async function fetchAndParsePage(url){
   }
   return null;
 }
-function getBestKeywordUrl(keyword, fallbackUrl){
-  let bestUrl = fallbackUrl || '';
-  if(typeof gscDataFull !== 'undefined' && gscDataFull && gscDataFull.length){
-    const matches = gscDataFull.filter(r =>
-      (r.keyword || '').trim().toLowerCase() === (keyword || '').trim().toLowerCase() && r.url
-    );
-    if(matches.length){
-      matches.sort((a,b) => ((b.clicks||0) - (a.clicks||0)) || ((a.position||999) - (b.position||999)));
-      bestUrl = matches[0].url || bestUrl;
-    }
-  }
-  return bestUrl;
-}
-
-function openAiPanelForKeyword(keyword, fallbackUrl){
-  const bestUrl = getBestKeywordUrl(keyword, fallbackUrl);
-  openAiPanel(keyword, bestUrl);
-  if(!bestUrl){
-    showToast('No ranking page URL found yet. Sync GSC or enter URL manually.', true);
-  }
-}
-
 function openAiPanel(keyword,url){
   currentAiKeyword=keyword;currentAiUrl=url||'';fetchedPageData=null;
   document.getElementById('aiKeyword').textContent=keyword;
@@ -2171,7 +2148,7 @@ function openParentIfChild(pageId){
   }
 }
 
-async function runStandaloneAI(){const kw=document.getElementById('standalone-keyword').value.trim();const url=document.getElementById('standalone-url').value.trim();if(!kw)return showToast('Enter a keyword',true);openAiPanel(kw,getBestKeywordUrl(kw,url));}
+async function runStandaloneAI(){const kw=document.getElementById('standalone-keyword').value.trim();const url=document.getElementById('standalone-url').value.trim();if(!kw)return showToast('Enter a keyword',true);openAiPanel(kw,url);}
 const providerModels={groq:['llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768','gemma2-9b-it'],openai:['gpt-4o-mini','gpt-4o','gpt-3.5-turbo'],anthropic:['claude-3-haiku-20240307','claude-3-5-sonnet-20241022'],gemini:['gemini-1.5-flash','gemini-1.5-pro'],mistral:['mistral-large-latest','mistral-small-latest'],cohere:['command-r','command-r-plus','command'],together:['meta-llama/Llama-3.3-70B-Instruct-Turbo','mistralai/Mixtral-8x7B-Instruct-v0.1']};
 document.getElementById('aiProviderSelect').addEventListener('change',function(){document.getElementById('aiModelSelect').innerHTML=providerModels[this.value].map(m=>`<option value="${m}">${m}</option>`).join('');});
 async function loadAIKeyStatuses(){
