@@ -2886,27 +2886,41 @@ async function showKeywordDetail(kwId, keyword) {
 function closeKeywordDetail() { document.getElementById('overview-kw-detail').style.display = 'none'; }
 
 function switchGMBTab(n) {
+  // Hide all tab contents
   document.querySelectorAll('.gmb-tab-content').forEach(c => c.style.display = 'none');
+
+  // Show selected tab
   if(n === 'overview') {
     document.getElementById('gmb-tab-overview').style.display = 'block';
     loadLocationOverview();
   } else {
-    document.getElementById('gmb-tab-' + n).style.display = 'block';
+    const tab = document.getElementById('gmb-tab-' + n);
+    if(tab) tab.style.display = 'block';
   }
-  document.querySelectorAll('.gmb-tab-btn').forEach(b => {
-  document.querySelectorAll('.gmb-tab-content').forEach(t => t.style.display = 'none');
+
+  // Reset all button styles
   document.querySelectorAll('.gmb-tab-btn').forEach(b => {
     b.style.background = '#fff';
     b.style.color = '#0a5c36';
     b.style.borderColor = '#d4f5e2';
+    b.classList.remove('active');
   });
-  document.getElementById('gmb-tab-' + n).style.display = 'block';
+
+  // Highlight active button
   const btns = document.querySelectorAll('.gmb-tab-btn');
-  btns[n].style.background = '#2ecc71';
-  btns[n].style.color = '#fff';
-  btns[n].style.borderColor = '#2ecc71';
+  btns.forEach(b => {
+    const onclick = b.getAttribute('onclick') || '';
+    if((n === 'overview' && onclick.includes("'overview'")) || (n !== 'overview' && onclick.includes('(' + n + ')'))) {
+      b.style.background = '#2ecc71';
+      b.style.color = '#fff';
+      b.style.borderColor = '#2ecc71';
+      b.classList.add('active');
+    }
+  });
+
   if (n === 4) loadHistoryKeywords();
 }
+
 
 // ---- TAB 0: RANK CHECKER ----
 async function checkLocalRank() {
