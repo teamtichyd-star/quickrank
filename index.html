@@ -2919,17 +2919,19 @@ async function showKeywordDetail(kwId, keyword) {
         const age = Math.round((Date.now() - cache.cachedAt) / 3600000);
         const ageStr = age < 1 ? 'just now' : age + 'h ago';
         // Set full HTML first including the mini-grid container
+        const safeKw1 = keyword.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         gridEl.innerHTML =
           '<div style="margin-bottom:8px;font-size:12px;color:#888;">Last grid: <b>' + ageStr + '</b> · ' +
-          '<button onclick="runGridFromOverview(' + JSON.stringify(keyword) + ')" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:700;">🔄 Re-run</button></div>' +
+          '<button data-kw="' + safeKw1 + '" onclick="runGridFromOverview(this.getAttribute('data-kw'))" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:700;">🔄 Re-run</button></div>' +
           '<div id="overview-mini-grid"></div>';
         // Now render into the container that exists in DOM
         renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
       } else {
+        const safeKw2 = keyword.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         gridEl.innerHTML =
           '<div style="color:#aaa;font-size:12px;padding:10px;text-align:center;">' +
           'No grid data yet for this keyword.<br>' +
-          '<button onclick="runGridFromOverview(' + JSON.stringify(keyword) + ')" ' +
+          '<button data-kw="' + safeKw2 + '" onclick="runGridFromOverview(this.getAttribute('data-kw'))" ' +
           'style="margin-top:8px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:700;">▶ Run Grid Check</button></div>';
       }
     }
