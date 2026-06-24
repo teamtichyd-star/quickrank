@@ -869,7 +869,7 @@ tr:hover td{background:#f9fffe;}
               <canvas id="overviewKwChart" style="max-height:280px;"></canvas>
             </div>
             <div>
-              <h4 style="color:#0a5c36;font-size:13px;margin-bottom:10px;">🗺️ Grid Map</h4>
+              <h4 style="color:#0a5c36;font-size:13px;margin-bottom:10px;">🗺️ Grid Map (Coming Soon)</h4>
               <div id="overview-detail-grid" style="background:#f0fdf6;border-radius:8px;padding:16px;min-height:80px;"></div>
             </div>
           </div>
@@ -2913,26 +2913,27 @@ async function showKeywordDetail(kwId, keyword) {
     // Load cached grid into overview-detail-grid
     const gridEl = document.getElementById('overview-detail-grid');
     if (gridEl) {
-      window._overviewGridKw = keyword;
-      gridEl.innerHTML = '<div style="color:#888;font-size:12px;padding:12px;text-align:center;">Checking cached grid...</div>';
+      gridEl.innerHTML = '<div style="color:#aaa;font-size:12px;padding:10px;">Loading cached grid...</div>';
       const cache = await loadGridCache(keyword);
-
-      if (cache && cache.results && cache.results.length) {
-        const ageHours = Math.round((Date.now() - (cache.cachedAt || Date.now())) / 3600000);
-        const ageStr = ageHours < 1 ? 'just now' : ageHours + 'h ago';
-
+      if (cache && cache.results) {
+        const age = Math.round((Date.now() - cache.cachedAt) / 3600000);
+        const ageStr = age < 1 ? 'just now' : age + 'h ago';
+        // Set full HTML first including the mini-grid container
+        const safeKw1 = keyword.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         gridEl.innerHTML =
           '<div style="margin-bottom:8px;font-size:12px;color:#888;">Last grid: <b>' + ageStr + '</b> · ' +
-          '<button onclick="runGridFromOverview(window._overviewGridKw)" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Re-run Grid</button></div>' +
+          '<button data-kw="' + safeKw1 + '" onclick="runGridFromOverview(window._overviewGridKw)" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:700;">Re-run Grid</button></div>' +
           '<div id="overview-mini-grid"></div>';
-
+        // Now render into the container that exists in DOM
         renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
       } else {
+        const safeKw2 = keyword.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        window._overviewGridKw = keyword;
         gridEl.innerHTML =
-          '<div style="color:#666;font-size:12px;padding:16px;text-align:center;">' +
-          'No cached grid for this keyword yet.<br>' +
+          '<div style="color:#aaa;font-size:12px;padding:20px;text-align:center;">' +
+          'No grid data found for this area.<br>' +
           '<button onclick="runGridFromOverview(window._overviewGridKw)" ' +
-          'style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:700;">Run Grid Check Here</button></div>';
+          'style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(10,92,54,0.2);">🚀 Run Live Grid Check</button></div>';
       }
     }
   } catch(e) { console.log('History error:', e); }
@@ -2946,12 +2947,12 @@ async function runGridFromOverview(keyword) {
   const gridEl = document.getElementById('overview-detail-grid');
   if (gridEl) {
     gridEl.innerHTML =
-      '<div style="padding:18px;text-align:center;color:#0a5c36;font-weight:700;">Running live grid check for<br><span style="font-size:13px;color:#333;">' + keyword + '</span><br><span style="font-size:12px;color:#888;font-weight:400;">This may take 1-2 minutes.</span></div>';
+      '<div style="padding:18px;text-align:center;color:#0a5c36;font-weight:700;">Running live grid check for <br><span style="font-size:13px;color:#333;">' + keyword + '</span><br><span style="font-size:12px;color:#888;font-weight:400;">This can take 1-2 minutes depending on Google Places response.</span></div>';
   }
 
   try {
-    const sizeEl = document.getElementById('grid-size-select');
-    const gridSize = sizeEl ? parseInt(sizeEl.value || '5') : 5;
+    const gridSizeEl = document.getElementById('grid-size-select');
+    const gridSize = gridSizeEl ? parseInt(gridSizeEl.value || '5') : 5;
 
     const built = await buildGridResults(keyword, gridSize);
     const results = built.results;
@@ -2969,12 +2970,12 @@ async function runGridFromOverview(keyword) {
 
     if (typeof showToast === 'function') showToast('Grid check complete');
   } catch(e) {
-    console.log('Overview grid error:', e);
     if (gridEl) {
       gridEl.innerHTML =
         '<div style="padding:18px;text-align:center;color:#c0392b;font-size:13px;">Grid check failed.<br><span style="font-size:12px;color:#666;">' + e.message + '</span><br>' +
         '<button onclick="runGridFromOverview(window._overviewGridKw)" style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:700;">Try Again</button></div>';
     }
+    console.log('Overview grid error:', e);
   }
 }
 
