@@ -4154,33 +4154,21 @@ let kwSuggestSelections = {}; // { keyword: true/false }
 let kwTrackedSet = new Set();  // currently tracked keywords (lowercase)
 
 function openKeywordSuggest() {
+  // Build tracked set ONLY from actual tracked keyword list on Overview
   kwTrackedSet = new Set();
-  document.querySelectorAll('#overview-kw-tbody tr[data-kw]').forEach(tr => {
-    const enc = tr.getAttribute('data-kw') || '';
-    const kw = enc ? decodeURIComponent(enc) : '';
+  document.querySelectorAll('#overview-kw-list .kw-name, #overview-kw-list [data-keyword], #kw-list .kw-name, #kw-list [data-keyword]').forEach(el => {
+    const kw = el.getAttribute('data-keyword') || el.textContent || '';
     if (kw) kwTrackedSet.add(kw.trim().toLowerCase());
   });
   kwSuggestSelections = {};
-  const modal = document.getElementById('kwSuggestModal');
-  if (modal) {
-    modal.style.display = 'flex';
-    modal.onclick = function(e) {
-      if (e.target === modal) closeKeywordSuggest();
-    };
-  }
+  document.getElementById('kwSuggestModal').style.display = 'flex';
   switchKwTab('gsc');
   loadGSCSuggestions();
-  updateKwSelectedCount();
 }
 
 function closeKeywordSuggest() {
-  const modal = document.getElementById('kwSuggestModal');
-  if (modal) modal.style.display = 'none';
+  document.getElementById('kwSuggestModal').style.display = 'none';
   kwSuggestSelections = {};
-  document.querySelectorAll('#kwSuggestModal input[type=checkbox][data-kw]').forEach(cb => {
-    cb.checked = false;
-  });
-  updateKwSelectedCount();
 }
 
 function switchKwTab(tab) {
@@ -4193,22 +4181,19 @@ function switchKwTab(tab) {
 }
 
 function updateKwSelectedCount() {
-  const count = document.querySelectorAll('#kwSuggestModal input[type=checkbox][data-kw]:checked:not([disabled])').length;
-  const el = document.getElementById('kwSelectedCount');
-  if (el) el.textContent = count + ' keyword' + (count !== 1 ? 's' : '') + ' selected';
+  const count = Object.values(kwSuggestSelections).filter(Boolean).length;
+  document.getElementById('kwSelectedCount').textContent = count + ' keyword' + (count !== 1 ? 's' : '') + ' selected';
 }
 
 function buildKwRow(keyword, vol, cpc, source) {
-  const kwText = (keyword || '').trim();
-  const kwLower = kwText.toLowerCase();
+  const kwLower = keyword.trim().toLowerCase();
   const isTracked = kwTrackedSet.has(kwLower);
+  const checked = kwSuggestSelections[kwLower] || false;
   const rowId = 'kwrow-' + kwLower.replace(/[^a-z0-9]/g, '-');
-  const attrKw = kwLower.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  const attrLabel = kwText.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  return '<div class="kw-suggest-row' + (isTracked ? ' already' : '') + '" id="' + rowId + '" data-kw="' + attrKw + '">' +
-    '<input type="checkbox" ' + (isTracked ? 'disabled' : '') +
-    ' data-kw="' + attrKw + '" data-kw-label="' + attrLabel + '" onchange="toggleKwSelect(this)" style="width:16px;height:16px;accent-color:#2ecc71;cursor:pointer;">' +
-    '<span class="kw-name" style="flex:1;font-size:13px;font-weight:600;color:#1a1a1a;">' + kwText + '</span>' +
+  return '<div class="kw-suggest-row' + (isTracked ? ' already' : '') + '" id="' + rowId + '" data-kw="' + kwLower.replace(/"/g,'&quot;') + '">' +
+    '<input type="checkbox" ' + (checked ? 'checked' : '') + ' ' + (isTracked ? 'disabled' : '') +
+    ' data-kw="' + kwLower.replace(/"/g,'&quot;') + '" onchange="toggleKwSelect(this)" style="width:16px;height:16px;accent-color:#2ecc71;cursor:pointer;">' +
+    '<span class="kw-name" style="flex:1;font-size:13px;font-weight:600;color:#1a1a1a;">' + keyword + '</span>' +
     (isTracked ? '<span class="kw-badge-tracking">✅ Tracking</span>' : '') +
     (vol ? '<span class="kw-badge-vol">📊 ' + vol + '/mo</span>' : '') +
     (cpc ? '<span class="kw-badge-cpc">₹' + cpc + ' CPC</span>' : '') +
@@ -4216,17 +4201,16 @@ function buildKwRow(keyword, vol, cpc, source) {
 }
 
 function toggleKwSelect(el) {
-  const kwLower = (el.getAttribute('data-kw') || '').trim().toLowerCase();
-  if (!kwLower) return;
-  kwSuggestSelections[kwLower] = !!el.checked;
+  const kwLower = el.getAttribute('data-kw');
+  kwSuggestSelections[kwLower] = el.checked;
   updateKwSelectedCount();
 }
 
 function selectAllKwSuggest() {
-  document.querySelectorAll('#kwSuggestModal input[type=checkbox][data-kw]:not([disabled])').forEach(cb => {
+  document.querySelectorAll('#kwSuggestModal input[type=checkbox]:not([disabled])').forEach(cb => {
     cb.checked = true;
-    const kwLower = (cb.getAttribute('data-kw') || '').trim().toLowerCase();
-    if (kwLower) kwSuggestSelections[kwLower] = true;
+    const kw = cb.getAttribute('data-kw');
+    if (kw) kwSuggestSelections[kw] = true;
   });
   updateKwSelectedCount();
 }
@@ -4385,32 +4369,24 @@ function parsePlannerCsv() {
 
 // ── Bulk Add Selected Keywords ──
 async function addSelectedKeywords() {
-  const selectedEls = Array.from(document.querySelectorAll('#kwSuggestModal input[type=checkbox][data-kw]:checked:not([disabled])'));
-  const selected = selectedEls.map(cb => (cb.getAttribute('data-kw-label') || cb.getAttribute('data-kw') || '').trim()).filter(Boolean);
-
+  const selected = Object.entries(kwSuggestSelections).filter(([k, v]) => v).map(([k]) => k);
   if (!selected.length) {
     alert('No keywords selected. Check at least one keyword to add.');
     return;
   }
-
   const user = firebase.auth().currentUser;
-  const companyId = (typeof currentCompanyId !== 'undefined' && currentCompanyId) ? currentCompanyId : getCurrentCompanyId();
-  console.log('[BulkAdd] companyId:', companyId, 'selected:', selected);
-
-  if (!user || !companyId || companyId === 'default') {
-    showToast('Not logged in or no company selected', true);
+  if (!user) { showToast('Not logged in', true); return; }
+  const companyId = getCurrentCompanyId();
+  console.log('[BulkAdd] companyId:', companyId);
+  if (!companyId || companyId === 'default') {
+    showToast('No company selected', true);
     return;
   }
-
   const btn = document.querySelector('#kwSuggestModal button[onclick="addSelectedKeywords()"]');
   if (btn) { btn.textContent = '⏳ Adding...'; btn.disabled = true; }
-
   let added = 0, skipped = 0;
-  const refreshQueue = [];
-
   for (const kw of selected) {
-    const kwLower = kw.toLowerCase();
-    if (kwTrackedSet.has(kwLower)) { skipped++; continue; }
+    if (kwTrackedSet.has(kw)) { skipped++; continue; }
     try {
       const ref = await firebase.firestore()
         .collection('users').doc(user.uid)
@@ -4422,26 +4398,39 @@ async function addSelectedKeywords() {
           lastUpdated: 0,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-      refreshQueue.push({ id: ref.id, kw: kw });
+      refreshKeywordRank(ref.id, kw, true);
       added++;
-    } catch (e) {
-      console.error('Failed to add location keyword:', kw, e);
-    }
+    } catch(e) { console.error('Failed to add:', kw, e); }
   }
-
   if (btn) { btn.textContent = '➕ Add Selected'; btn.disabled = false; }
-
   closeKeywordSuggest();
-
-  if (typeof loadLocationKeywords === 'function') {
-    await loadLocationKeywords();
-  }
-
   showToast('Added ' + added + ' keyword' + (added !== 1 ? 's' : '') + (skipped ? ' · ' + skipped + ' already tracking' : ''));
-
-  refreshQueue.forEach((item, i) => {
-    setTimeout(() => refreshKeywordRank(item.id, item.kw, true), 300 + (i * 150));
-  });
+  await loadLocationKeywords();
+}
+  const btn = document.querySelector('#kwSuggestModal button[onclick="addSelectedKeywords()"]');
+  if (btn) { btn.textContent = '⏳ Adding...'; btn.disabled = true; }
+  let added = 0, skipped = 0;
+  for (const kw of selected) {
+    if (kwTrackedSet.has(kw)) { skipped++; continue; }
+    try {
+      await db.collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('keywords').add({
+          keyword: kw,
+          url: '',
+          position: 0,
+          change: 0,
+          clicks: 0,
+          impressions: 0,
+          gscSynced: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      added++;
+    } catch(e) { console.error('Failed to add keyword:', kw, e); }
+  }
+  if (btn) { btn.textContent = '➕ Add Selected'; btn.disabled = false; }
+  closeKeywordSuggest();
+  alert('✅ Added ' + added + ' keyword' + (added !== 1 ? 's' : '') + (skipped ? ' · ' + skipped + ' already tracking' : '') + '. Ranks will auto-check shortly.');
 }
 
 // Close modal on backdrop click
