@@ -4194,30 +4194,27 @@ function buildKwRow(keyword, vol, cpc, source) {
   const isTracked = kwTrackedSet.has(kwLower);
   const checked = kwSuggestSelections[kwLower] || false;
   const rowId = 'kwrow-' + kwLower.replace(/[^a-z0-9]/g, '-');
-  return '<div class="kw-suggest-row' + (isTracked ? ' already' : '') + '" id="' + rowId + '">' +
+  return '<div class="kw-suggest-row' + (isTracked ? ' already' : '') + '" id="' + rowId + '" data-kw="' + kwLower.replace(/"/g,'&quot;') + '">' +
     '<input type="checkbox" ' + (checked ? 'checked' : '') + ' ' + (isTracked ? 'disabled' : '') +
-    ' onchange="toggleKwSelect(' + JSON.stringify(kwLower) + ',this.checked)" style="width:16px;height:16px;accent-color:#2ecc71;cursor:pointer;">' +
-    '<span style="flex:1;font-size:13px;font-weight:600;color:#1a1a1a;">' + keyword + '</span>' +
+    ' data-kw="' + kwLower.replace(/"/g,'&quot;') + '" onchange="toggleKwSelect(this)" style="width:16px;height:16px;accent-color:#2ecc71;cursor:pointer;">' +
+    '<span class="kw-name" style="flex:1;font-size:13px;font-weight:600;color:#1a1a1a;">' + keyword + '</span>' +
     (isTracked ? '<span class="kw-badge-tracking">✅ Tracking</span>' : '') +
     (vol ? '<span class="kw-badge-vol">📊 ' + vol + '/mo</span>' : '') +
     (cpc ? '<span class="kw-badge-cpc">₹' + cpc + ' CPC</span>' : '') +
     '</div>';
 }
 
-function toggleKwSelect(kwLower, checked) {
-  kwSuggestSelections[kwLower] = checked;
+function toggleKwSelect(el) {
+  const kwLower = el.getAttribute('data-kw');
+  kwSuggestSelections[kwLower] = el.checked;
   updateKwSelectedCount();
 }
 
 function selectAllKwSuggest() {
   document.querySelectorAll('#kwSuggestModal input[type=checkbox]:not([disabled])').forEach(cb => {
     cb.checked = true;
-    const row = cb.closest('.kw-suggest-row');
-    if (row) {
-      // get keyword from sibling span
-      const span = row.querySelector('span');
-      if (span) kwSuggestSelections[span.textContent.trim().toLowerCase()] = true;
-    }
+    const kw = cb.getAttribute('data-kw');
+    if (kw) kwSuggestSelections[kw] = true;
   });
   updateKwSelectedCount();
 }
