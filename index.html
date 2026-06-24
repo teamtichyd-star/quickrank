@@ -4215,12 +4215,18 @@ function selectAllKwSuggest() {
 
 function loadGSCSuggestions() {
   const container = document.getElementById('kwGSCList');
-  if (!window.gscDataFull || !gscDataFull.length) {
-    container.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">No GSC data found.</div>';
+  if (!gscDataFull || !gscDataFull.length) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">No GSC data found. Sync GSC first from Search Console tab.</div>';
     return;
   }
-  const sorted = [...gscDataFull].sort((a,b)=>b.impressions-a.impressions).slice(0,40);
-  container.innerHTML = sorted.map(r => buildKwRow(r.keyword, r.impressions.toLocaleString(), '', 'gsc')).join('');
+  const sorted = [...gscDataFull].sort((a,b)=>(b.impressions||0)-(a.impressions||0)).slice(0,40);
+  if (!sorted.length) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">No keywords in GSC yet.</div>';
+    return;
+  }
+  container.innerHTML = '<div style="font-size:11px;color:#aaa;margin-bottom:10px;">' + sorted.length + ' keywords from GSC</div>' +
+    sorted.map(r => buildKwRow(r.keyword || r.query || '', r.impressions ? r.impressions.toLocaleString() : '', '', 'gsc')).join('');
+  updateKwSelectedCount();
 }
 
 async function loadAISuggestions() {
