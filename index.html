@@ -2396,14 +2396,19 @@ async function saveAIKeys(){
    COMPANY SETTINGS
 ══════════════════════════════ */
 async function loadCompanySettings(){
-  if(!currentUser||!currentCompanyId)return;
-  try{const doc=await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
-    if(doc.exists){const d=doc.data();document.getElementById('s-companyName').value=d.name||'';document.getElementById('s-website').value=d.website||'';document.getElementById('s-gscProperty').value=d.gscProperty||'';document.getElementById('s-gmbName').value=d.gmbName||'';document.getElementById('s-gmbAddress').value=d.gmbAddress||'';
-      document.getElementById('s-googlePlacesKey').value=d.googlePlacesKey||'';
-      document.getElementById('s-gmbPlaceId').value=d.gmbPlaceId||'ChIJxfKa-NuQyzsRZo3TiDBGjdw';
-      document.getElementById('s-gmbLat').value=d.gmbLat||'17.4506074';
-      document.getElementById('s-gmbLng').value=d.gmbLng||'78.3624082';}
-  }catch(e){}
+  if(!currentUser){ console.log('loadCompanySettings: no user'); return; }
+  const companyId = currentCompanyId || getCurrentCompanyId();
+  if(!companyId){ console.log('loadCompanySettings: no companyId'); return; }
+  try{const doc=await db.collection('users').doc(currentUser.uid).collection('companies').doc(companyId).get();
+    if(doc.exists){const d=doc.data();
+      const setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+      setVal('s-companyName',d.name);setVal('s-website',d.website);setVal('s-gscProperty',d.gscProperty);
+      setVal('s-gmbName',d.gmbName);setVal('s-gmbAddress',d.gmbAddress);setVal('s-googlePlacesKey',d.googlePlacesKey);
+      setVal('s-gmbPlaceId',d.gmbPlaceId||'ChIJxfKa-NuQyzsRZo3TiDBGjdw');
+      setVal('s-gmbLat',d.gmbLat||'17.4506074');setVal('s-gmbLng',d.gmbLng||'78.3624082');
+      console.log('Settings loaded for',companyId);
+    }else{console.log('Company doc not found:',companyId);}
+  }catch(e){console.log('loadCompanySettings error:',e);}
   // Show current company ID and auto-suggest new slug
   const idDisplay = document.getElementById('currentCompanyIdDisplay');
   if(idDisplay) idDisplay.textContent = currentCompanyId || 'unknown';
