@@ -770,6 +770,7 @@ tr:hover td{background:#f9fffe;}
         <button class="gmb-tab-btn active" onclick="switchGMBTab('overview')" style="padding:9px 18px;border-radius:8px;border:1.5px solid #2ecc71;background:#2ecc71;color:#fff;font-weight:700;cursor:pointer;font-size:13px;">📊 Overview</button>
         <button class="gmb-tab-btn" onclick="switchGMBTab(1)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">🗺️ Rank Grid</button>
         <button class="gmb-tab-btn" onclick="switchGMBTab(3)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">AI Push Strategy</button>
+        <button class="gmb-tab-btn" onclick="switchGMBTab(4)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">🎯 Action Plan</button>
       </div>
 
       <!-- TAB 0: RANK CHECKER -->
@@ -949,9 +950,61 @@ tr:hover td{background:#f9fffe;}
         </div>
       </div>
 
-      <!-- TAB 4: RANK HISTORY -->
+      <!-- TAB 4: ACTION PLAN -->
+      <div id="gmb-tab-4" class="gmb-tab-content" style="display:none;">
+        <div class="settings-section">
+          <h3>🎯 Your Action Plan to Top 3</h3>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Real tasks based on YOUR GMB data. Check them off as you complete.</p>
+          
+          <!-- Progress Bar -->
+          <div style="background:linear-gradient(135deg,#d4f5e2,#fff);padding:18px;border-radius:10px;margin-bottom:20px;border-left:4px solid #2ecc71;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-weight:700;color:#0a5c36;font-size:15px;">Your Progress</div>
+              <div id="ap-progress-text" style="font-weight:700;color:#0a5c36;font-size:14px;">0 / 0 tasks</div>
+            </div>
+            <div style="background:#fff;height:14px;border-radius:7px;overflow:hidden;border:1px solid #d4f5e2;">
+              <div id="ap-progress-bar" style="height:100%;background:linear-gradient(90deg,#2ecc71,#0a5c36);width:0%;transition:width 0.5s;"></div>
+            </div>
+            <div id="ap-progress-msg" style="margin-top:10px;font-size:12px;color:#666;">Loading your data...</div>
+          </div>
+
+          <!-- Refresh Button -->
+          <div style="margin-bottom:18px;">
+            <button onclick="loadActionPlan()" style="padding:10px 18px;background:#0a5c36;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">🔄 Refresh Action Plan</button>
+            <span id="ap-last-updated" style="margin-left:12px;font-size:12px;color:#999;"></span>
+          </div>
+
+          <!-- Loading -->
+          <div id="ap-loading" style="display:none;text-align:center;padding:30px;color:#0a5c36;font-weight:600;">Analyzing your GMB data...</div>
+
+          <!-- Critical Tasks -->
+          <div id="ap-critical-section" style="margin-bottom:20px;">
+            <h4 style="color:#e74c3c;margin-bottom:12px;font-size:15px;">🔥 CRITICAL — Do This Week</h4>
+            <div id="ap-critical-list" style="background:#fff;border:1.5px solid #ffe5e5;border-radius:10px;padding:6px;"></div>
+          </div>
+
+          <!-- Important Tasks -->
+          <div id="ap-important-section" style="margin-bottom:20px;">
+            <h4 style="color:#e67e22;margin-bottom:12px;font-size:15px;">⚡ IMPORTANT — Do This Month</h4>
+            <div id="ap-important-list" style="background:#fff;border:1.5px solid #ffe9d4;border-radius:10px;padding:6px;"></div>
+          </div>
+
+          <!-- Growth Tasks -->
+          <div id="ap-growth-section" style="margin-bottom:20px;">
+            <h4 style="color:#2ecc71;margin-bottom:12px;font-size:15px;">📈 GROWTH — Long-term Goals</h4>
+            <div id="ap-growth-list" style="background:#fff;border:1.5px solid #d4f5e2;border-radius:10px;padding:6px;"></div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="ap-empty" style="text-align:center;padding:40px;color:#aaa;">
+            Click "Refresh Action Plan" to load your personalized tasks.
+          </div>
+        </div>
       </div>
-<!-- ═══ SETTINGS ═══ -->
+
+
+
+      <!-- ═══ SETTINGS ═══ -->
     <div id="page-settings" style="display:none;">
       <div class="page-header"><div><div class="page-title">⚙️ Settings</div></div></div>
       <div class="settings-section">
@@ -3302,6 +3355,212 @@ function renderOptimizationScore(myData, top3, gmbName) {
 }
 
 // ---- TAB 3: AI STRATEGY ----
+
+// ═══ ACTION PLAN SYSTEM ═══
+async function loadActionPlan() {
+  if (!currentUser || !activeCompanyId) {
+    alert('Please select a company first');
+    return;
+  }
+  
+  document.getElementById('ap-loading').style.display = 'block';
+  document.getElementById('ap-empty').style.display = 'none';
+  document.getElementById('ap-critical-section').style.display = 'none';
+  document.getElementById('ap-important-section').style.display = 'none';
+  document.getElementById('ap-growth-section').style.display = 'none';
+  
+  try {
+    // Get company data
+    const compDoc = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(activeCompanyId).get();
+    const comp = compDoc.data();
+    
+    // Get GMB data via Place Details API
+    let myData = { rating: 0, reviews: 0, photos: 0, phone: '', hasWebsite: false };
+    if (comp.gmbPlaceId && comp.googlePlacesKey) {
+      try {
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${comp.gmbPlaceId}&fields=rating,user_ratings_total,photos,formatted_phone_number,website&key=${comp.googlePlacesKey}`;
+        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+        const res = await fetch(proxyUrl);
+        const data = await res.json();
+        if (data.result) {
+          myData.rating = data.result.rating || 0;
+          myData.reviews = data.result.user_ratings_total || 0;
+          myData.photos = (data.result.photos || []).length;
+          myData.phone = data.result.formatted_phone_number || '';
+          myData.hasWebsite = !!data.result.website;
+        }
+      } catch(e) { console.warn('GMB fetch failed', e); }
+    }
+    
+    // Get tracked keywords data
+    const kwSnap = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(activeCompanyId)
+      .collection('locationKeywords').get();
+    const keywords = kwSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    const ranks = keywords.map(k => k.currentRank || 99).filter(r => r < 99);
+    const avgRank = ranks.length ? Math.round(ranks.reduce((a,b) => a+b, 0) / ranks.length) : 99;
+    const top3Count = ranks.filter(r => r <= 3).length;
+    const top10Count = ranks.filter(r => r <= 10).length;
+    
+    // Build smart tasks based on REAL data
+    const tasks = [];
+    
+    // ═══ CRITICAL TASKS ═══
+    if (myData.reviews < 50) {
+      const needed = 50 - myData.reviews;
+      tasks.push({ tier: 'critical', id: 'reviews_50', 
+        title: `Get ${needed} more reviews (currently: ${myData.reviews})`, 
+        action: 'Send WhatsApp review requests to past 20 clients this week',
+        impact: '+5 ranks potential' });
+    }
+    
+    if (myData.rating > 0 && myData.rating < 4.5) {
+      tasks.push({ tier: 'critical', id: 'rating_45', 
+        title: `Improve rating from ${myData.rating} to 4.5+`, 
+        action: 'Reply to all negative reviews professionally, request happy clients to review',
+        impact: 'Major ranking factor' });
+    }
+    
+    if (myData.photos < 20) {
+      tasks.push({ tier: 'critical', id: 'photos_20', 
+        title: `Add ${20 - myData.photos} more photos (currently: ${myData.photos})`, 
+        action: 'Upload before/after project photos, team photos, office photos',
+        impact: '+10% profile views' });
+    }
+    
+    tasks.push({ tier: 'critical', id: 'post_weekly', 
+      title: 'Post 3 GMB updates this week', 
+      action: 'Share recent projects, offers, tips with target keywords',
+      impact: 'Keeps profile active' });
+    
+    // ═══ IMPORTANT TASKS ═══
+    if (myData.reviews < 100) {
+      tasks.push({ tier: 'important', id: 'reviews_100', 
+        title: `Reach 100 reviews this month (currently: ${myData.reviews})`, 
+        action: 'Set up automated WhatsApp review request after project completion',
+        impact: 'Move from Page 2 to Page 1' });
+    }
+    
+    if (avgRank > 10 && avgRank < 99) {
+      tasks.push({ tier: 'important', id: 'rank_top10', 
+        title: `Get all keywords to Top 10 (current avg: #${avgRank})`, 
+        action: 'Run Rank Grid weekly, optimize GMB description with keywords',
+        impact: 'Visibility in local pack' });
+    }
+    
+    tasks.push({ tier: 'important', id: 'qa_section', 
+      title: 'Add 10 Questions & Answers to GMB', 
+      action: 'Anticipate FAQs: services, pricing, areas served, timeline',
+      impact: 'Helps Google understand business' });
+    
+    tasks.push({ tier: 'important', id: 'citations', 
+      title: 'Get listed on 10 local directories', 
+      action: 'JustDial, Sulekha, IndiaMart, Urban Company, etc',
+      impact: 'Builds authority' });
+    
+    tasks.push({ tier: 'important', id: 'service_areas', 
+      title: 'Add 5+ service areas to GMB', 
+      action: 'Gachibowli, Hitech City, Madhapur, Kondapur, Jubilee Hills',
+      impact: 'Appear in more zones' });
+    
+    // ═══ GROWTH TASKS ═══
+    tasks.push({ tier: 'growth', id: 'reviews_500', 
+      title: `Reach 500 reviews (currently: ${myData.reviews})`, 
+      action: 'Long-term: 1-2 reviews per day average',
+      impact: 'Top 3 territory' });
+    
+    if (top3Count < keywords.length) {
+      tasks.push({ tier: 'growth', id: 'top3_all', 
+        title: `Get all ${keywords.length} keywords to Top 3 (currently: ${top3Count}/${keywords.length})`, 
+        action: 'Combine reviews + citations + content strategy',
+        impact: 'Dominate local search' });
+    }
+    
+    tasks.push({ tier: 'growth', id: 'blog_content', 
+      title: 'Publish 12 blog posts on website (1/week)', 
+      action: 'Topics: Interior design trends, project case studies, tips',
+      impact: 'SEO authority' });
+    
+    tasks.push({ tier: 'growth', id: 'backlinks', 
+      title: 'Build 20 quality backlinks', 
+      action: 'Guest posts, local newspapers, design forums',
+      impact: 'Long-term ranking power' });
+    
+    // Load completed tasks from Firebase
+    const apDoc = await db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(activeCompanyId)
+      .collection('actionPlan').doc('progress').get();
+    const completed = apDoc.exists ? (apDoc.data().completed || {}) : {};
+    
+    // Render tasks
+    const renderTaskList = (tier, containerId) => {
+      const tierTasks = tasks.filter(t => t.tier === tier);
+      const container = document.getElementById(containerId);
+      container.innerHTML = tierTasks.map(t => {
+        const isDone = completed[t.id] === true;
+        return `
+          <div style="display:flex;gap:12px;padding:12px;border-bottom:1px solid #f0f0f0;align-items:flex-start;${isDone ? 'opacity:0.5;background:#fafafa;' : ''}">
+            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleActionTask('${t.id}', this.checked)" style="margin-top:3px;width:18px;height:18px;cursor:pointer;accent-color:#2ecc71;">
+            <div style="flex:1;">
+              <div style="font-weight:600;color:#0a5c36;font-size:14px;${isDone ? 'text-decoration:line-through;' : ''}">${t.title}</div>
+              <div style="font-size:12px;color:#666;margin-top:4px;">${t.action}</div>
+              <div style="font-size:11px;color:#2ecc71;margin-top:4px;font-weight:600;">📊 ${t.impact}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById(containerId.replace('-list', '-section')).style.display = tierTasks.length ? 'block' : 'none';
+    };
+    
+    renderTaskList('critical', 'ap-critical-list');
+    renderTaskList('important', 'ap-important-list');
+    renderTaskList('growth', 'ap-growth-list');
+    
+    // Update progress
+    const totalTasks = tasks.length;
+    const doneTasks = tasks.filter(t => completed[t.id]).length;
+    const pct = totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    document.getElementById('ap-progress-text').textContent = `${doneTasks} / ${totalTasks} tasks`;
+    document.getElementById('ap-progress-bar').style.width = pct + '%';
+    
+    let msg = '';
+    if (pct === 0) msg = 'Start with Critical tasks to see fastest impact';
+    else if (pct < 30) msg = 'Good start! Keep going with critical tasks';
+    else if (pct < 60) msg = 'Great progress! You are building momentum';
+    else if (pct < 90) msg = 'Almost there! Focus on growth tasks now';
+    else msg = 'Excellent! You are on track for Top 3';
+    document.getElementById('ap-progress-msg').textContent = msg;
+    
+    document.getElementById('ap-last-updated').textContent = 'Updated: just now';
+    document.getElementById('ap-loading').style.display = 'none';
+    
+  } catch(e) {
+    console.error(e);
+    document.getElementById('ap-loading').style.display = 'none';
+    document.getElementById('ap-empty').style.display = 'block';
+    document.getElementById('ap-empty').textContent = 'Error loading: ' + e.message;
+  }
+}
+
+async function toggleActionTask(taskId, isDone) {
+  if (!currentUser || !activeCompanyId) return;
+  try {
+    const ref = db.collection('users').doc(currentUser.uid)
+      .collection('companies').doc(activeCompanyId)
+      .collection('actionPlan').doc('progress');
+    const doc = await ref.get();
+    const completed = doc.exists ? (doc.data().completed || {}) : {};
+    completed[taskId] = isDone;
+    await ref.set({ completed, updatedAt: new Date().toISOString() }, { merge: true });
+    loadActionPlan();
+  } catch(e) {
+    console.error('Save failed', e);
+  }
+}
+
+
 async function generateGMBStrategy() {
   const keyword  = document.getElementById('ai-target-keyword').value.trim();
   const provider = document.getElementById('ai-provider-gmb').value;
