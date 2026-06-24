@@ -3358,7 +3358,7 @@ function renderOptimizationScore(myData, top3, gmbName) {
 
 // ═══ ACTION PLAN SYSTEM ═══
 async function loadActionPlan() {
-  if (!currentUser || !activeCompanyId) {
+  if (!currentUser || !currentCompanyId) {
     alert('Please select a company first');
     return;
   }
@@ -3372,7 +3372,7 @@ async function loadActionPlan() {
   try {
     // Get company data
     const compDoc = await db.collection('users').doc(currentUser.uid)
-      .collection('companies').doc(activeCompanyId).get();
+      .collection('companies').doc(currentCompanyId).get();
     const comp = compDoc.data();
     
     // Get GMB data via Place Details API
@@ -3395,7 +3395,7 @@ async function loadActionPlan() {
     
     // Get tracked keywords data
     const kwSnap = await db.collection('users').doc(currentUser.uid)
-      .collection('companies').doc(activeCompanyId)
+      .collection('companies').doc(currentCompanyId)
       .collection('locationKeywords').get();
     const keywords = kwSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     
@@ -3490,7 +3490,7 @@ async function loadActionPlan() {
     
     // Load completed tasks from Firebase
     const apDoc = await db.collection('users').doc(currentUser.uid)
-      .collection('companies').doc(activeCompanyId)
+      .collection('companies').doc(currentCompanyId)
       .collection('actionPlan').doc('progress').get();
     const completed = apDoc.exists ? (apDoc.data().completed || {}) : {};
     
@@ -3545,10 +3545,10 @@ async function loadActionPlan() {
 }
 
 async function toggleActionTask(taskId, isDone) {
-  if (!currentUser || !activeCompanyId) return;
+  if (!currentUser || !currentCompanyId) return;
   try {
     const ref = db.collection('users').doc(currentUser.uid)
-      .collection('companies').doc(activeCompanyId)
+      .collection('companies').doc(currentCompanyId)
       .collection('actionPlan').doc('progress');
     const doc = await ref.get();
     const completed = doc.exists ? (doc.data().completed || {}) : {};
