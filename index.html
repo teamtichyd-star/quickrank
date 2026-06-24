@@ -2928,29 +2928,38 @@ async function showKeywordDetail(kwId, keyword) {
         renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
       } else {
         const safeKw2 = keyword.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        window._overviewGridKw = keyword;
         gridEl.innerHTML =
-          '<div style="color:#aaa;font-size:12px;padding:10px;text-align:center;">' +
-          'No grid data yet for this keyword.<br>' +
-          '<button data-kw="' + safeKw2 + '" onclick="runGridFromOverview(window._overviewGridKw)" ' +
-          'style="margin-top:8px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:700;">Run Grid Check</button></div>';
+          '<div style="color:#aaa;font-size:12px;padding:20px;text-align:center;">' +
+          'No grid data found for this area.<br>' +
+          '<button onclick="runGridFromOverview(window._overviewGridKw)" ' +
+          'style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(10,92,54,0.2);">🚀 Run Live Grid Check</button></div>';
       }
     }
   } catch(e) { console.log('History error:', e); }
 }
 
 async function runGridFromOverview(keyword) {
-  // Switch to Rank Grid tab
+  if(!keyword) return;
+  // 1. Switch to Rank Grid Tab
   switchGMBTab(1);
-  // Set keyword in grid input
+  
+  // 2. Setup the UI
   const kwInput = document.getElementById('grid-keyword');
   if (kwInput) kwInput.value = keyword;
-  // Small delay to let tab render
-  await new Promise(r => setTimeout(r, 200));
-  // Run the grid check
+  
+  // 3. Wait for tab transition
+  await new Promise(r => setTimeout(r, 500));
+  
+  // 4. Start the Grid Process
   await runGridCheck();
-  // Switch back to overview after done
+  
+  // 5. Success! Return to Overview
+  showToast('Grid Check Complete ✅');
   switchGMBTab('overview');
-  await loadLocationKeywords();
+  
+  // 6. Refresh the overview to show the new cached grid
+  if(typeof loadLocationKeywords === 'function') await loadLocationKeywords();
 }
 
 function closeKeywordDetail() { document.getElementById('overview-kw-detail').style.display = 'none'; }
