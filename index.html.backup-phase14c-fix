@@ -4295,7 +4295,8 @@ function parseAdsCsv() {
   container.innerHTML = '<div style="color:#aaa;font-size:13px;padding:20px;">⏳ Parsing CSV...</div>';
   const reader = new FileReader();
   reader.onload = function(e) {
-    const lines = e.target.result.split('\n').filter(l => l.trim());
+    const lines = e.target.result.split('
+').filter(l => l.trim());
     if (lines.length < 2) { container.innerHTML = '<div style="color:#e74c3c;font-size:13px;padding:20px;">CSV appears empty or invalid.</div>'; return; }
     // Find header row
     const headerLine = lines.findIndex(l => l.toLowerCase().includes('search term') || l.toLowerCase().includes('keyword'));
@@ -4338,7 +4339,8 @@ function parsePlannerCsv() {
   container.innerHTML = '<div style="color:#aaa;font-size:13px;padding:20px;">⏳ Parsing CSV...</div>';
   const reader = new FileReader();
   reader.onload = function(e) {
-    const lines = e.target.result.split('\n').filter(l => l.trim());
+    const lines = e.target.result.split('
+').filter(l => l.trim());
     if (lines.length < 2) { container.innerHTML = '<div style="color:#e74c3c;font-size:13px;padding:20px;">CSV appears empty or invalid.</div>'; return; }
     const headerLine = lines.findIndex(l => l.toLowerCase().includes('keyword') && (l.toLowerCase().includes('search') || l.toLowerCase().includes('avg')));
     if (headerLine === -1) { container.innerHTML = '<div style="color:#e74c3c;font-size:13px;padding:20px;">Could not find keyword column. Check CSV format.</div>'; return; }
