@@ -3368,6 +3368,9 @@ function renderMiniGrid(results, size, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
   const half = Math.floor(size / 2);
+  const centerPt = results.find(p => p.row === 0 && p.col === 0);
+  const centerLat = centerPt ? centerPt.lat : 17.4401;
+  const centerLng = centerPt ? centerPt.lng : 78.3489;
   let cells = '';
   for (let r = -half; r <= half; r++) {
     for (let c = -half; c <= half; c++) {
@@ -3379,13 +3382,21 @@ function renderMiniGrid(results, size, containerId) {
                : rank <= 10 ? '#f39c12'
                : '#e74c3c';
       const lbl = isCenter ? '★' : rank >= 20 ? '20+' : rank;
-      cells += '<div style="width:38px;height:38px;background:' + bg + ';border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;border:2px solid rgba(255,255,255,0.5);">' + lbl + '</div>';
+      cells += '<div style="width:36px;height:36px;background:' + bg + ';border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;border:2px solid rgba(255,255,255,0.7);box-shadow:0 2px 6px rgba(0,0,0,0.2);opacity:0.92;">' + lbl + '</div>';
     }
   }
   const top3 = results.filter(p => p.rank <= 3).length;
   const total = results.length;
-  el.innerHTML = '<div style="margin-bottom:10px;display:inline-grid;grid-template-columns:repeat(' + size + ',1fr);gap:3px;">' + cells + '</div>' +
-    '<div style="font-size:12px;color:#0a5c36;font-weight:700;margin-top:6px;">🟢 Top 3 in ' + top3 + '/' + total + ' zones</div>';
+  el.innerHTML =
+    '<div style="position:relative;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.12);margin:0 auto;max-width:340px;">' +
+      '<iframe width="100%" height="320" style="border:none;display:block;" loading="lazy" ' +
+      'referrerpolicy="no-referrer-when-downgrade" ' +
+      'src="https://www.google.com/maps?q=' + centerLat + ',' + centerLng + '&z=' + (size === 5 ? 13 : 11) + '&output=embed"></iframe>' +
+      '<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(' + size + ',1fr);gap:3px;padding:14px;box-sizing:border-box;pointer-events:none;align-content:center;justify-items:center;">' +
+        cells +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:#0a5c36;font-weight:700;margin-top:10px;text-align:center;">🟢 Top 3 in ' + top3 + '/' + total + ' zones</div>';
 }
 
 function showGridPointDetail(rank, keyword) {
