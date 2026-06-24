@@ -2910,7 +2910,33 @@ async function showKeywordDetail(kwId, keyword) {
       data: { labels, datasets: [{label:'Position', data, borderColor:'#2ecc71', backgroundColor:'rgba(46,204,113,0.1)', borderWidth:3, pointBackgroundColor:'#0a5c36', pointRadius:5, tension:0.3}] },
       options: { responsive:true, scales:{y:{reverse:true, min:1, title:{display:true, text:'Position'}}}, plugins:{legend:{display:false}} }
     });
+    // Load cached grid into overview-detail-grid
+    const gridEl = document.getElementById('overview-detail-grid');
+    if (gridEl) {
+      gridEl.innerHTML = '<div style="color:#aaa;font-size:12px;padding:10px;">Loading cached grid...</div>';
+      const cache = await loadGridCache(keyword);
+      if (cache && cache.results) {
+        const age = Math.round((Date.now() - cache.cachedAt) / 3600000);
+        const ageStr = age < 1 ? 'just now' : age + 'h ago';
+        gridEl.innerHTML = '<div style="margin-bottom:8px;font-size:12px;color:#888;">Last grid check: <b>' + ageStr + '</b> · ' +
+          '<button onclick="runGridFromOverview(' + JSON.stringify(keyword) + ')" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:700;">🔄 Re-run Grid</button></div>';
+        renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
+        gridEl.innerHTML += '<div id="overview-mini-grid"></div>';
+        renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
+      } else {
+        gridEl.innerHTML = '<div style="color:#aaa;font-size:12px;padding:10px;text-align:center;">' +
+          'No grid data yet.<br><button onclick="runGridFromOverview(' + JSON.stringify(keyword) + ')" ' +
+          'style="margin-top:8px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:700;">▶ Run Grid Check</button></div>';
+      }
+    }
   } catch(e) { console.log('History error:', e); }
+}
+
+async function runGridFromOverview(keyword) {
+  switchGMBTab(1);
+  const kwInput = document.getElementById('grid-keyword');
+  if (kwInput) { kwInput.value = keyword; }
+  await runGridCheck();
 }
 
 function closeKeywordDetail() { document.getElementById('overview-kw-detail').style.display = 'none'; }
@@ -3150,6 +3176,7 @@ async function runGridCheck() {
 
   document.getElementById('grid-loading').style.display = 'none';
   renderGrid(results, gridSize, keyword, zone.label);
+  await saveGridCache(keyword, results, gridSize, zone.label);
 }
 
 function renderGrid(results, size, keyword, label) {
@@ -3241,6 +3268,70 @@ function renderGrid(results, size, keyword, label) {
     </div>
     ${legend}
   `;
+}
+
+async function saveGridCache(keyword, results, size, label) {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+    const companyId = currentCompanyId || getCurrentCompanyId();
+    if (!companyId) return;
+    const key = keyword.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    await firebase.firestore()
+      .collection('users').doc(user.uid)
+      .collection('companies').doc(companyId)
+      .collection('gridCache').doc(key)
+      .set({
+        keyword: keyword,
+        size: size,
+        label: label,
+        results: results,
+        cachedAt: Date.now(),
+        top3: results.filter(p => p.rank <= 3).length,
+        total: results.length
+      });
+    console.log('[14D] Grid cached for:', keyword);
+  } catch(e) { console.log('[14D] Grid cache save error:', e); }
+}
+
+async function loadGridCache(keyword) {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return null;
+    const companyId = currentCompanyId || getCurrentCompanyId();
+    if (!companyId) return null;
+    const key = keyword.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const doc = await firebase.firestore()
+      .collection('users').doc(user.uid)
+      .collection('companies').doc(companyId)
+      .collection('gridCache').doc(key)
+      .get();
+    return doc.exists ? doc.data() : null;
+  } catch(e) { return null; }
+}
+
+function renderMiniGrid(results, size, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const half = Math.floor(size / 2);
+  let cells = '';
+  for (let r = -half; r <= half; r++) {
+    for (let c = -half; c <= half; c++) {
+      const pt = results.find(p => p.row === r && p.col === c);
+      const rank = pt ? pt.rank : 99;
+      const isCenter = r === 0 && c === 0;
+      const bg = isCenter ? '#0a5c36'
+               : rank <= 3 ? '#2ecc71'
+               : rank <= 10 ? '#f39c12'
+               : '#e74c3c';
+      const lbl = isCenter ? '★' : rank >= 20 ? '20+' : rank;
+      cells += '<div style="width:38px;height:38px;background:' + bg + ';border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;border:2px solid rgba(255,255,255,0.5);">' + lbl + '</div>';
+    }
+  }
+  const top3 = results.filter(p => p.rank <= 3).length;
+  const total = results.length;
+  el.innerHTML = '<div style="margin-bottom:10px;display:inline-grid;grid-template-columns:repeat(' + size + ',1fr);gap:3px;">' + cells + '</div>' +
+    '<div style="font-size:12px;color:#0a5c36;font-weight:700;margin-top:6px;">🟢 Top 3 in ' + top3 + '/' + total + ' zones</div>';
 }
 
 function showGridPointDetail(rank, keyword) {
