@@ -3920,18 +3920,22 @@ async function saveGMBRankToFirestore(keyword, results, gmbName) {
 async function loadHistoryKeywords() {
   const user = firebase.auth().currentUser;
   if (!user) return;
-  const companyId = getCurrentCompanyId();
+  const companyId = currentCompanyId || getCurrentCompanyId();
+  if (!companyId) return;
+  const sel = document.getElementById('history-keyword-select');
+  if (!sel) return; // element not in DOM
   try {
-    const snap = await firebase.firestore()
+    // Try locationKeywords history first (GMB Overview keywords)
+    const kwSnap = await firebase.firestore()
       .collection('users').doc(user.uid)
       .collection('companies').doc(companyId)
-      .collection('gmbHistory')
-      .orderBy('savedAt','desc').limit(100).get();
-    const keywords = [...new Set(snap.docs.map(d => d.data().keyword))];
-    const sel = document.getElementById('history-keyword-select');
+      .collection('locationKeywords').get();
+    const keywords = kwSnap.docs.map(d => d.data().keyword).filter(Boolean);
     sel.innerHTML = '<option value="">-- Select Keyword --</option>';
-    keywords.forEach(k => { sel.innerHTML += `<option value="${k}">${k}</option>`; });
-    if (keywords.length > 0) document.getElementById('history-empty').style.display = 'none';
+    keywords.forEach(k => { sel.innerHTML += '<option value="' + k + '">' + k + '</option>'; });
+    const emptyEl = document.getElementById('history-empty');
+    if (keywords.length > 0 && emptyEl) emptyEl.style.display = 'none';
+    else if (emptyEl) emptyEl.textContent = 'No keywords tracked yet. Add keywords in Overview tab.';
   } catch(e) { console.log('Load keywords error:', e); }
 }
 
@@ -4088,9 +4092,10 @@ function getCurrentCompany() {
 
 // Get current company ID (Phase 11)
 function getCurrentCompanyId() {
-  if (typeof selectedCompanyId !== 'undefined' && selectedCompanyId) return selectedCompanyId;
+  // Always prefer the globally set currentCompanyId first
   if (typeof currentCompanyId !== 'undefined' && currentCompanyId) return currentCompanyId;
-  return 'default';
+  if (typeof selectedCompanyId !== 'undefined' && selectedCompanyId) return selectedCompanyId;
+  return null;
 }
 
 // Smart business matcher (Phase 11.6.1 - place_id + fuzzy + tokens)
