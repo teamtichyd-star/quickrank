@@ -4374,10 +4374,39 @@ async function addSelectedKeywords() {
     alert('No keywords selected. Check at least one keyword to add.');
     return;
   }
-  if (!currentUser || !currentCompanyId) {
-    alert('Not logged in or no company selected.');
+  const user = firebase.auth().currentUser;
+  if (!user) { showToast('Not logged in', true); return; }
+  const companyId = getCurrentCompanyId();
+  console.log('[BulkAdd] companyId:', companyId);
+  if (!companyId || companyId === 'default') {
+    showToast('No company selected', true);
     return;
   }
+  const btn = document.querySelector('#kwSuggestModal button[onclick="addSelectedKeywords()"]');
+  if (btn) { btn.textContent = '⏳ Adding...'; btn.disabled = true; }
+  let added = 0, skipped = 0;
+  for (const kw of selected) {
+    if (kwTrackedSet.has(kw)) { skipped++; continue; }
+    try {
+      const ref = await firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('companies').doc(companyId)
+        .collection('locationKeywords').add({
+          keyword: kw,
+          currentRank: 99,
+          previousRank: 99,
+          lastUpdated: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      refreshKeywordRank(ref.id, kw, true);
+      added++;
+    } catch(e) { console.error('Failed to add:', kw, e); }
+  }
+  if (btn) { btn.textContent = '➕ Add Selected'; btn.disabled = false; }
+  closeKeywordSuggest();
+  showToast('Added ' + added + ' keyword' + (added !== 1 ? 's' : '') + (skipped ? ' · ' + skipped + ' already tracking' : ''));
+  await loadLocationKeywords();
+}
   const btn = document.querySelector('#kwSuggestModal button[onclick="addSelectedKeywords()"]');
   if (btn) { btn.textContent = '⏳ Adding...'; btn.disabled = true; }
   let added = 0, skipped = 0;
