@@ -870,7 +870,7 @@ tr:hover td{background:#f9fffe;}
             </div>
             <div>
               <h4 style="color:#0a5c36;font-size:13px;margin-bottom:10px;">🗺️ Grid Map (Coming Soon)</h4>
-              <div id="overview-detail-grid" style="background:#f0fdf6;border-radius:8px;padding:40px;text-align:center;color:#888;font-size:13px;">Grid map view for this keyword</div>
+              <div id="overview-detail-grid" style="background:#f0fdf6;border-radius:8px;padding:16px;min-height:80px;"></div>
             </div>
           </div>
         </div>
@@ -2937,10 +2937,18 @@ async function showKeywordDetail(kwId, keyword) {
 }
 
 async function runGridFromOverview(keyword) {
+  // Switch to Rank Grid tab
   switchGMBTab(1);
+  // Set keyword in grid input
   const kwInput = document.getElementById('grid-keyword');
-  if (kwInput) { kwInput.value = keyword; }
+  if (kwInput) kwInput.value = keyword;
+  // Small delay to let tab render
+  await new Promise(r => setTimeout(r, 200));
+  // Run the grid check
   await runGridCheck();
+  // Switch back to overview after done
+  switchGMBTab('overview');
+  await loadLocationKeywords();
 }
 
 function closeKeywordDetail() { document.getElementById('overview-kw-detail').style.display = 'none'; }
