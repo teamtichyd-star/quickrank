@@ -2665,7 +2665,8 @@ function renderInsights() {
   });
   if (!myBusinessData) insights.unshift('<strong>You are not in Top 10</strong> for this keyword - Optimize GMB');
   if (insights.length === 0) insights.push('You are competitive. Keep monitoring weekly.');
-  document.getElementById('comp-insights-body').innerHTML = insights.map(i => '<div style="padding:10px;margin-bottom:8px;background:#f0fdf6;border-radius:6px;border-left:3px solid #2ecc71;">' + i + '</div>').join('');
+  const insightsEl = document.getElementById('comp-insights-body');
+  if (insightsEl) insightsEl.innerHTML = insights.map(i => '<div style="padding:10px;margin-bottom:8px;background:#f0fdf6;border-radius:6px;border-left:3px solid #2ecc71;">' + i + '</div>').join('');
 }
 
 async function saveCompetitorSnapshot() {
