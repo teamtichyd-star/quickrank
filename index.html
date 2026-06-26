@@ -2555,97 +2555,37 @@ async function runAIVisibilityCheck(){
     ...kwQueries
   ].slice(0,5);
 
-  const prompt = 'You are an expert in AI Search Engine Optimization (AEO) and local business visibility on AI tools like ChatGPT, Gemini, and Perplexity.
-
-'+
-'BUSINESS DETAILS:
-'+
-'- Business Name: "'+gmbName+'"
-'+
-'- Website: '+websiteURL+'
-'+
-'- Location: '+gmbAddress+'
-'+
-'- Website Title: '+websiteData.title+'
-'+
-'- Website H1: '+websiteData.h1+'
-'+
-'- Website Content Sample: '+websiteData.content.slice(0,800)+'
-'+
-'- Tracked Keywords: '+keywords.join(', ')+'
-
-'+
-'TASK 1 — AI VISIBILITY CHECK:
-'+
-'For each query below, analyze if "'+gmbName+'" would appear in ChatGPT/Gemini/Perplexity answers:
-'+
-allQueries.map((q,i)=>(i+1)+'. "'+q+'"').join('
-')+'
-
-'+
-'TASK 2 — SPECIFIC ACTION PLAN:
-'+
-'Based on the actual website content and business details above, give 5 highly specific actions to improve AI visibility. Each action must:
-'+
-'- Reference actual content from their website
-'+
-'- Give exact copy-paste text where applicable
-'+
-'- Include a direct URL where they can take action
-'+
-'- Explain exactly why this helps AI tools find them
-
-'+
-'Examples of GOOD specific actions:
-'+
-'- "Your website H1 says \"'+websiteData.h1+'\" — change it to \"Office Interior Contractors Hyderabad | Turnkey Interior Solutions\" — AI tools use H1 to identify what your business does"
-'+
-'- "Add your business to IndiaMART at indiamart.com/sell — AI tools frequently cite IndiaMART listings when answering business queries"
-'+
-'- "Your GMB description should include: commercial office fit-out, glass partitions, modular workstations, HITEC City, Gachibowli — these exact phrases trigger AI mentions"
-
-'+
-'Return ONLY this JSON, no other text:
-'+
-'{
-'+
-'  "queries": [
-'+
-'    {"query":"...","appears":"Yes/No/Maybe","position":"1st/2nd/3rd/not mentioned","reason":"specific reason based on their actual website data"},
-'+
-'    ...
-'+
-'  ],
-'+
-'  "chatgpt_verdict": "Likely appears/Unlikely/Possibly",
-'+
-'  "gemini_verdict": "Likely appears/Unlikely/Possibly",
-'+
-'  "perplexity_verdict": "Likely appears/Unlikely/Possibly",
-'+
-'  "score": 0-100,
-'+
-'  "score_reason": "one sentence explaining the score based on actual website analysis",
-'+
-'  "actions": [
-'+
-'    {
-'+
-'      "priority": "HIGH/MEDIUM/LOW",
-'+
-'      "action": "specific action with exact copy-paste text if applicable",
-'+
-'      "why": "exactly why this helps AI tools find them",
-'+
-'      "link": "direct URL to take action or empty string",
-'+
-'      "link_label": "short label for the link button"
-'+
-'    }
-'+
-'  ]
-'+
-'}';
+  const prompt = [
+    'You are an expert in AI Search Engine Optimization (AEO) and local business visibility on AI tools like ChatGPT, Gemini, and Perplexity.',
+    '',
+    'BUSINESS DETAILS:',
+    '- Business Name: "'+gmbName+'"',
+    '- Website: '+websiteURL,
+    '- Location: '+gmbAddress,
+    '- Website Title: '+websiteData.title,
+    '- Website H1: '+websiteData.h1,
+    '- Website Content Sample: '+websiteData.content.slice(0,800),
+    '- Tracked Keywords: '+keywords.join(', '),
+    '',
+    'TASK 1 - AI VISIBILITY CHECK:',
+    'For each query below, analyze if "'+gmbName+'" would appear in ChatGPT/Gemini/Perplexity answers:',
+    allQueries.map((q,i)=>(i+1)+'. "'+q+'"').join(' | '),
+    '',
+    'TASK 2 - SPECIFIC ACTION PLAN:',
+    'Based on the actual website content above, give 5 highly specific actions to improve AI visibility.',
+    'Each action must reference actual content from their website, give exact copy-paste text, include a direct URL, and explain why it helps AI tools find them.',
+    '',
+    'Return ONLY this JSON, no other text:',
+    '{',
+    '  "queries": [{"query":"...","appears":"Yes/No/Maybe","position":"1st/2nd/3rd/not mentioned","reason":"specific reason based on their actual data"}],',
+    '  "chatgpt_verdict": "Likely appears/Unlikely/Possibly",',
+    '  "gemini_verdict": "Likely appears/Unlikely/Possibly",',
+    '  "perplexity_verdict": "Likely appears/Unlikely/Possibly",',
+    '  "score": 0,',
+    '  "score_reason": "one sentence explaining score",',
+    '  "actions": [{"priority":"HIGH/MEDIUM/LOW","action":"specific action with copy-paste text","why":"why this helps AI","link":"direct URL","link_label":"short label"}]',
+    '}'
+  ].join('\n')
 
   try {
     const result = await callAI(provider, prompt, keys);
