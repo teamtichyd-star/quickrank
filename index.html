@@ -1090,15 +1090,20 @@ tr:hover td{background:#f9fffe;}
         <button class="btn-gsc" onclick="showPage('gsc',document.getElementById('nav-gsc'))">Manage GSC →</button>
       </div>
       <div class="settings-section">
-        <h3>🔑 AI API Keys</h3>
-        <div class="form-group"><label>Groq API Key</label><input type="password" id="s-groqKey" placeholder="gsk_..."><div class="form-hint">Free · Fastest · Recommended</div></div>
-        <div class="form-group"><label>OpenAI</label><input type="password" id="s-openaiKey" placeholder="sk-..."></div>
-        <div class="form-group"><label>Anthropic (Claude)</label><input type="password" id="s-anthropicKey" placeholder="sk-ant-..."></div>
-        <div class="form-group"><label>Google Gemini</label><input type="password" id="s-geminiKey"></div>
-        <div class="form-group"><label>Mistral AI</label><input type="password" id="s-mistralKey"></div>
-        <div class="form-group"><label>Cohere</label><input type="password" id="s-cohereKey"></div>
-        <div class="form-group"><label>Together AI</label><input type="password" id="s-togetherKey"></div>
-        <button class="btn-primary" onclick="saveAIKeys()">Save API Keys</button>
+        <h3>🔑 AI Provider Manager</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:16px;">Add API keys, test connections, and set fallback order. QuickRank tries providers top-to-bottom if one fails.</p>
+
+        <!-- Fallback Chain -->
+        <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:18px;">
+          <div style="font-weight:600;font-size:13px;color:#166534;margin-bottom:10px;">⛓️ Fallback Chain (drag to reorder)</div>
+          <div id="aiChainList" style="display:flex;flex-direction:column;gap:6px;"></div>
+          <div style="font-size:11px;color:#666;margin-top:8px;">QuickRank tries providers in this order. First one with a valid key wins.</div>
+        </div>
+
+        <!-- Provider Cards -->
+        <div id="aiProviderCards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;"></div>
+
+        <button class="btn-primary" onclick="saveAIKeys()">💾 Save All Keys</button>
         <div class="key-status-grid" id="keyStatusGrid" style="margin-top:16px;"></div>
       </div>
     </div>
@@ -2106,7 +2111,8 @@ async function fetchPageContent(){
   }
 }
 async function loadAIKeys(){if(!currentUser)return{};try{const d=await db.collection('users').doc(currentUser.uid).collection('settings').doc('aikeys').get();return d.exists?d.data():{};}catch(e){return{};}}
-async function callAI(provider,prompt,keys){
+/* ── callAI single provider ── */
+async function callAISingle(provider,prompt,keys){
   const model=document.getElementById('aiModelSelect')?.value||'';
   const configs={
     groq:{url:'https://api.groq.com/openai/v1/chat/completions',key:keys.groq,model:model||'llama-3.3-70b-versatile'},
@@ -2117,7 +2123,7 @@ async function callAI(provider,prompt,keys){
     cohere:{url:'https://api.cohere.ai/v1/chat',key:keys.cohere,model:model||'command-r',cohere:true},
     together:{url:'https://api.together.xyz/v1/chat/completions',key:keys.together,model:model||'meta-llama/Llama-3.3-70B-Instruct-Turbo'}
   };
-  const cfg=configs[provider];if(!cfg?.key)throw new Error(`No ${provider} API key. Add in Settings.`);
+  const cfg=configs[provider];if(!cfg?.key)throw new Error(`No ${provider} API key`);
   let resp,body;
   if(cfg.gemini){resp=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});body=await resp.json();if(!resp.ok)throw new Error(body.error?.message||'Gemini error');return{text:body.candidates?.[0]?.content?.parts?.[0]?.text||'',model:'gemini'};}
   if(cfg.special){resp=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:cfg.model,max_tokens:1024,messages:[{role:'user',content:prompt}]})});body=await resp.json();if(!resp.ok)throw new Error(body.error?.message||'Anthropic error');return{text:body.content?.[0]?.text||'',model:cfg.model};}
@@ -2125,6 +2131,33 @@ async function callAI(provider,prompt,keys){
   resp=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${cfg.key}`},body:JSON.stringify({model:cfg.model,messages:[{role:'user',content:prompt}],max_tokens:1500,temperature:0.7})});
   body=await resp.json();if(!resp.ok)throw new Error(body.error?.message||`${provider} error`);
   return{text:body.choices?.[0]?.message?.content||'',model:body.model||cfg.model};
+}
+
+/* ── callAI with auto fallback chain ── */
+async function callAI(provider,prompt,keys){
+  // Build chain: if provider explicitly passed use it first, then fallback chain
+  let chain=[];
+  const savedChain=(keys.aiChain&&keys.aiChain.length)?keys.aiChain:['groq','openai','gemini','anthropic','mistral','cohere','together'];
+  if(provider&&provider!=='auto'){
+    chain=[provider,...savedChain.filter(p=>p!==provider)];
+  } else {
+    chain=savedChain;
+  }
+  // Filter to only providers that have keys
+  const available=chain.filter(p=>keys[p]);
+  if(available.length===0)throw new Error('No AI keys configured. Add keys in Settings.');
+  let lastErr='';
+  for(const p of available){
+    try{
+      const result=await callAISingle(p,prompt,keys);
+      if(p!==provider&&provider!=='auto')console.log(`callAI: fell back to ${p}`);
+      return result;
+    }catch(e){
+      lastErr=e.message;
+      console.warn(`callAI: ${p} failed - ${e.message}`);
+    }
+  }
+  throw new Error(`All AI providers failed. Last error: ${lastErr}`);
 }
 function buildPrompt(keyword,url,pageData,mode){
   let pp = '';
@@ -2381,15 +2414,115 @@ function openParentIfChild(pageId){
 async function runStandaloneAI(){const kw=document.getElementById('standalone-keyword').value.trim();const url=document.getElementById('standalone-url').value.trim();if(!kw)return showToast('Enter a keyword',true);openAiPanel(kw,getBestKeywordUrl(kw,url));}
 const providerModels={groq:['llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768','gemma2-9b-it'],openai:['gpt-4o-mini','gpt-4o','gpt-3.5-turbo'],anthropic:['claude-3-haiku-20240307','claude-3-5-sonnet-20241022'],gemini:['gemini-1.5-flash','gemini-1.5-pro'],mistral:['mistral-large-latest','mistral-small-latest'],cohere:['command-r','command-r-plus','command'],together:['meta-llama/Llama-3.3-70B-Instruct-Turbo','mistralai/Mixtral-8x7B-Instruct-v0.1']};
 document.getElementById('aiProviderSelect').addEventListener('change',function(){document.getElementById('aiModelSelect').innerHTML=providerModels[this.value].map(m=>`<option value="${m}">${m}</option>`).join('');});
+/* == AI PROVIDER MANAGER == */
+const AI_PROVIDERS=[
+  {id:'groq',name:'Groq',icon:'G',color:'#f97316',placeholder:'gsk_...',hint:'Free - Fastest - Recommended'},
+  {id:'openai',name:'OpenAI',icon:'O',color:'#10a37f',placeholder:'sk-...',hint:'GPT-4o - Most capable'},
+  {id:'anthropic',name:'Claude',icon:'C',color:'#d97706',placeholder:'sk-ant-...',hint:'Claude 3 - Great reasoning'},
+  {id:'gemini',name:'Gemini',icon:'Gm',color:'#4285f4',placeholder:'AIza...',hint:'Google - Free tier available'},
+  {id:'mistral',name:'Mistral',icon:'M',color:'#7c3aed',placeholder:'...',hint:'European - Privacy focused'},
+  {id:'cohere',name:'Cohere',icon:'Co',color:'#059669',placeholder:'...',hint:'Command-R - Good for RAG'},
+  {id:'together',name:'Together',icon:'T',color:'#0ea5e9',placeholder:'...',hint:'Open source models'}
+];
+let aiChainOrder=['groq','openai','gemini','anthropic','mistral','cohere','together'];
+let aiTestStatus={};
+
+function renderAIProviderCards(keys){
+  const container=document.getElementById('aiProviderCards');
+  if(!container)return;
+  container.innerHTML=AI_PROVIDERS.map(p=>{
+    const hasKey=!!(keys&&keys[p.id]);
+    const status=aiTestStatus[p.id]||'untested';
+    const statusHtml=status==='ok'?'<span style="color:#16a34a;font-size:12px;font-weight:600;">Connected</span>':status==='fail'?'<span style="color:#dc2626;font-size:12px;font-weight:600;">Failed</span>':status==='testing'?'<span style="color:#d97706;font-size:12px;">Testing...</span>':'<span style="color:#9ca3af;font-size:12px;">Untested</span>';
+    return '<div style="border:1.5px solid '+(hasKey?'#bbf7d0':'#e5e7eb')+';border-radius:10px;padding:14px;background:'+(hasKey?'#f0fdf4':'#fafafa')+';margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
+      '<div style="width:32px;height:32px;border-radius:8px;background:'+p.color+';color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">'+p.icon+'</div>'+
+      '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">'+p.name+'</div><div style="font-size:11px;color:#666;">'+p.hint+'</div></div>'+
+      statusHtml+'</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;">'+
+      '<input type="password" id="s-'+p.id+'Key" placeholder="'+p.placeholder+'" value="'+((keys&&keys[p.id])||'')+'" style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;" oninput="onAIKeyInput(''+p.id+'')">'+
+      '<button onclick="testAIProvider(''+p.id+'')" style="padding:8px 12px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;">Test</button>'+
+      '<button onclick="clearAIKey(''+p.id+'')" style="padding:8px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:12px;cursor:pointer;">X</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function renderAIChain(keys){
+  const container=document.getElementById('aiChainList');
+  if(!container)return;
+  const active=aiChainOrder.filter(p=>keys&&keys[p]);
+  if(active.length===0){container.innerHTML='<div style="color:#9ca3af;font-size:13px;padding:8px;">Add API keys above to build your fallback chain.</div>';return;}
+  container.innerHTML=active.map((p,i)=>{
+    const info=AI_PROVIDERS.find(x=>x.id===p);
+    return '<div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d1fae5;border-radius:7px;padding:8px 12px;margin-bottom:4px;">'+
+      '<span style="color:#9ca3af;font-size:12px;width:18px;">#'+(i+1)+'</span>'+
+      '<div style="width:22px;height:22px;border-radius:5px;background:'+info.color+';color:#fff;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;">'+info.icon+'</div>'+
+      '<span style="flex:1;font-size:13px;font-weight:500;">'+info.name+'</span>'+
+      '<button onclick="moveChain(''+p+'',-1)" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">up</button>'+
+      '<button onclick="moveChain(''+p+'',1)" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">dn</button>'+
+      '</div>';
+  }).join('');
+}
+
+function moveChain(providerId,dir){
+  const i=aiChainOrder.indexOf(providerId);
+  if(i===-1)return;
+  const j=i+dir;
+  if(j<0||j>=aiChainOrder.length)return;
+  [aiChainOrder[i],aiChainOrder[j]]=[aiChainOrder[j],aiChainOrder[i]];
+  const fakeKeys={};AI_PROVIDERS.forEach(p=>{const el=document.getElementById('s-'+p.id+'Key');if(el&&el.value.trim())fakeKeys[p.id]=el.value.trim();});
+  renderAIChain(fakeKeys);
+}
+
+function onAIKeyInput(providerId){
+  const fakeKeys={};AI_PROVIDERS.forEach(p=>{const el=document.getElementById('s-'+p.id+'Key');if(el&&el.value.trim())fakeKeys[p.id]=el.value.trim();});
+  renderAIChain(fakeKeys);
+}
+
+function clearAIKey(providerId){
+  const el=document.getElementById('s-'+providerId+'Key');
+  if(el)el.value='';
+  delete aiTestStatus[providerId];
+  const fakeKeys={};AI_PROVIDERS.forEach(p=>{const el2=document.getElementById('s-'+p.id+'Key');if(el2&&el2.value.trim())fakeKeys[p.id]=el2.value.trim();});
+  renderAIProviderCards(fakeKeys);
+  renderAIChain(fakeKeys);
+}
+
+async function testAIProvider(providerId){
+  const keyEl=document.getElementById('s-'+providerId+'Key');
+  const keyVal=keyEl?keyEl.value.trim():'';
+  if(!keyVal)return showToast('Enter a key first',true);
+  aiTestStatus[providerId]='testing';
+  const allKeys={};AI_PROVIDERS.forEach(p=>{const el=document.getElementById('s-'+p.id+'Key');if(el&&el.value.trim())allKeys[p.id]=el.value.trim();});
+  renderAIProviderCards(allKeys);
+  try{
+    const result=await callAISingle(providerId,'Reply with exactly the word OK and nothing else.',{[providerId]:keyVal});
+    aiTestStatus[providerId]=(result.text&&result.text.length>0)?'ok':'fail';
+    showToast(providerId+' connected!');
+  }catch(e){
+    aiTestStatus[providerId]='fail';
+    showToast(providerId+' failed: '+e.message,true);
+  }
+  renderAIProviderCards(allKeys);
+}
+
 async function loadAIKeyStatuses(){
   const keys=await loadAIKeys();
-  ['groq','openai','anthropic','gemini','mistral','cohere','together'].forEach(p=>{const el=document.getElementById('s-'+p+'Key');if(el&&keys[p])el.value=keys[p];});
+  if(keys.aiChain&&keys.aiChain.length)aiChainOrder=keys.aiChain;
+  renderAIProviderCards(keys);
+  renderAIChain(keys);
   const grid=document.getElementById('keyStatusGrid');
-  if(grid) grid.innerHTML=['groq','openai','anthropic','gemini','mistral','cohere','together'].map(p=>'<div class="key-status-item '+(keys[p]?'key-ok':'key-missing')+'">'+(keys[p]?'✅':'❌')+' '+p.charAt(0).toUpperCase()+p.slice(1)+'</div>').join('');
+  if(grid)grid.innerHTML='';
 }
+
 async function saveAIKeys(){
-  const data={};['groq','openai','anthropic','gemini','mistral','cohere','together'].forEach(p=>{const v=document.getElementById(`s-${p}Key`)?.value.trim();if(v)data[p]=v;});
-  try{await db.collection('users').doc(currentUser.uid).collection('settings').doc('aikeys').set(data);showToast('API Keys saved ✅');loadAIKeyStatuses();}catch(e){showToast('Error: '+e.message,true);}
+  const data={aiChain:aiChainOrder};
+  AI_PROVIDERS.forEach(p=>{const v=document.getElementById('s-'+p.id+'Key')?document.getElementById('s-'+p.id+'Key').value.trim():'';if(v)data[p.id]=v;});
+  try{
+    await db.collection('users').doc(currentUser.uid).collection('settings').doc('aikeys').set(data);
+    showToast('AI Keys saved!');
+    loadAIKeyStatuses();
+  }catch(e){showToast('Error: '+e.message,true);}
 }
 
 /* ══════════════════════════════
