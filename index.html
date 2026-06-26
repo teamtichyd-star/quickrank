@@ -2550,9 +2550,11 @@ async function runAIVisibilityCheck(){
     : ['office interior contractors in Hyderabad','commercial fit-out companies Hyderabad','office renovation Hyderabad'];
 
   const allQueries = [
-    'Who are the best '+( keywords[0]||'office interior contractors')+' in Hyderabad?',
+    'Who are the best '+(keywords[0]||'office interior contractors')+' in Hyderabad?',
     'Best commercial office fit-out companies in HITEC City Hyderabad',
-    ...kwQueries
+    kwQueries[0]||'office interior contractors in Hyderabad',
+    kwQueries[1]||'commercial fit-out companies Hyderabad',
+    kwQueries[2]||'office renovation Hyderabad'
   ].slice(0,5);
 
   const prompt = [
