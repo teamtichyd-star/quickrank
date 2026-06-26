@@ -2427,31 +2427,88 @@ const AI_PROVIDERS=[
 let aiChainOrder=['groq','openai','gemini','anthropic','mistral','cohere','together'];
 let aiTestStatus={};
 
+
 function renderAIProviderCards(keys){
   const container=document.getElementById('aiProviderCards');
   if(!container)return;
-  container.innerHTML=AI_PROVIDERS.map(p=>{
-    const hasKey=!!(keys&&keys[p.id]);
-    const status=aiTestStatus[p.id]||'untested';
-    const statusHtml=status==='ok'?'<span style="color:#16a34a;font-size:12px;font-weight:600;">Connected</span>':status==='fail'?'<span style="color:#dc2626;font-size:12px;font-weight:600;">Failed</span>':status==='testing'?'<span style="color:#d97706;font-size:12px;">Testing...</span>':'<span style="color:#9ca3af;font-size:12px;">Untested</span>';
-    return '<div style="border:1.5px solid '+(hasKey?'#bbf7d0':'#e5e7eb')+';border-radius:10px;padding:14px;background:'+(hasKey?'#f0fdf4':'#fafafa')+';margin-bottom:8px;">'+
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
-      '<div style="width:32px;height:32px;border-radius:8px;background:'+p.color+';color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">'+p.icon+'</div>'+
-      '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">'+p.name+'</div><div style="font-size:11px;color:#666;">'+p.hint+'</div></div>'+
-      statusHtml+'</div>'+
-      '<div style="display:flex;gap:8px;align-items:center;">'+
-      '<input type="password" id="s-'+p.id+'Key" placeholder="'+p.placeholder+'" value="'+((keys&&keys[p.id])||'')+'" style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;" data-pid="'+p.id+'" oninput="onAIKeyInput(this.dataset.pid)">'+
-      '<button data-pid="'+p.id+'" onclick="testAIProvider(this.dataset.pid)" style="padding:8px 12px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;">Test</button>'+
-      '<button data-pid="'+p.id+'" onclick="clearAIKey(this.dataset.pid)" style="padding:8px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:12px;cursor:pointer;">X</button>'+
-      '</div></div>';
+
+  container.innerHTML = AI_PROVIDERS.map(p=>{
+    const hasKey = !!(keys && keys[p.id]);
+    const status = aiTestStatus[p.id] || 'untested';
+
+    const statusHtml =
+      status==='ok' ? '<span style="color:#16a34a;font-size:12px;font-weight:600;">Connected</span>' :
+      status==='fail' ? '<span style="color:#dc2626;font-size:12px;font-weight:600;">Failed</span>' :
+      status==='testing' ? '<span style="color:#d97706;font-size:12px;">Testing...</span>' :
+      '<span style="color:#9ca3af;font-size:12px;">Untested</span>';
+
+    return `
+      <div style="border:1.5px solid ${hasKey?'#bbf7d0':'#e5e7eb'};border-radius:10px;padding:14px;background:${hasKey?'#f0fdf4':'#fafafa'};margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:${p.color};color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">${p.icon}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:14px;">${p.name}</div>
+            <div style="font-size:11px;color:#666;">${p.hint}</div>
+          </div>
+          ${statusHtml}
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password"
+            id="s-${p.id}Key"
+            placeholder="${p.placeholder}"
+            value="${(keys && keys[p.id]) || ''}"
+            style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;"
+            oninput="onAIKeyInput('${p.id}')">
+
+          <button onclick="testAIProvider('${p.id}')"
+            style="padding:8px 12px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;">
+            Test
+          </button>
+
+          <button onclick="clearAIKey('${p.id}')"
+            style="padding:8px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:12px;cursor:pointer;">
+            X
+          </button>
+        </div>
+      </div>
+    `;
   }).join('');
 }
+
 
 function renderAIChain(keys){
   const container=document.getElementById('aiChainList');
   if(!container)return;
-  const active=aiChainOrder.filter(p=>keys&&keys[p]);
-  if(active.length===0){container.innerHTML='<div style="color:#9ca3af;font-size:13px;padding:8px;">Add API keys above to build your fallback chain.</div>';return;}
+
+  const active = aiChainOrder.filter(p=>keys && keys[p]);
+
+  if(active.length===0){
+    container.innerHTML='<div style="color:#9ca3af;font-size:13px;padding:8px;">Add API keys above to build your fallback chain.</div>';
+    return;
+  }
+
+  container.innerHTML = active.map((p,i)=>{
+    const info = AI_PROVIDERS.find(x=>x.id===p);
+    return `
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d1fae5;border-radius:7px;padding:8px 12px;margin-bottom:6px;">
+        <span style="color:#9ca3af;font-size:12px;width:18px;">#${i+1}</span>
+        <div style="width:22px;height:22px;border-radius:5px;background:${info.color};color:#fff;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;">${info.icon}</div>
+        <span style="flex:1;font-size:13px;font-weight:500;">${info.name}</span>
+
+        <button onclick="moveChain('${p}',-1)"
+          style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">
+          up
+        </button>
+
+        <button onclick="moveChain('${p}',1)"
+          style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">
+          dn
+        </button>
+      </div>
+    `;
+  }).join('');
+}
   container.innerHTML=active.map((p,i)=>{
     const info=AI_PROVIDERS.find(x=>x.id===p);
     return '<div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d1fae5;border-radius:7px;padding:8px 12px;margin-bottom:4px;">'+
