@@ -2440,9 +2440,9 @@ function renderAIProviderCards(keys){
       '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">'+p.name+'</div><div style="font-size:11px;color:#666;">'+p.hint+'</div></div>'+
       statusHtml+'</div>'+
       '<div style="display:flex;gap:8px;align-items:center;">'+
-      '<input type="password" id="s-'+p.id+'Key" placeholder="'+p.placeholder+'" value="'+((keys&&keys[p.id])||'')+'" style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;" oninput="onAIKeyInput(''+p.id+'')">'+
-      '<button onclick="testAIProvider(''+p.id+'')" style="padding:8px 12px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;">Test</button>'+
-      '<button onclick="clearAIKey(''+p.id+'')" style="padding:8px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:12px;cursor:pointer;">X</button>'+
+      '<input type="password" id="s-'+p.id+'Key" placeholder="'+p.placeholder+'" value="'+((keys&&keys[p.id])||'')+'" style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;" data-pid="'+p.id+'" oninput="onAIKeyInput(this.dataset.pid)">'+
+      '<button data-pid="'+p.id+'" onclick="testAIProvider(this.dataset.pid)" style="padding:8px 12px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;">Test</button>'+
+      '<button data-pid="'+p.id+'" onclick="clearAIKey(this.dataset.pid)" style="padding:8px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:7px;font-size:12px;cursor:pointer;">X</button>'+
       '</div></div>';
   }).join('');
 }
