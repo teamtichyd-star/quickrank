@@ -11,77 +11,55 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui,-apple-system,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
 :root{
-  --bg:#0a0a0f;
-  --bg2:#0f0f17;
-  --bg3:#13131e;
-  --card:#161621;
-  --card2:#1a1a2e;
-  --border:rgba(46,204,113,0.15);
-  --border2:rgba(46,204,113,0.3);
-  --green:#2ecc71;
-  --green-dark:#0a5c36;
-  --green-glow:rgba(46,204,113,0.2);
-  --green-glow2:rgba(46,204,113,0.4);
-  --text:#e8e8f0;
-  --text2:#a0a0b8;
-  --text3:#6b6b88;
-  --topbar-height:60px;
-  --sidebar-width:240px;
-  --radius:14px;
-  --shadow:0 4px 24px rgba(0,0,0,0.4);
-  --shadow-green:0 0 20px rgba(46,204,113,0.15);
-}
-:root{
-  --green1:#0a5c36;--green2:#1a7a4a;--green3:#2ecc71;--green4:var(--border);--green5:#f0fdf6;
+  --green1:#0a5c36;--green2:#1a7a4a;--green3:#2ecc71;--green4:#d4f5e2;--green5:#f0fdf6;
   --sidebar-width:260px;--topbar-height:60px;
   --shadow:0 2px 16px rgba(10,92,54,0.10);--radius:12px;
 }
-#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 60% 40%,#0a2a1a 0%,#050508 60%,#0a0a0f 100%);padding:20px;}
-.login-card{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 80px rgba(0,0,0,0.6),0 0 40px rgba(46,204,113,0.1);backdrop-filter:blur(20px);}
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a5c36 0%,#1a7a4a 50%,#2ecc71 100%);padding:20px;}
+.login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
 .login-logo{width:70px;height:70px;background:linear-gradient(135deg,#0a5c36,#2ecc71);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
 .login-logo svg{width:38px;height:38px;fill:#fff;}
-.login-card h1{font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-0.5px;}
-.login-card p{color:var(--text2);font-size:15px;margin-bottom:32px;line-height:1.5;}
+.login-card h1{font-size:28px;font-weight:800;color:#0a5c36;margin-bottom:6px;}
+.login-card p{color:#666;font-size:15px;margin-bottom:32px;line-height:1.5;}
 .features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;text-align:left;}
-.feature-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(46,204,113,0.08);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--green);font-weight:500;}
+.feature-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f0fdf6;border-radius:10px;font-size:13px;color:#0a5c36;font-weight:500;}
 .feature-item svg{width:18px;height:18px;flex-shrink:0;fill:#2ecc71;}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;border:2px solid var(--border2);border-radius:12px;background:rgba(46,204,113,0.08);cursor:pointer;font-size:15px;font-weight:600;color:#fff;transition:all 0.2s;}
-.google-btn:hover{border-color:var(--green);background:rgba(46,204,113,0.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,204,113,0.3);}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;cursor:pointer;font-size:15px;font-weight:600;color:#333;transition:all 0.2s;}
+.google-btn:hover{border-color:#2ecc71;background:#f0fdf6;transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.2);}
 .google-btn img{width:22px;height:22px;}
-.login-footer{margin-top:20px;font-size:12px;color:var(--text3);}
-#app{display:none;min-height:100vh;background:var(--bg);}
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:var(--green);font-weight:700;letter-spacing:2px;}
-.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1000;box-shadow:0 1px 0 rgba(46,204,113,0.1);}
+.login-footer{margin-top:20px;font-size:12px;color:#999;}
+#app{display:none;min-height:100vh;background:#f0fdf6;}
+#loading{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;font-size:18px;color:#0a5c36;font-weight:700;}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-height);background:#fff;border-bottom:1px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1000;box-shadow:var(--shadow);}
 .topbar-left{display:flex;align-items:center;gap:14px;}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
-.hamburger span{width:22px;height:2px;background:var(--green);border-radius:2px;transition:all 0.3s;}
+.hamburger span{width:22px;height:2px;background:#0a5c36;border-radius:2px;transition:all 0.3s;}
 .topbar-logo{display:flex;align-items:center;gap:10px;}
 .topbar-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0a5c36,#2ecc71);border-radius:10px;display:flex;align-items:center;justify-content:center;}
 .topbar-logo-icon svg{width:20px;height:20px;fill:#fff;}
-.topbar-logo span{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
-.topbar-logo sup{font-size:10px;color:var(--green);font-weight:700;}
-.company-switcher{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1.5px solid var(--border2);border-radius:10px;background:rgba(46,204,113,0.08);cursor:pointer;font-size:13px;font-weight:600;color:var(--green);position:relative;transition:all 0.2s;}
+.topbar-logo span{font-size:20px;font-weight:800;color:#0a5c36;}
+.topbar-logo sup{font-size:10px;color:#2ecc71;font-weight:700;}
+.company-switcher{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1.5px solid #d4f5e2;border-radius:10px;background:#f0fdf6;cursor:pointer;font-size:13px;font-weight:600;color:#0a5c36;position:relative;}
 .company-switcher svg{width:16px;height:16px;fill:#2ecc71;}
-.company-dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:220px;background:var(--card2);border:1.5px solid var(--border2);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(46,204,113,0.1);z-index:2000;overflow:hidden;display:none;}
+.company-dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:220px;background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;box-shadow:0 8px 24px rgba(10,92,54,0.12);z-index:2000;overflow:hidden;display:none;}
 .company-dropdown.open{display:block;}
-.company-dropdown-item{padding:11px 16px;font-size:13px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s;}
-.company-dropdown-item:hover{background:rgba(46,204,113,0.1);color:var(--green);}
-.company-dropdown-item.active{background:rgba(46,204,113,0.15);color:var(--green);font-weight:600;}
-.company-dropdown-add{padding:11px 16px;font-size:13px;color:var(--green);cursor:pointer;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:600;}
-.company-dropdown-add:hover{background:rgba(46,204,113,0.08);}
+.company-dropdown-item{padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background 0.15s;}
+.company-dropdown-item:hover{background:#f0fdf6;color:#0a5c36;}
+.company-dropdown-item.active{background:#d4f5e2;color:#0a5c36;font-weight:600;}
+.company-dropdown-add{padding:11px 16px;font-size:13px;color:#2ecc71;cursor:pointer;border-top:1px solid #d4f5e2;display:flex;align-items:center;gap:8px;font-weight:600;}
+.company-dropdown-add:hover{background:#f0fdf6;}
 .topbar-right{display:flex;align-items:center;gap:12px;}
 .user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid #2ecc71;object-fit:cover;cursor:pointer;}
-.user-name{font-size:13px;font-weight:600;color:var(--text);}
-.logout-btn{padding:7px 14px;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.2s;font-weight:500;}
-.logout-btn:hover{border-color:#e74c3c;color:#e74c3c;background:rgba(231,76,60,0.08);}
-.sidebar{position:fixed;top:var(--topbar-height);left:0;width:var(--sidebar-width);height:calc(100vh - var(--topbar-height));background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:900;transition:transform 0.3s;padding:16px 0;}
-.sidebar-section{padding:6px 16px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:8px;}
-.nav-parent{display:flex;align-items:center;padding:11px 20px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:500;border-left:3px solid transparent;transition:all 0.2s;gap:12px;user-select:none;}
-.nav-parent:hover{background:rgba(46,204,113,0.06);color:var(--text);border-left-color:var(--border2);}
-.nav-parent.open{color:var(--green);font-weight:700;border-left-color:var(--green);background:rgba(46,204,113,0.08);}
+.user-name{font-size:13px;font-weight:600;color:#0a5c36;}
+.logout-btn{padding:7px 14px;background:transparent;border:1.5px solid #d4f5e2;border-radius:8px;color:#666;font-size:12px;cursor:pointer;transition:all 0.2s;font-weight:500;}
+.logout-btn:hover{border-color:#e74c3c;color:#e74c3c;}
+.sidebar{position:fixed;top:var(--topbar-height);left:0;width:var(--sidebar-width);height:calc(100vh - var(--topbar-height));background:#fff;border-right:1px solid #d4f5e2;overflow-y:auto;z-index:900;transition:transform 0.3s;padding:16px 0;}
+.sidebar-section{padding:6px 16px;font-size:10px;font-weight:700;color:#999;letter-spacing:1.2px;text-transform:uppercase;margin-top:8px;}
+.nav-parent{display:flex;align-items:center;padding:11px 20px;cursor:pointer;color:#444;font-size:14px;font-weight:500;border-left:3px solid transparent;transition:all 0.2s;gap:12px;user-select:none;}
+.nav-parent:hover{background:#f0fdf6;color:#0a5c36;border-left-color:#d4f5e2;}
+.nav-parent.open{color:#0a5c36;font-weight:700;border-left-color:#2ecc71;background:#f0fdf6;}
 .nav-parent svg:first-child{width:18px;height:18px;fill:#888;flex-shrink:0;}
 .nav-parent.open svg:first-child{fill:#0a5c36;}
 .nav-arrow{fill:#888;flex-shrink:0;}
@@ -90,43 +68,43 @@
 .nav-children.open{max-height:200px;}
 .nav-child{padding-left:36px !important;font-size:12.5px;}
 .nav-child svg{width:15px !important;height:15px !important;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;font-size:14px;color:var(--text2);font-weight:500;}
-.nav-item:hover{background:rgba(46,204,113,0.06);color:var(--text);border-left-color:var(--border2);}
-.nav-item.active{background:rgba(46,204,113,0.12);color:var(--green);font-weight:700;border-left-color:var(--green);box-shadow:inset 0 0 20px rgba(46,204,113,0.05);}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;font-size:14px;color:#444;font-weight:500;}
+.nav-item:hover{background:#f0fdf6;color:#0a5c36;border-left-color:#d4f5e2;}
+.nav-item.active{background:#d4f5e2;color:#0a5c36;font-weight:700;border-left-color:#2ecc71;}
 .nav-item svg{width:18px;height:18px;flex-shrink:0;fill:#888;}
 .nav-item.active svg,.nav-item:hover svg{fill:#0a5c36;}
-.nav-badge{margin-left:auto;background:var(--green);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
-.nav-badge.orange{background:#f39c12;color:#000;}
+.nav-badge{margin-left:auto;background:#2ecc71;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.nav-badge.orange{background:#f39c12;}
 .main{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:28px;min-height:calc(100vh - var(--topbar-height));}
 .page-header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
-.page-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-0.5px;}
-.page-subtitle{font-size:14px;color:var(--text2);}
+.page-title{font-size:24px;font-weight:800;color:#0a5c36;margin-bottom:4px;}
+.page-subtitle{font-size:14px;color:#888;}
 .page-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;}
-.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid var(--border);transition:transform 0.2s;}
+.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid #d4f5e2;transition:transform 0.2s;}
 .stat-card:hover{transform:translateY(-2px);}
-.stat-label{font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
-.stat-value{font-size:28px;font-weight:800;color:var(--green);margin:6px 0 2px;}
+.stat-label{font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.stat-value{font-size:28px;font-weight:800;color:#0a5c36;margin:6px 0 2px;}
 .stat-change{font-size:12px;color:#2ecc71;font-weight:600;}
-.table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
-.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
-.table-title{font-size:15px;font-weight:700;color:var(--green);}
-.search-input{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;color:var(--text);transition:border 0.2s;width:200px;}
+.table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;overflow:hidden;margin-bottom:24px;}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d4f5e2;flex-wrap:wrap;gap:10px;}
+.table-title{font-size:15px;font-weight:700;color:#0a5c36;}
+.search-input{padding:8px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;outline:none;color:#333;transition:border 0.2s;width:200px;}
 .search-input:focus{border-color:#2ecc71;}
 .add-btn{padding:8px 16px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.3);}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;background:rgba(46,204,113,0.05);border-bottom:1px solid var(--border);white-space:nowrap;}
+th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;background:#f0fdf6;border-bottom:1px solid #d4f5e2;white-space:nowrap;}
 th.sortable{cursor:pointer;user-select:none;transition:all 0.2s;}
-th.sortable:hover{background:var(--border);color:var(--green);}
+th.sortable:hover{background:#d4f5e2;color:#0a5c36;}
 th.sort-asc::after{content:' ↑';color:#2ecc71;}
 th.sort-desc::after{content:' ↓';color:#e74c3c;}
-td{padding:13px 16px;font-size:13px;color:var(--text);border-bottom:1px solid #f0fdf6;}
+td{padding:13px 16px;font-size:13px;color:#333;border-bottom:1px solid #f0fdf6;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#f9fffe;}
 .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-weight:800;font-size:14px;}
-.rank-top3{background:var(--border);color:var(--green);}
+.rank-top3{background:#d4f5e2;color:#0a5c36;}
 .rank-top10{background:#e8f8ef;color:#1a7a4a;}
 .rank-top20{background:#fff3cd;color:#856404;}
 .rank-low{background:#fde8e8;color:#e74c3c;}
@@ -134,180 +112,180 @@ tr:hover td{background:#f9fffe;}
 .change-up{color:#2ecc71;font-weight:700;font-size:13px;}
 .change-down{color:#e74c3c;font-weight:700;font-size:13px;}
 .change-same{color:#999;font-weight:600;font-size:13px;}
-.trend-up{display:inline-flex;align-items:center;gap:3px;background:var(--border);color:var(--green);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+.trend-up{display:inline-flex;align-items:center;gap:3px;background:#d4f5e2;color:#0a5c36;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
 .trend-down{display:inline-flex;align-items:center;gap:3px;background:#fde8e8;color:#e74c3c;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
-.trend-same{display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;color:var(--text2);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.trend-same{display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;color:#888;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;}
 .btn-primary{padding:10px 20px;background:linear-gradient(135deg,#0a5c36,#2ecc71);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,204,113,0.3);}
-.btn-secondary{padding:10px 20px;background:#f5f5f5;color:var(--text2);border:1.5px solid #e0e0e0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-secondary{padding:10px 20px;background:#f5f5f5;color:#555;border:1.5px solid #e0e0e0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-secondary:hover{background:#eee;}
 .btn-danger{padding:10px 20px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;}
 .btn-gsc{padding:10px 20px;background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
 .btn-gsc:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(66,133,244,0.4);}
 .btn-gsc:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-.ai-btn{padding:6px 12px;background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:7px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
-.ai-btn:hover{background:#0a5c36;color:#fff;border-color:var(--green);}
-.chart-btn{padding:6px 12px;background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:7px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
-.chart-btn:hover{background:#0a5c36;color:#fff;border-color:var(--green);}
+.ai-btn{padding:6px 12px;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:7px;color:#0a5c36;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.ai-btn:hover{background:#0a5c36;color:#fff;border-color:#0a5c36;}
+.chart-btn{padding:6px 12px;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:7px;color:#0a5c36;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.chart-btn:hover{background:#0a5c36;color:#fff;border-color:#0a5c36;}
 .audit-btn{padding:10px 20px;background:linear-gradient(135deg,#8e44ad,#9b59b6);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
 .audit-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(155,89,182,0.4);}
 .audit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
 .form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;color:var(--text);transition:border 0.2s;background:#fff;}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:10px;font-size:14px;outline:none;color:#333;transition:border 0.2s;background:#fff;}
 .form-group input:focus,.form-group select:focus{border-color:#2ecc71;}
 .form-hint{font-size:11px;color:#999;margin-top:4px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--card2);border:1px solid var(--border2);border-radius:20px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;}
+.modal{background:#fff;border-radius:20px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;}
 .modal.large{max-width:700px;}
-.modal h2{font-size:20px;font-weight:800;color:var(--green);margin-bottom:20px;}
+.modal h2{font-size:20px;font-weight:800;color:#0a5c36;margin-bottom:20px;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
 .success-toast{position:fixed;bottom:24px;right:24px;background:#0a5c36;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(10,92,54,0.3);display:none;align-items:center;gap:8px;}
 .success-toast.show{display:flex;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:850;display:none;}
 .sidebar-overlay.open{display:block;}
 .empty-state{text-align:center;padding:60px 20px;}
-.empty-state h3{font-size:18px;font-weight:700;color:var(--green);margin-bottom:8px;}
-.empty-state p{color:var(--text2);font-size:14px;}
+.empty-state h3{font-size:18px;font-weight:700;color:#0a5c36;margin-bottom:8px;}
+.empty-state p{color:#888;font-size:14px;}
 /* AI Panel */
-.ai-panel{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);margin-top:16px;overflow:hidden;display:none;}
+.ai-panel{background:#fff;border:1.5px solid #d4f5e2;border-radius:var(--radius);margin-top:16px;overflow:hidden;display:none;}
 .ai-panel.open{display:block;}
-.ai-panel-header{padding:14px 20px;background:rgba(46,204,113,0.05);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.ai-panel-header h3{font-size:14px;font-weight:700;color:var(--green);}
+.ai-panel-header{padding:14px 20px;background:#f0fdf6;border-bottom:1px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;}
+.ai-panel-header h3{font-size:14px;font-weight:700;color:#0a5c36;}
 .ai-panel-body{padding:20px;}
 .ai-mode-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.ai-mode-tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);color:var(--text2);cursor:pointer;background:#fff;transition:all 0.2s;}
-.ai-mode-tab.active{background:#0a5c36;color:#fff;border-color:var(--green);}
+.ai-mode-tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid #d4f5e2;color:#666;cursor:pointer;background:#fff;transition:all 0.2s;}
+.ai-mode-tab.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
 .fetch-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;}
-.fetch-row input{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;}
+.fetch-row input{flex:1;padding:8px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;outline:none;}
 .fetch-row input:focus{border-color:#2ecc71;}
-.fetch-btn{padding:8px 14px;background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--green);cursor:pointer;white-space:nowrap;}
+.fetch-btn{padding:8px 14px;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:8px;font-size:12px;font-weight:600;color:#0a5c36;cursor:pointer;white-space:nowrap;}
 .fetch-btn:hover{background:#0a5c36;color:#fff;}
-.fetch-status{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.fetch-status{font-size:12px;color:#888;margin-bottom:8px;}
 .fetch-status.error{color:#e74c3c;}
 .fetch-status.success{color:#2ecc71;}
-.page-preview{background:#f8fffe;border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;font-size:12px;display:none;}
+.page-preview{background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:10px;padding:14px;margin-bottom:12px;font-size:12px;display:none;}
 .page-preview.open{display:block;}
 .preview-item{margin-bottom:10px;}
-.preview-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:3px;}
-.preview-value{color:var(--text);line-height:1.4;}
+.preview-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:3px;}
+.preview-value{color:#333;line-height:1.4;}
 .preview-empty{color:#e74c3c;font-style:italic;}
-.ai-output-box{background:#f8fffe;border:1.5px solid var(--border);border-radius:10px;padding:20px;min-height:120px;font-size:13px;color:var(--text);line-height:1.7;}.ai-output-box h4{color:var(--green);font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:4px;border-bottom:1.5px solid var(--border);}.ai-output-box h4:first-child{margin-top:0;}.ai-output-box ul{padding-left:0;margin:8px 0;list-style:none;}.ai-output-box li{padding:7px 12px;margin-bottom:6px;background:#fff;border-radius:8px;border-left:3px solid #2ecc71;font-size:13px;line-height:1.6;}.ai-output-box .ai-score-bar{display:flex;align-items:center;gap:12px;background:#fff;border-radius:10px;padding:14px 18px;margin-top:16px;border:1.5px solid var(--border);}.ai-score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;}.ai-critical-badge{background:#fff5f5;border:1.5px solid #fecaca;border-radius:8px;padding:6px 12px;font-size:12px;color:#e74c3c;font-weight:700;}
-.ai-meta{font-size:11px;color:var(--text2);margin-top:8px;}
+.ai-output-box{background:#f8fffe;border:1.5px solid #d4f5e2;border-radius:10px;padding:20px;min-height:120px;font-size:13px;color:#333;line-height:1.7;}.ai-output-box h4{color:#0a5c36;font-size:14px;font-weight:700;margin:16px 0 8px;padding-bottom:4px;border-bottom:1.5px solid #d4f5e2;}.ai-output-box h4:first-child{margin-top:0;}.ai-output-box ul{padding-left:0;margin:8px 0;list-style:none;}.ai-output-box li{padding:7px 12px;margin-bottom:6px;background:#fff;border-radius:8px;border-left:3px solid #2ecc71;font-size:13px;line-height:1.6;}.ai-output-box .ai-score-bar{display:flex;align-items:center;gap:12px;background:#fff;border-radius:10px;padding:14px 18px;margin-top:16px;border:1.5px solid #d4f5e2;}.ai-score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;}.ai-critical-badge{background:#fff5f5;border:1.5px solid #fecaca;border-radius:8px;padding:6px 12px;font-size:12px;color:#e74c3c;font-weight:700;}
+.ai-meta{font-size:11px;color:#888;margin-top:8px;}
 /* Audit */
-.audit-progress{display:none;background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.audit-progress{display:none;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;margin-bottom:16px;}
 .audit-progress.show{display:block;}
-.progress-bar{width:100%;height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:10px 0;}
+.progress-bar{width:100%;height:8px;background:#d4f5e2;border-radius:4px;overflow:hidden;margin:10px 0;}
 .progress-fill{height:100%;background:linear-gradient(90deg,#0a5c36,#2ecc71);border-radius:4px;transition:width 0.3s;}
 .audit-results{display:none;margin-top:16px;}
 .audit-results.show{display:block;}
 .audit-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px;}
-.summary-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
-.summary-card-value{font-size:24px;font-weight:800;color:var(--green);}
-.summary-card-label{font-size:11px;color:var(--text2);font-weight:600;margin-top:4px;}
-.audit-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.summary-card{background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:16px;text-align:center;}
+.summary-card-value{font-size:24px;font-weight:800;color:#0a5c36;}
+.summary-card-label{font-size:11px;color:#888;font-weight:600;margin-top:4px;}
+.audit-item{background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;margin-bottom:10px;overflow:hidden;}
 .audit-item-header{padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.15s;}
-.audit-item-header:hover{background:rgba(46,204,113,0.05);}
-.audit-item-keyword{font-size:14px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:8px;}
+.audit-item-header:hover{background:#f0fdf6;}
+.audit-item-keyword{font-size:14px;font-weight:600;color:#0a5c36;display:flex;align-items:center;gap:8px;}
 .audit-score{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;}
-.score-excellent{background:var(--border);color:var(--green);}
+.score-excellent{background:#d4f5e2;color:#0a5c36;}
 .score-good{background:#e8f8ef;color:#1a7a4a;}
 .score-fair{background:#fff3cd;color:#856404;}
 .score-poor{background:#fde8e8;color:#e74c3c;}
 .audit-issues{padding:0 18px 12px;display:flex;flex-wrap:wrap;gap:6px;}
-.audit-details{display:none;border-top:1px solid var(--border);padding:16px 18px;background:#f8fffe;}
+.audit-details{display:none;border-top:1px solid #d4f5e2;padding:16px 18px;background:#f8fffe;}
 .audit-details.open{display:block;}
-.audit-details pre{font-size:12px;white-space:pre-wrap;line-height:1.6;color:var(--text);}
-.toggle-icon{font-size:12px;color:var(--text2);}
+.audit-details pre{font-size:12px;white-space:pre-wrap;line-height:1.6;color:#333;}
+.toggle-icon{font-size:12px;color:#888;}
 .audit-issue-badge{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;}
 .issue-critical{background:#fde8e8;color:#e74c3c;}
 .issue-warning{background:#fff3cd;color:#856404;}
-.issue-info{background:var(--border);color:var(--green);}
+.issue-info{background:#d4f5e2;color:#0a5c36;}
 /* Settings */
-.settings-section{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;}
-.settings-section h3{font-size:16px;font-weight:700;color:var(--green);margin-bottom:16px;}
+.settings-section{background:#fff;border:1.5px solid #d4f5e2;border-radius:var(--radius);padding:24px;margin-bottom:20px;}
+.settings-section h3{font-size:16px;font-weight:700;color:#0a5c36;margin-bottom:16px;}
 .key-status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;}
 .key-status-item{padding:10px 14px;border-radius:10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
-.key-ok{background:var(--border);color:var(--green);}
+.key-ok{background:#d4f5e2;color:#0a5c36;}
 .key-missing{background:#fde8e8;color:#c0392b;}
-.company-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(46,204,113,0.05);border-radius:10px;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--green);}
+.company-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf6;border-radius:10px;margin-bottom:8px;font-size:13px;font-weight:600;color:#0a5c36;}
 /* Charts */
-.overview-chart-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:24px;margin-bottom:24px;}
-.overview-chart-card h3{font-size:16px;font-weight:700;color:var(--green);margin-bottom:6px;}
-.overview-chart-card p{font-size:13px;color:var(--text2);margin-bottom:20px;}
+.overview-chart-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;padding:24px;margin-bottom:24px;}
+.overview-chart-card h3{font-size:16px;font-weight:700;color:#0a5c36;margin-bottom:6px;}
+.overview-chart-card p{font-size:13px;color:#888;margin-bottom:20px;}
 .chart-canvas-wrap{position:relative;width:100%;height:320px;}
 .chart-filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-.chart-filter-bar label{font-size:13px;font-weight:600;color:var(--text2);}
-.range-btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;transition:all 0.2s;}
-.range-btn.active{background:#0a5c36;color:#fff;border-color:var(--green);}
-.range-btn:hover:not(.active){background:rgba(46,204,113,0.05);color:var(--green);}
+.chart-filter-bar label{font-size:13px;font-weight:600;color:#555;}
+.range-btn{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid #d4f5e2;background:#fff;color:#666;cursor:pointer;transition:all 0.2s;}
+.range-btn.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
+.range-btn:hover:not(.active){background:#f0fdf6;color:#0a5c36;}
 .kw-charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:20px;margin-bottom:24px;}
-.kw-chart-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:20px;}
+.kw-chart-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;padding:20px;}
 .kw-chart-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;}
-.kw-chart-title{font-size:14px;font-weight:700;color:var(--green);word-break:break-word;}
-.kw-chart-meta{font-size:12px;color:var(--text2);margin-top:3px;}
+.kw-chart-title{font-size:14px;font-weight:700;color:#0a5c36;word-break:break-word;}
+.kw-chart-meta{font-size:12px;color:#888;margin-top:3px;}
 .kw-chart-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
 .kw-rank-change{font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;}
-.kw-rank-up{background:var(--border);color:var(--green);}
+.kw-rank-up{background:#d4f5e2;color:#0a5c36;}
 .kw-rank-down{background:#fde8e8;color:#e74c3c;}
-.kw-rank-same{background:#f5f5f5;color:var(--text2);}
+.kw-rank-same{background:#f5f5f5;color:#888;}
 .kw-chart-canvas-wrap{position:relative;height:160px;}
 .kw-chart-no-data{height:160px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#aaa;}
 .kw-chart-footer{margin-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .kw-snapshot-info{font-size:11px;color:#aaa;}
-.update-rank-btn{padding:5px 12px;background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:7px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px;}
-.update-rank-btn:hover{background:#0a5c36;color:#fff;border-color:var(--green);}
+.update-rank-btn{padding:5px 12px;background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:7px;color:#0a5c36;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px;}
+.update-rank-btn:hover{background:#0a5c36;color:#fff;border-color:#0a5c36;}
 .history-table-wrap{overflow-x:auto;margin-top:12px;}
 .history-table{width:100%;border-collapse:collapse;font-size:12px;}
-.history-table th{padding:8px 12px;background:rgba(46,204,113,0.05);color:var(--text2);font-weight:700;text-align:left;font-size:11px;text-transform:uppercase;}
-.history-table td{padding:8px 12px;border-bottom:1px solid #f5f5f5;color:var(--text);}
-.chart-loading{display:flex;align-items:center;justify-content:center;height:120px;color:var(--text2);font-size:14px;gap:10px;}
-.spinner{width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;}
+.history-table th{padding:8px 12px;background:#f0fdf6;color:#888;font-weight:700;text-align:left;font-size:11px;text-transform:uppercase;}
+.history-table td{padding:8px 12px;border-bottom:1px solid #f5f5f5;color:#333;}
+.chart-loading{display:flex;align-items:center;justify-content:center;height:120px;color:#888;font-size:14px;gap:10px;}
+.spinner{width:20px;height:20px;border:3px solid #d4f5e2;border-top-color:#0a5c36;border-radius:50%;animation:spin 0.7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .chart-insights{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .chart-insight-pill{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;}
-.pill-green{background:var(--border);color:var(--green);}
+.pill-green{background:#d4f5e2;color:#0a5c36;}
 .pill-red{background:#fde8e8;color:#c0392b;}
 .pill-yellow{background:#fff3cd;color:#856404;}
 .pill-blue{background:#e8f4fd;color:#2980b9;}
 .rank-quick-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-.rank-quick-btn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:rgba(46,204,113,0.05);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.rank-quick-btn{padding:6px 14px;border-radius:8px;border:1.5px solid #d4f5e2;background:#f0fdf6;color:#0a5c36;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .rank-quick-btn:hover{background:#0a5c36;color:#fff;}
 /* GSC */
 .gsc-connect-card{background:linear-gradient(135deg,#e8f4fd,#f0f7ff);border:2px solid #4285f4;border-radius:var(--radius);padding:28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.gsc-connect-card.connected{background:linear-gradient(135deg,var(--border),#f0fdf6);border-color:#2ecc71;}
+.gsc-connect-card.connected{background:linear-gradient(135deg,#d4f5e2,#f0fdf6);border-color:#2ecc71;}
 .gsc-connect-info h3{font-size:16px;font-weight:700;color:#1a73e8;margin-bottom:6px;}
-.gsc-connect-card.connected .gsc-connect-info h3{color:var(--green);}
-.gsc-connect-info p{font-size:13px;color:var(--text2);max-width:400px;line-height:1.5;}
+.gsc-connect-card.connected .gsc-connect-info h3{color:#0a5c36;}
+.gsc-connect-info p{font-size:13px;color:#666;max-width:400px;line-height:1.5;}
 .gsc-status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;}
-.gsc-status-connected{background:var(--border);color:var(--green);}
+.gsc-status-connected{background:#d4f5e2;color:#0a5c36;}
 .gsc-status-disconnected{background:#fde8e8;color:#c0392b;}
 .gsc-data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
-.gsc-data-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
-.gsc-data-value{font-size:22px;font-weight:800;color:var(--green);}
-.gsc-data-label{font-size:11px;color:var(--text2);font-weight:600;margin-top:4px;text-transform:uppercase;}
-.gsc-table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:24px;}
-.gsc-sync-bar{background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.gsc-sync-info{font-size:13px;color:var(--text2);}
-.gsc-sync-info strong{color:var(--green);}
+.gsc-data-card{background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:16px;text-align:center;}
+.gsc-data-value{font-size:22px;font-weight:800;color:#0a5c36;}
+.gsc-data-label{font-size:11px;color:#888;font-weight:600;margin-top:4px;text-transform:uppercase;}
+.gsc-table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #d4f5e2;overflow:hidden;margin-bottom:24px;}
+.gsc-sync-bar{background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.gsc-sync-info{font-size:13px;color:#555;}
+.gsc-sync-info strong{color:#0a5c36;}
 .gsc-progress{display:none;margin-bottom:16px;}
 .gsc-progress.show{display:block;}
-.gsc-progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0;}
+.gsc-progress-bar{width:100%;height:6px;background:#d4f5e2;border-radius:3px;overflow:hidden;margin:8px 0;}
 .gsc-progress-fill{height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);border-radius:3px;transition:width 0.3s;}
 .gsc-kw-row-matched td{background:#f0fdf6!important;}
 .gsc-position-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:8px;font-weight:800;font-size:13px;min-width:40px;}
 .gsc-clicks{color:#1a73e8;font-weight:700;}
-.gsc-ctr{font-weight:600;color:var(--green);}
+.gsc-ctr{font-weight:600;color:#0a5c36;}
 /* Date range tabs for GSC view */
 .view-range-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
-.view-range-bar label{font-size:13px;font-weight:600;color:var(--text2);margin-right:4px;}
-.view-range-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;transition:all 0.2s;}
+.view-range-bar label{font-size:13px;font-weight:600;color:#555;margin-right:4px;}
+.view-range-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid #d4f5e2;background:#fff;color:#666;cursor:pointer;transition:all 0.2s;}
 .view-range-btn.active{background:#1a73e8;color:#fff;border-color:#1a73e8;}
 .view-range-btn:hover:not(.active){background:#e8f4fd;color:#1a73e8;}
 /* Sort indicator in table */
 .sort-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.sort-select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;}
+.sort-select{padding:7px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:12px;color:#333;background:#fff;cursor:pointer;}
 /* Responsive */
 @media(max-width:1100px){.kw-charts-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}}
 @media(max-width:768px){
@@ -490,15 +468,15 @@ tr:hover td{background:#f9fffe;}
       <!-- Audit -->
       <div class="audit-progress" id="auditProgress">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-weight:700;color:var(--green);">🔍 Running Bulk Audit...</span>
-          <span id="auditStats" style="font-size:13px;color:var(--text2);">0 / 0</span>
+          <span style="font-weight:700;color:#0a5c36;">🔍 Running Bulk Audit...</span>
+          <span id="auditStats" style="font-size:13px;color:#888;">0 / 0</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-        <div id="progressCurrent" style="font-size:12px;color:var(--text2);margin-top:4px;"></div>
+        <div id="progressCurrent" style="font-size:12px;color:#888;margin-top:4px;"></div>
       </div>
       <div class="audit-results" id="auditResults">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-          <div style="font-size:16px;font-weight:700;color:var(--green);">📋 Audit Results</div>
+          <div style="font-size:16px;font-weight:700;color:#0a5c36;">📋 Audit Results</div>
           <div style="display:flex;gap:8px;">
             <button class="btn-secondary" style="font-size:13px;" onclick="exportAuditPDF()">📄 Export PDF</button>
             <button class="btn-secondary" style="font-size:13px;" onclick="closeAuditResults()">✕ Close</button>
@@ -530,7 +508,7 @@ tr:hover td{background:#f9fffe;}
           <div class="page-preview" id="pagePreview"></div>
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <button class="btn-primary" style="font-size:13px;padding:9px 18px;" onclick="runAI()">🚀 Run AI</button>
-            <select id="aiProviderSelect" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#fff;">
+            <select id="aiProviderSelect" style="padding:8px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;color:#333;background:#fff;">
               <option value="groq">Groq (Fastest)</option>
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic</option>
@@ -539,7 +517,7 @@ tr:hover td{background:#f9fffe;}
               <option value="cohere">Cohere</option>
               <option value="together">Together AI</option>
             </select>
-            <select id="aiModelSelect" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:#fff;">
+            <select id="aiModelSelect" style="padding:8px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;color:#333;background:#fff;">
               <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
             </select>
           </div>
@@ -568,16 +546,16 @@ tr:hover td{background:#f9fffe;}
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
             <button class="btn-gsc" onclick="connectGSC()" style="font-size:14px;padding:12px 24px;">🔗 Connect with Google</button>
-            <div style="font-size:11px;color:var(--text2);">One-time login · Free forever</div>
+            <div style="font-size:11px;color:#888;">One-time login · Free forever</div>
           </div>
         </div>
         <div class="settings-section">
           <h3>✨ What you get with GSC</h3>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:8px;">
-            <div style="padding:16px;background:rgba(46,204,113,0.05);border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📍</div><div style="font-weight:700;color:var(--green);margin-bottom:4px;">Exact Position</div><div style="font-size:12px;color:var(--text2);">Real Google ranking for every keyword</div></div>
-            <div style="padding:16px;background:rgba(46,204,113,0.05);border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📈</div><div style="font-weight:700;color:var(--green);margin-bottom:4px;">90 Days History</div><div style="font-size:12px;color:var(--text2);">Import full 90-day history — fills charts instantly</div></div>
-            <div style="padding:16px;background:rgba(46,204,113,0.05);border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">👆</div><div style="font-weight:700;color:var(--green);margin-bottom:4px;">Clicks & CTR</div><div style="font-size:12px;color:var(--text2);">See exactly how many clicks from Google</div></div>
-            <div style="padding:16px;background:rgba(46,204,113,0.05);border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">🔄</div><div style="font-weight:700;color:var(--green);margin-bottom:4px;">Auto Sync</div><div style="font-size:12px;color:var(--text2);">Syncs every time you open the app</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📍</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Exact Position</div><div style="font-size:12px;color:#666;">Real Google ranking for every keyword</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">📈</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">90 Days History</div><div style="font-size:12px;color:#666;">Import full 90-day history — fills charts instantly</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">👆</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Clicks & CTR</div><div style="font-size:12px;color:#666;">See exactly how many clicks from Google</div></div>
+            <div style="padding:16px;background:#f0fdf6;border-radius:12px;"><div style="font-size:20px;margin-bottom:8px;">🔄</div><div style="font-weight:700;color:#0a5c36;margin-bottom:4px;">Auto Sync</div><div style="font-size:12px;color:#666;">Syncs every time you open the app</div></div>
           </div>
         </div>
       </div>
@@ -633,7 +611,7 @@ tr:hover td{background:#f9fffe;}
           <button class="view-range-btn active" onclick="setGSCViewRange(28,this)">28 Days</button>
           <button class="view-range-btn" onclick="setGSCViewRange(90,this)">90 Days</button>
           <button class="view-range-btn" onclick="setGSCViewRange(0,this)">All</button>
-          <span style="font-size:11px;color:var(--text2);margin-left:8px;">← Changes view instantly without re-importing</span>
+          <span style="font-size:11px;color:#888;margin-left:8px;">← Changes view instantly without re-importing</span>
         </div>
 
         <!-- GSC Table -->
@@ -714,8 +692,8 @@ tr:hover td{background:#f9fffe;}
         <div id="overviewChartEmpty" style="display:none;text-align:center;padding:40px;color:#aaa;"><div style="font-size:32px;margin-bottom:8px;">📈</div><div>No rank history yet. Sync GSC for automatic data.</div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:16px;font-weight:700;color:var(--green);">📌 Per-Keyword Charts</div>
-        <div style="font-size:13px;color:var(--text2);">Sync GSC for auto data · or click Update Rank manually</div>
+        <div style="font-size:16px;font-weight:700;color:#0a5c36;">📌 Per-Keyword Charts</div>
+        <div style="font-size:13px;color:#888;">Sync GSC for auto data · or click Update Rank manually</div>
       </div>
       <div id="kwChartsGrid" class="kw-charts-grid"><div class="chart-loading"><div class="spinner"></div> Loading...</div></div>
     </div>
@@ -746,19 +724,19 @@ tr:hover td{background:#f9fffe;}
       <div id="watchdog-summary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
         <div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:10px;padding:16px;text-align:center;">
           <div id="wd-critical-count" style="font-size:28px;font-weight:800;color:#e74c3c;">-</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:4px;">Critical Drops</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Critical Drops</div>
         </div>
         <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:16px;text-align:center;">
           <div id="wd-warning-count" style="font-size:28px;font-weight:800;color:#e67e22;">-</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:4px;">Warnings</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Warnings</div>
         </div>
-        <div style="background:rgba(46,204,113,0.05);border:1.5px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div id="wd-win-count" style="font-size:28px;font-weight:800;color:var(--green);">-</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:4px;">Wins</div>
+        <div style="background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:10px;padding:16px;text-align:center;">
+          <div id="wd-win-count" style="font-size:28px;font-weight:800;color:#0a5c36;">-</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Wins</div>
         </div>
         <div style="background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:10px;padding:16px;text-align:center;">
           <div id="wd-tip-count" style="font-size:28px;font-weight:800;color:#4f46e5;">-</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:4px;">Tips</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Tips</div>
         </div>
       </div>
       <div id="wd-last-run" style="font-size:12px;color:#999;margin-bottom:16px;text-align:right;">Not run yet - click Run Check</div>
@@ -773,7 +751,7 @@ tr:hover td{background:#f9fffe;}
 
     <div id="page-audit" style="display:none;">
       <div class="page-header"><div><div class="page-title">⚡ Bulk AI Audit</div></div></div>
-      <div class="settings-section"><h3>Go to Rank Tracker page</h3><p style="font-size:13px;color:var(--text2);">Click "Bulk AI Audit" button there to audit all keywords.</p></div>
+      <div class="settings-section"><h3>Go to Rank Tracker page</h3><p style="font-size:13px;color:#666;">Click "Bulk AI Audit" button there to audit all keywords.</p></div>
     </div>
 
     <!-- ═══ LOCAL ═══ -->
@@ -781,18 +759,18 @@ tr:hover td{background:#f9fffe;}
       <div class="page-header"><div><div class="page-title">📍 Local GMB Tracker</div></div></div>
       <!-- GMB TRACKER PHASE 11 -->
       <div style="margin-bottom:20px;">
-        <h2 style="color:var(--green);font-size:22px;font-weight:800;margin-bottom:4px;">
+        <h2 style="color:#0a5c36;font-size:22px;font-weight:800;margin-bottom:4px;">
           <i class="fas fa-map-marked-alt"></i> GMB Local Rank Tracker
         </h2>
-        <p style="color:var(--text2);font-size:13px;">Track your Google Business Profile rankings and push to Top 3</p>
+        <p style="color:#666;font-size:13px;">Track your Google Business Profile rankings and push to Top 3</p>
       </div>
 
       <!-- GMB TABS -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="gmbTabBar">
         <button class="gmb-tab-btn active" onclick="switchGMBTab('overview')" style="padding:9px 18px;border-radius:8px;border:1.5px solid #2ecc71;background:#2ecc71;color:#fff;font-weight:700;cursor:pointer;font-size:13px;">📊 Overview</button>
-        <button class="gmb-tab-btn" onclick="switchGMBTab(1)" style="padding:9px 18px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--green);font-weight:700;cursor:pointer;font-size:13px;">🗺️ Rank Grid</button>
-        <button class="gmb-tab-btn" onclick="switchGMBTab(3)" style="padding:9px 18px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--green);font-weight:700;cursor:pointer;font-size:13px;">AI Push Strategy</button>
-        <button class="gmb-tab-btn" onclick="switchGMBTab(4)" style="padding:9px 18px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--green);font-weight:700;cursor:pointer;font-size:13px;">🎯 Action Plan</button>
+        <button class="gmb-tab-btn" onclick="switchGMBTab(1)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">🗺️ Rank Grid</button>
+        <button class="gmb-tab-btn" onclick="switchGMBTab(3)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">AI Push Strategy</button>
+        <button class="gmb-tab-btn" onclick="switchGMBTab(4)" style="padding:9px 18px;border-radius:8px;border:1.5px solid #d4f5e2;background:#fff;color:#0a5c36;font-weight:700;cursor:pointer;font-size:13px;">🎯 Action Plan</button>
       </div>
 
       <!-- TAB 0: RANK CHECKER -->
@@ -803,19 +781,19 @@ tr:hover td{background:#f9fffe;}
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
 
           <!-- Card 1: Business NAP -->
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;">
-            <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Business Info (NAP)</div>
-            <div id="overview-nap-name" style="font-weight:700;color:var(--green);font-size:14px;margin-bottom:6px;line-height:1.4;">Loading...</div>
-            <div id="overview-nap-address" style="font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.5;">—</div>
-            <div id="overview-nap-phone" style="font-size:12px;color:var(--text2);">—</div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:18px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Business Info (NAP)</div>
+            <div id="overview-nap-name" style="font-weight:700;color:#0a5c36;font-size:14px;margin-bottom:6px;line-height:1.4;">Loading...</div>
+            <div id="overview-nap-address" style="font-size:12px;color:#555;margin-bottom:4px;line-height:1.5;">—</div>
+            <div id="overview-nap-phone" style="font-size:12px;color:#555;">—</div>
             <a id="overview-nap-map" href="#" target="_blank" style="font-size:11px;color:#2ecc71;text-decoration:none;display:inline-block;margin-top:8px;">📍 View on Map →</a>
           </div>
 
           <!-- Card 2: All Keywords Top 3 % -->
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;">
-            <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">All Keywords - Top 3</div>
-            <div id="overview-top3-percent" style="font-size:32px;font-weight:800;color:var(--green);margin-bottom:4px;">—%</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">in positions 1-3</div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:18px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">All Keywords - Top 3</div>
+            <div id="overview-top3-percent" style="font-size:32px;font-weight:800;color:#0a5c36;margin-bottom:4px;">—%</div>
+            <div style="font-size:11px;color:#666;margin-bottom:8px;">in positions 1-3</div>
             <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;">
               <div style="display:flex;justify-content:space-between;"><span style="color:#2ecc71;">● Pos 1-3</span><span id="overview-pos13" style="font-weight:700;">0%</span></div>
               <div style="display:flex;justify-content:space-between;"><span style="color:#a8e6cf;">● Pos 4-10</span><span id="overview-pos410" style="font-weight:700;">0%</span></div>
@@ -825,37 +803,37 @@ tr:hover td{background:#f9fffe;}
           </div>
 
           <!-- Card 3: Best Keyword -->
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;">
-            <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Best Performing Keyword</div>
-            <div id="overview-best-kw" style="font-weight:700;color:var(--green);font-size:13px;margin-bottom:8px;line-height:1.4;">—</div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:18px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Best Performing Keyword</div>
+            <div id="overview-best-kw" style="font-weight:700;color:#0a5c36;font-size:13px;margin-bottom:8px;line-height:1.4;">—</div>
             <div id="overview-best-pos" style="font-size:28px;font-weight:800;color:#2ecc71;margin-bottom:4px;">—</div>
-            <div style="font-size:11px;color:var(--text2);">Average position</div>
+            <div style="font-size:11px;color:#666;">Average position</div>
           </div>
 
           <!-- Card 4: Google Reviews -->
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;">
-            <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Google Reviews</div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:18px;">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:700;">Google Reviews</div>
             <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px;">
-              <div id="overview-rating" style="font-size:28px;font-weight:800;color:var(--green);">—</div>
+              <div id="overview-rating" style="font-size:28px;font-weight:800;color:#0a5c36;">—</div>
               <div style="font-size:14px;color:#e67e22;">⭐</div>
             </div>
-            <div id="overview-review-count" style="font-size:12px;color:var(--text2);margin-bottom:8px;">0 reviews</div>
-            <div style="font-size:11px;color:var(--text2);">Update reviews on GMB</div>
+            <div id="overview-review-count" style="font-size:12px;color:#666;margin-bottom:8px;">0 reviews</div>
+            <div style="font-size:11px;color:#888;">Update reviews on GMB</div>
           </div>
         </div>
 
         <!-- Tracked Keywords Section -->
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;">
+        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-            <h3 style="color:var(--green);margin:0;">📍 Tracked Location Keywords <span id="overview-kw-count" style="color:var(--text2);font-weight:400;font-size:13px;">(0)</span></h3>
+            <h3 style="color:#0a5c36;margin:0;">📍 Tracked Location Keywords <span id="overview-kw-count" style="color:#888;font-weight:400;font-size:13px;">(0)</span></h3>
             <div style="display:flex;gap:8px;align-items:center;">
-              <input type="text" id="overview-new-kw" placeholder="Add keyword (e.g. interior contractors hyderabad)" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;min-width:280px;">
+              <input type="text" id="overview-new-kw" placeholder="Add keyword (e.g. interior contractors hyderabad)" style="padding:8px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;min-width:280px;">
               <button onclick="addLocationKeyword()" style="padding:8px 18px;background:#2ecc71;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">+ Add Keyword</button>
               <button onclick="openKeywordSuggest()" style="padding:8px 18px;background:#0a5c36;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;margin-left:8px;">💡 Suggest Keywords</button>
             </div>
           </div>
 
-          <div id="overview-kw-loading" style="text-align:center;padding:30px;color:var(--text2);display:none;">Loading keywords...</div>
+          <div id="overview-kw-loading" style="text-align:center;padding:30px;color:#888;display:none;">Loading keywords...</div>
 
           <div id="overview-kw-empty" style="text-align:center;padding:40px;color:#999;">
             <div style="font-size:42px;margin-bottom:10px;">📍</div>
@@ -866,12 +844,12 @@ tr:hover td{background:#f9fffe;}
           <div id="overview-kw-list" style="display:none;">
             <table style="width:100%;border-collapse:collapse;">
               <thead>
-                <tr style="background:rgba(46,204,113,0.05);border-bottom:2px solid var(--border);">
-                  <th style="padding:12px;text-align:left;color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Keyword</th>
-                  <th style="padding:12px;text-align:center;color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Current Rank</th>
-                  <th style="padding:12px;text-align:center;color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Trend</th>
-                  <th style="padding:12px;text-align:center;color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Last Updated</th>
-                  <th style="padding:12px;text-align:center;color:var(--green);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Actions</th>
+                <tr style="background:#f0fdf6;border-bottom:2px solid #d4f5e2;">
+                  <th style="padding:12px;text-align:left;color:#0a5c36;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Keyword</th>
+                  <th style="padding:12px;text-align:center;color:#0a5c36;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Current Rank</th>
+                  <th style="padding:12px;text-align:center;color:#0a5c36;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Trend</th>
+                  <th style="padding:12px;text-align:center;color:#0a5c36;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Last Updated</th>
+                  <th style="padding:12px;text-align:center;color:#0a5c36;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="overview-kw-tbody"></tbody>
@@ -880,19 +858,19 @@ tr:hover td{background:#f9fffe;}
         </div>
 
         <!-- Selected Keyword Detail (Chart + Grid) -->
-        <div id="overview-kw-detail" style="display:none;margin-top:20px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;">
+        <div id="overview-kw-detail" style="display:none;margin-top:20px;background:#fff;border:1.5px solid #d4f5e2;border-radius:12px;padding:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <h3 id="overview-detail-title" style="color:var(--green);margin:0;">Keyword Details</h3>
-            <button onclick="closeKeywordDetail()" style="padding:6px 14px;background:#fff;color:var(--text2);border:1.5px solid #ddd;border-radius:6px;cursor:pointer;font-size:12px;">✕ Close</button>
+            <h3 id="overview-detail-title" style="color:#0a5c36;margin:0;">Keyword Details</h3>
+            <button onclick="closeKeywordDetail()" style="padding:6px 14px;background:#fff;color:#888;border:1.5px solid #ddd;border-radius:6px;cursor:pointer;font-size:12px;">✕ Close</button>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>
-              <h4 style="color:var(--green);font-size:13px;margin-bottom:10px;">📈 Rank History</h4>
+              <h4 style="color:#0a5c36;font-size:13px;margin-bottom:10px;">📈 Rank History</h4>
               <canvas id="overviewKwChart" style="max-height:280px;"></canvas>
             </div>
             <div>
-              <h4 style="color:var(--green);font-size:13px;margin-bottom:10px;">🗺️ Grid Map</h4>
-              <div id="overview-detail-grid" style="background:rgba(46,204,113,0.05);border-radius:8px;padding:16px;min-height:80px;"></div>
+              <h4 style="color:#0a5c36;font-size:13px;margin-bottom:10px;">🗺️ Grid Map</h4>
+              <div id="overview-detail-grid" style="background:#f0fdf6;border-radius:8px;padding:16px;min-height:80px;"></div>
             </div>
           </div>
         </div>
@@ -901,17 +879,17 @@ tr:hover td{background:#f9fffe;}
       <div id="gmb-tab-0" class="gmb-tab-content" style="display:none;">
         <div class="settings-section">
           <h3>Local Rank Checker</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Check where your business ranks on Google Maps for any keyword</p>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Check where your business ranks on Google Maps for any keyword</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-            <input type="text" id="gmb-keyword" placeholder="e.g. interior contractors hyderabad" style="flex:1;min-width:220px;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;">
-            <select id="gmb-location-scope" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--green);">
+            <input type="text" id="gmb-keyword" placeholder="e.g. interior contractors hyderabad" style="flex:1;min-width:220px;padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:14px;">
+            <select id="gmb-location-scope" style="padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;color:#0a5c36;">
               <option value="gachibowli">Gachibowli Zone</option>
               <option value="hyderabad">Full Hyderabad</option>
             </select>
             <button onclick="checkLocalRank()" style="padding:11px 24px;background:#0a5c36;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">Check Rank</button>
           </div>
           <div id="gmb-rank-loading" style="display:none;text-align:center;padding:30px;">
-            <p style="color:var(--green);font-weight:600;">Searching Google Maps...</p>
+            <p style="color:#0a5c36;font-weight:600;">Searching Google Maps...</p>
           </div>
           <div id="gmb-rank-result" style="display:none;"></div>
         </div>
@@ -921,10 +899,10 @@ tr:hover td{background:#f9fffe;}
       <div id="gmb-tab-1" class="gmb-tab-content" style="display:none;">
         <div class="settings-section">
           <h3>Competitor Map Grid</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Visual grid showing your rank across zones</p>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Visual grid showing your rank across zones</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-            <input type="text" id="grid-keyword" placeholder="Keyword for grid check" style="flex:1;min-width:200px;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;">
-            <select id="grid-size-select" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+            <input type="text" id="grid-keyword" placeholder="Keyword for grid check" style="flex:1;min-width:200px;padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:14px;">
+            <select id="grid-size-select" style="padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;">
               <option value="5">5x5 Grid - Gachibowli</option>
               <option value="7">7x7 Grid - Full Hyderabad</option>
             </select>
@@ -935,7 +913,7 @@ tr:hover td{background:#f9fffe;}
             <span style="font-size:12px;"><span style="background:#f39c12;color:#fff;padding:2px 10px;border-radius:20px;">4-10</span> Page 1</span>
             <span style="font-size:12px;"><span style="background:#e74c3c;color:#fff;padding:2px 10px;border-radius:20px;">11+</span> Not Visible</span>
           </div>
-          <div id="grid-loading" style="display:none;text-align:center;padding:30px;"><p style="color:var(--green);font-weight:600;">Building grid map...</p></div>
+          <div id="grid-loading" style="display:none;text-align:center;padding:30px;"><p style="color:#0a5c36;font-weight:600;">Building grid map...</p></div>
           <div id="map-grid-container" style="overflow-x:auto;"></div>
           <div id="grid-competitor-detail" style="margin-top:16px;"></div>
         </div>
@@ -945,12 +923,12 @@ tr:hover td{background:#f9fffe;}
       <div id="gmb-tab-2" class="gmb-tab-content" style="display:none;">
         <div class="settings-section">
           <h3>GMB Optimization Score</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Score your GMB vs competitors</p>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Score your GMB vs competitors</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-            <input type="text" id="score-keyword" placeholder="Keyword to compare" style="flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;">
+            <input type="text" id="score-keyword" placeholder="Keyword to compare" style="flex:1;padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:14px;">
             <button onclick="calculateGMBScore()" style="padding:11px 24px;background:#0a5c36;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Calculate Score</button>
           </div>
-          <div id="score-loading" style="display:none;text-align:center;padding:20px;color:var(--green);font-weight:600;">Analyzing GMB profile...</div>
+          <div id="score-loading" style="display:none;text-align:center;padding:20px;color:#0a5c36;font-weight:600;">Analyzing GMB profile...</div>
           <div id="score-result" style="display:none;"></div>
         </div>
       </div>
@@ -959,16 +937,16 @@ tr:hover td{background:#f9fffe;}
       <div id="gmb-tab-3" class="gmb-tab-content" style="display:none;">
         <div class="settings-section">
           <h3>AI Push Strategy</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">AI-powered action plan to push to Top 3</p>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">AI-powered action plan to push to Top 3</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-            <input type="text" id="ai-target-keyword" placeholder="Target keyword" style="flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;">
-            <select id="ai-provider-gmb" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+            <input type="text" id="ai-target-keyword" placeholder="Target keyword" style="flex:1;padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:14px;">
+            <select id="ai-provider-gmb" style="padding:11px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;">
               <option value="groq">Groq (Fast)</option>
               <option value="gemini">Gemini</option>
             </select>
             <button onclick="generateGMBStrategy()" style="padding:11px 24px;background:#2ecc71;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Generate Strategy</button>
           </div>
-          <div id="ai-strategy-loading" style="display:none;text-align:center;padding:20px;color:var(--green);font-weight:600;">AI is generating your strategy...</div>
+          <div id="ai-strategy-loading" style="display:none;text-align:center;padding:20px;color:#0a5c36;font-weight:600;">AI is generating your strategy...</div>
           <div id="ai-strategy-result" style="display:none;"></div>
         </div>
       </div>
@@ -977,18 +955,18 @@ tr:hover td{background:#f9fffe;}
       <div id="gmb-tab-4" class="gmb-tab-content" style="display:none;">
         <div class="settings-section">
           <h3>🎯 Your Action Plan to Top 3</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Real tasks based on YOUR GMB data. Check them off as you complete.</p>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Real tasks based on YOUR GMB data. Check them off as you complete.</p>
           
           <!-- Progress Bar -->
-          <div style="background:linear-gradient(135deg,var(--border),#fff);padding:18px;border-radius:10px;margin-bottom:20px;border-left:4px solid #2ecc71;">
+          <div style="background:linear-gradient(135deg,#d4f5e2,#fff);padding:18px;border-radius:10px;margin-bottom:20px;border-left:4px solid #2ecc71;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-              <div style="font-weight:700;color:var(--green);font-size:15px;">Your Progress</div>
-              <div id="ap-progress-text" style="font-weight:700;color:var(--green);font-size:14px;">0 / 0 tasks</div>
+              <div style="font-weight:700;color:#0a5c36;font-size:15px;">Your Progress</div>
+              <div id="ap-progress-text" style="font-weight:700;color:#0a5c36;font-size:14px;">0 / 0 tasks</div>
             </div>
-            <div style="background:#fff;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--border);">
+            <div style="background:#fff;height:14px;border-radius:7px;overflow:hidden;border:1px solid #d4f5e2;">
               <div id="ap-progress-bar" style="height:100%;background:linear-gradient(90deg,#2ecc71,#0a5c36);width:0%;transition:width 0.5s;"></div>
             </div>
-            <div id="ap-progress-msg" style="margin-top:10px;font-size:12px;color:var(--text2);">Loading your data...</div>
+            <div id="ap-progress-msg" style="margin-top:10px;font-size:12px;color:#666;">Loading your data...</div>
           </div>
 
           <!-- Refresh Button -->
@@ -998,7 +976,7 @@ tr:hover td{background:#f9fffe;}
           </div>
 
           <!-- Loading -->
-          <div id="ap-loading" style="display:none;text-align:center;padding:30px;color:var(--green);font-weight:600;">Analyzing your GMB data...</div>
+          <div id="ap-loading" style="display:none;text-align:center;padding:30px;color:#0a5c36;font-weight:600;">Analyzing your GMB data...</div>
 
           <!-- Critical Tasks -->
           <div id="ap-critical-section" style="margin-bottom:20px;">
@@ -1015,7 +993,7 @@ tr:hover td{background:#f9fffe;}
           <!-- Growth Tasks -->
           <div id="ap-growth-section" style="margin-bottom:20px;">
             <h4 style="color:#2ecc71;margin-bottom:12px;font-size:15px;">📈 GROWTH — Long-term Goals</h4>
-            <div id="ap-growth-list" style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:6px;"></div>
+            <div id="ap-growth-list" style="background:#fff;border:1.5px solid #d4f5e2;border-radius:10px;padding:6px;"></div>
           </div>
 
           <!-- Empty State -->
@@ -1044,9 +1022,9 @@ tr:hover td{background:#f9fffe;}
         <div class="form-group"><label>GMB Name</label><input type="text" id="s-gmbName"></div>
         <div class="form-group"><label>GMB Address</label><input type="text" id="s-gmbAddress"></div>
         <div class="form-group">
-          <label>GMB Place ID <span style="color:var(--text2);font-weight:400;font-size:12px;">(one-time setup for 100% accuracy)</span></label>
+          <label>GMB Place ID <span style="color:#888;font-weight:400;font-size:12px;">(one-time setup for 100% accuracy)</span></label>
           <input type="text" id="s-gmbPlaceId" placeholder="e.g. ChIJxfKa-NuQyzsRZo3TiDBGjdw">
-          <small style="color:var(--text2);display:block;margin-top:4px;font-size:11px;">
+          <small style="color:#666;display:block;margin-top:4px;font-size:11px;">
             Get from Google Maps embed code → look for <code>!1s0x...</code><br>
             Or from URL after searching your business → <code>!3m1!4b1!4m6!3m5!1s[YOUR_ID]</code>
           </small>
@@ -1060,10 +1038,10 @@ tr:hover td{background:#f9fffe;}
           <input type="text" id="s-gmbLng" placeholder="e.g. 78.3624082">
         </div>
         <div class="form-group">
-          <label style="font-weight:600;color:var(--green);">Google Places API Key</label>
+          <label style="font-weight:600;color:#0a5c36;">Google Places API Key</label>
           <input type="password" id="s-googlePlacesKey" placeholder="Paste your Google Places API Key here"
-            style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-          <small style="color:var(--text2);font-size:11px;">
+            style="width:100%;padding:10px 14px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;">
+          <small style="color:#888;font-size:11px;">
             Get free key → <a href="https://console.cloud.google.com" target="_blank" style="color:#2ecc71;">console.cloud.google.com</a> 
             → Enable Places API → Credentials → Copy Key
           </small>
@@ -1073,14 +1051,14 @@ tr:hover td{background:#f9fffe;}
 
       <div class="settings-section">
         <h3>🔄 Migrate Company ID</h3>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">
-          Your current company doc ID is: <code id="currentCompanyIdDisplay" style="background:rgba(46,204,113,0.05);padding:2px 8px;border-radius:4px;color:var(--green);font-weight:600;">loading...</code><br>
+        <p style="font-size:13px;color:#666;margin-bottom:12px;">
+          Your current company doc ID is: <code id="currentCompanyIdDisplay" style="background:#f0fdf6;padding:2px 8px;border-radius:4px;color:#0a5c36;font-weight:600;">loading...</code><br>
           <span style="font-size:12px;color:#999;">If this looks like an old slug (e.g. "sb-interior-solutions"), migrate to a clean ID based on your current company name.</span>
         </p>
         <div class="form-group">
-          <label>New Company ID <span style="color:var(--text2);font-weight:400;font-size:12px;">(auto-generated, editable)</span></label>
+          <label>New Company ID <span style="color:#888;font-weight:400;font-size:12px;">(auto-generated, editable)</span></label>
           <input type="text" id="s-newCompanyId" placeholder="e.g. tic-turnkey-interior-contractors" style="font-family:monospace;">
-          <small style="color:var(--text2);font-size:11px;display:block;margin-top:4px;">Lowercase letters, numbers and hyphens only. No spaces.</small>
+          <small style="color:#666;font-size:11px;display:block;margin-top:4px;">Lowercase letters, numbers and hyphens only. No spaces.</small>
         </div>
         <button class="btn-primary" style="background:#e67e22;border-color:#e67e22;" onclick="showMigrateModal()">🔄 Migrate Company ID</button>
       </div>
@@ -1089,9 +1067,9 @@ tr:hover td{background:#f9fffe;}
       <div id="migrateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;">
         <div style="background:#fff;border-radius:12px;padding:32px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
           <h3 style="color:#e67e22;margin-bottom:12px;">⚠️ Confirm Migration</h3>
-          <p style="font-size:14px;color:var(--text2);margin-bottom:8px;">This will:</p>
-          <ul style="font-size:13px;color:var(--text2);margin-bottom:16px;padding-left:20px;line-height:1.8;">
-            <li>Create new company doc: <strong id="modal-newId" style="color:var(--green);"></strong></li>
+          <p style="font-size:14px;color:#444;margin-bottom:8px;">This will:</p>
+          <ul style="font-size:13px;color:#555;margin-bottom:16px;padding-left:20px;line-height:1.8;">
+            <li>Create new company doc: <strong id="modal-newId" style="color:#0a5c36;"></strong></li>
             <li>Copy all company data + subcollections</li>
             <li>Delete old doc: <strong id="modal-oldId" style="color:#e74c3c;"></strong></li>
             <li>Reload the app automatically</li>
@@ -1101,25 +1079,25 @@ tr:hover td{background:#f9fffe;}
           </p>
           <div style="display:flex;gap:12px;">
             <button class="btn-primary" style="background:#e67e22;border-color:#e67e22;flex:1;" onclick="confirmMigrate()">Yes, Migrate Now</button>
-            <button class="btn-primary" style="background:#fff;color:var(--text2);border:1.5px solid #ddd;flex:1;" onclick="closeMigrateModal()">Cancel</button>
+            <button class="btn-primary" style="background:#fff;color:#444;border:1.5px solid #ddd;flex:1;" onclick="closeMigrateModal()">Cancel</button>
           </div>
         </div>
       </div>
 
       <div class="settings-section">
         <h3>🔗 Google Search Console</h3>
-        <div id="settingsGscStatus" style="margin-bottom:16px;font-size:13px;color:var(--text2);">Checking...</div>
+        <div id="settingsGscStatus" style="margin-bottom:16px;font-size:13px;color:#888;">Checking...</div>
         <button class="btn-gsc" onclick="showPage('gsc',document.getElementById('nav-gsc'))">Manage GSC →</button>
       </div>
       <div class="settings-section">
         <h3>🔑 AI Provider Manager</h3>
-        <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">Add API keys, test connections, and set fallback order. QuickRank tries providers top-to-bottom if one fails.</p>
+        <p style="color:#666;font-size:13px;margin-bottom:16px;">Add API keys, test connections, and set fallback order. QuickRank tries providers top-to-bottom if one fails.</p>
 
         <!-- Fallback Chain -->
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:18px;">
           <div style="font-weight:600;font-size:13px;color:#166534;margin-bottom:10px;">⛓️ Fallback Chain (drag to reorder)</div>
           <div id="aiChainList" style="display:flex;flex-direction:column;gap:6px;"></div>
-          <div style="font-size:11px;color:var(--text2);margin-top:8px;">QuickRank tries providers in this order. First one with a valid key wins.</div>
+          <div style="font-size:11px;color:#666;margin-top:8px;">QuickRank tries providers in this order. First one with a valid key wins.</div>
         </div>
 
         <!-- Provider Cards -->
@@ -1163,7 +1141,7 @@ tr:hover td{background:#f9fffe;}
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <h2>🗑️ Delete Keyword</h2>
-    <p style="color:var(--text2);margin-bottom:8px;">Delete "<strong id="deleteKeywordName"></strong>"?</p>
+    <p style="color:#666;margin-bottom:8px;">Delete "<strong id="deleteKeywordName"></strong>"?</p>
     <p style="font-size:13px;color:#e74c3c;">⚠️ Also deletes all rank history.</p>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
@@ -1175,7 +1153,7 @@ tr:hover td{background:#f9fffe;}
 <div class="modal-overlay" id="updateRankModal">
   <div class="modal">
     <h2>📍 Update Rank Position</h2>
-    <div style="font-size:14px;color:var(--text2);margin-bottom:20px;" id="updateRankKwName"></div>
+    <div style="font-size:14px;color:#888;margin-bottom:20px;" id="updateRankKwName"></div>
     <div class="form-group"><label>New Position *</label><input type="number" id="updateRankPos" placeholder="e.g. 4" min="1" max="500"></div>
     <div class="rank-quick-btns">
       <button class="rank-quick-btn" onclick="setQuickRank(1)">🥇#1</button>
@@ -1305,7 +1283,7 @@ function renderCompanyDropdown(){
 }
 function renderSettingsCompanyList(){
   document.getElementById('settingsCompanyList').innerHTML=companies.map(c=>
-    `<div class="company-list-item"><span>🏢 ${c.name}</span><span style="font-size:11px;color:var(--text2);">${c.website||''}</span></div>`
+    `<div class="company-list-item"><span>🏢 ${c.name}</span><span style="font-size:11px;color:#888;">${c.website||''}</span></div>`
   ).join('');
 }
 function switchCompany(id,name,e){
@@ -1368,18 +1346,18 @@ function renderKeywords(kwList){
     const rankClass=!pos?'rank-none':pos<=3?'rank-top3':pos<=10?'rank-top10':pos<=20?'rank-top20':'rank-low';
     const change=k.change||0;
     const trendHtml=change===0?`<span class="trend-same">— same</span>`:change>0?`<span class="trend-up">▲${change}</span>`:`<span class="trend-down">▼${Math.abs(change)}</span>`;
-    const urlDisplay=k.url?`<a href="${k.url}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none;">${(()=>{try{return new URL(k.url).pathname.slice(0,22)||'/';}catch(e){return k.url.slice(0,22);}})()}</a>`:'<span style="color:#ccc;font-size:12px;">—</span>';
+    const urlDisplay=k.url?`<a href="${k.url}" target="_blank" style="color:#0a5c36;font-size:12px;text-decoration:none;">${(()=>{try{return new URL(k.url).pathname.slice(0,22)||'/';}catch(e){return k.url.slice(0,22);}})()}</a>`:'<span style="color:#ccc;font-size:12px;">—</span>';
     const clicks=k.clicks?`<span class="gsc-clicks">${k.clicks.toLocaleString()}</span>`:'<span style="color:#ccc;">—</span>';
     const impr=k.impressions?k.impressions.toLocaleString():'—';
     const ctr=k.ctr?`${(k.ctr*100).toFixed(1)}%`:'—';
-    const bestPos=k.bestPosition?`<span style="color:var(--green);font-weight:700;">#${k.bestPosition}</span>`:'—';
+    const bestPos=k.bestPosition?`<span style="color:#0a5c36;font-weight:700;">#${k.bestPosition}</span>`:'—';
     return `<tr ${k.gscSynced?'class="gsc-kw-row-matched"':''}>
-      <td><div style="font-weight:600;color:var(--text);">${k.keyword}</div>${k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':''}</td>
+      <td><div style="font-weight:600;color:#222;">${k.keyword}</div>${k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':''}</td>
       <td>${urlDisplay}</td>
       <td><span class="rank-badge ${rankClass}">${pos||'—'}</span></td>
       <td>${bestPos}</td>
       <td>${clicks}</td>
-      <td style="font-size:12px;color:var(--text2);">${impr}</td>
+      <td style="font-size:12px;color:#888;">${impr}</td>
       <td style="font-size:12px;">${ctr}</td>
       <td>${trendHtml}</td>
       <td>
@@ -1602,7 +1580,7 @@ function updateGSCUI(connected){
     ?`<button class="btn-gsc" onclick="syncGSC()">🔄 Sync Now</button>`
     :`<button class="btn-gsc" onclick="connectGSC()">🔗 Connect GSC</button>`;
   const s=document.getElementById('settingsGscStatus');
-  if(s)s.innerHTML=connected?`<span style="color:var(--green);font-weight:700;">✅ Connected</span> · ${gscProperty}`:`<span style="color:#c0392b;">❌ Not connected</span>`;
+  if(s)s.innerHTML=connected?`<span style="color:#0a5c36;font-weight:700;">✅ Connected</span> · ${gscProperty}`:`<span style="color:#c0392b;">❌ Not connected</span>`;
   const qb=document.getElementById('gscQuickBar');if(qb)qb.style.display=connected?'flex':'none';
   const badge=document.getElementById('gscNavBadge');
   if(badge){badge.textContent=connected?'✅':'NEW';badge.className=connected?'nav-badge':'nav-badge orange';}
@@ -1750,9 +1728,9 @@ function renderGSCTable(data){
       <td style="font-weight:600;">${g.keyword}</td>
       <td><span class="gsc-position-badge ${rankClass}">#${pos}</span></td>
       <td><span class="gsc-clicks">${g.clicks.toLocaleString()}</span></td>
-      <td style="font-size:12px;color:var(--text2);">${g.impressions.toLocaleString()}</td>
+      <td style="font-size:12px;color:#888;">${g.impressions.toLocaleString()}</td>
       <td class="gsc-ctr">${(g.ctr*100).toFixed(1)}%</td>
-      <td>${isMatched?`<span style="color:var(--green);font-size:12px;font-weight:600;">✅ Tracked</span>`:`<span style="color:var(--text2);font-size:12px;">Not tracked</span>`}</td>
+      <td>${isMatched?`<span style="color:#0a5c36;font-size:12px;font-weight:600;">✅ Tracked</span>`:`<span style="color:#888;font-size:12px;">Not tracked</span>`}</td>
       <td>${!isMatched?`<button style="padding:5px 12px;background:#fff3cd;border:1.5px solid #f39c12;border-radius:7px;color:#856404;font-size:12px;font-weight:600;cursor:pointer;" onclick="importSingleKeyword('${g.keyword.replace(/'/g,"\\'")}',${pos})">+ Add</button>`:'—'}</td>
     </tr>`;
   }).join('');
@@ -1856,7 +1834,7 @@ async function openHistoryModal(kwId,kwName){
       <tbody>${history.slice().reverse().map((h,i,arr)=>{
         const prev=arr[i+1];const diff=prev?(prev.position-h.position):null;
         const chg=diff===null?'—':diff>0?`<span style="color:#2ecc71;font-weight:700;">▲${diff}</span>`:diff<0?`<span style="color:#e74c3c;font-weight:700;">▼${Math.abs(diff)}</span>`:'<span style="color:#999;">—</span>';
-        return `<tr><td>${formatDateFull(h.date)}</td><td><strong>#${h.position}</strong></td><td>${chg}</td><td style="color:var(--text2);">${h.note||'—'}</td></tr>`;
+        return `<tr><td>${formatDateFull(h.date)}</td><td><strong>#${h.position}</strong></td><td>${chg}</td><td style="color:#888;">${h.note||'—'}</td></tr>`;
       }).join('')}</tbody>
     </table></div>`;
   setTimeout(()=>{const c=document.getElementById('historyModalChart');if(c)new Chart(c,buildLineChartConfig(history.map(h=>formatDateDisplay(h.date)),history.map(h=>h.position),kwName,'#0a5c36'));},50);
@@ -1947,7 +1925,7 @@ function renderKwCards(kwDataArr){
       </div>
       ${f.length>=2
         ?`<div class="kw-chart-canvas-wrap"><canvas id="kwChart_${d.kw.id}"></canvas></div>`
-        :`<div class="kw-chart-no-data"><svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:var(--border);"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg><span>${sc===0?'No history — sync GSC!':'Need 2+ snapshots'}</span></div>`}
+        :`<div class="kw-chart-no-data"><svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:#d4f5e2;"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg><span>${sc===0?'No history — sync GSC!':'Need 2+ snapshots'}</span></div>`}
       <div class="kw-chart-footer">
         <span class="kw-snapshot-info">${sc} snapshot${sc!==1?'s':''} · ${sc?`Last: ${formatDateFull(d.history[d.history.length-1].date)}`:'Never logged'}</span>
         <div style="display:flex;gap:6px;">
@@ -2074,7 +2052,7 @@ function openAiPanel(keyword,url){
   currentAiKeyword=keyword;currentAiUrl=url||'';fetchedPageData=null;
   document.getElementById('aiKeyword').textContent=keyword;
   document.getElementById('fetchUrl').value=url||'';
-  document.getElementById('aiOutput').innerHTML='<div style="color:var(--text2);padding:20px;text-align:center;">Enter URL and click Fetch Page, or click Run AI for keyword-only analysis.</div>';
+  document.getElementById('aiOutput').innerHTML='<div style="color:#888;padding:20px;text-align:center;">Enter URL and click Fetch Page, or click Run AI for keyword-only analysis.</div>';
   document.getElementById('aiMeta').style.display='none';
   document.getElementById('pagePreview').classList.remove('open');
   document.getElementById('fetchStatus').textContent='';
@@ -2264,12 +2242,12 @@ function formatAIOutput(text){
       var itemText = line
         .replace(/^\d+\.\s+/,'')
         .replace(/^[-*]\s+/,'')
-        .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:var(--green);">$1</strong>');
+        .replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#0a5c36;">$1</strong>');
       items.push(itemText);
     }
     // Regular text - treat as section intro or add to last item
     else if(line.match(/^\*\*[^*]+\*\*/)){
-      var boldText = line.replace(/\*\*([^*]+)\*\*/g,'<strong style="color:var(--green);">$1</strong>');
+      var boldText = line.replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#0a5c36;">$1</strong>');
       items.push(boldText);
     } else {
       if(items.length > 0){
@@ -2277,7 +2255,7 @@ function formatAIOutput(text){
       } else if(currentSection){
         items.push(line);
       } else {
-        html += '<p style="color:var(--text2);margin-bottom:12px;">' + line + '</p>';
+        html += '<p style="color:#555;margin-bottom:12px;">' + line + '</p>';
       }
     }
   });
@@ -2295,7 +2273,7 @@ function formatAIOutput(text){
     var scoreLabel = score >= 70 ? 'Good' : score >= 40 ? 'Needs Work' : 'Poor';
     html += '<div class="ai-score-bar">';
     html += '<div class="ai-score-circle" style="background:' + scoreColor + ';">' + score + '</div>';
-    html += '<div><div style="font-weight:700;color:var(--text);font-size:14px;">SEO Score: ' + score + '/100 <span style="color:' + scoreColor + ';">(' + scoreLabel + ')</span></div>';
+    html += '<div><div style="font-weight:700;color:#333;font-size:14px;">SEO Score: ' + score + '/100 <span style="color:' + scoreColor + ';">(' + scoreLabel + ')</span></div>';
     if(critical !== null){
       html += '<div class="ai-critical-badge" style="display:inline-block;margin-top:6px;">&#9888; ' + critical + ' Critical Issue' + (critical !== 1 ? 's' : '') + ' Found</div>';
     }
@@ -2308,7 +2286,7 @@ function formatAIOutput(text){
 async function runAI(){
   const provider=document.getElementById('aiProviderSelect').value;
   const out=document.getElementById('aiOutput');const meta=document.getElementById('aiMeta');
-  out.innerHTML='<div style="color:var(--text2);padding:20px;text-align:center;">⏳ Running AI analysis...</div>';meta.style.display='none';
+  out.innerHTML='<div style="color:#888;padding:20px;text-align:center;">⏳ Running AI analysis...</div>';meta.style.display='none';
   try{
     const keys=await loadAIKeys();
     const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode),keys);
@@ -2340,7 +2318,7 @@ function watchdogInvestigate(keyword){
 async function runWatchdog(){
   var alertsEl = document.getElementById('watchdog-alerts');
   var lastRunEl = document.getElementById('wd-last-run');
-  alertsEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);">Analyzing your SEO health...</div>';
+  alertsEl.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Analyzing your SEO health...</div>';
   var alerts = [];
 
   if(gscDataFull && gscDataFull.length > 0){
@@ -2386,12 +2364,12 @@ async function runWatchdog(){
   var colorMap = {
     critical:{bg:'#fff5f5',border:'#fecaca',title:'#e74c3c'},
     warning:{bg:'#fffbeb',border:'#fde68a',title:'#e67e22'},
-    win:{bg:'#f0fdf6',border:'var(--border)',title:'#0a5c36'},
+    win:{bg:'#f0fdf6',border:'#d4f5e2',title:'#0a5c36'},
     tip:{bg:'#f0f4ff',border:'#c7d2fe',title:'#4f46e5'}
   };
 
   if(alerts.length === 0){
-    alertsEl.innerHTML = '<div style="text-align:center;padding:60px;color:var(--green);font-size:16px;">All clear! No issues detected.</div>';
+    alertsEl.innerHTML = '<div style="text-align:center;padding:60px;color:#0a5c36;font-size:16px;">All clear! No issues detected.</div>';
   } else {
     alertsEl.innerHTML = alerts.map(function(a){
       var c = colorMap[a.type];
@@ -2399,7 +2377,7 @@ async function runWatchdog(){
       if(a.action && a.keyword){
         btn = '<button data-kw="' + encodeURIComponent(a.keyword) + '" onclick="watchdogInvestigate(decodeURIComponent(this.dataset.kw))" style="margin-top:10px;padding:6px 14px;background:' + c.title + ';color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">' + a.action + ' →</button>';
       }
-      return '<div style="background:' + c.bg + ';border:1.5px solid ' + c.border + ';border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;"><div style="flex:1;"><div style="font-weight:700;color:' + c.title + ';font-size:14px;margin-bottom:4px;">' + a.title + '</div><div style="font-size:13px;color:var(--text2);line-height:1.6;">' + a.msg + '</div>' + btn + '</div></div>';
+      return '<div style="background:' + c.bg + ';border:1.5px solid ' + c.border + ';border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;"><div style="flex:1;"><div style="font-weight:700;color:' + c.title + ';font-size:14px;margin-bottom:4px;">' + a.title + '</div><div style="font-size:13px;color:#444;line-height:1.6;">' + a.msg + '</div>' + btn + '</div></div>';
     }).join('');
   }
 
@@ -2470,7 +2448,7 @@ function renderAIProviderCards(keys){
           <div style="width:32px;height:32px;border-radius:8px;background:${p.color};color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">${p.icon}</div>
           <div style="flex:1;">
             <div style="font-weight:600;font-size:14px;">${p.name}</div>
-            <div style="font-size:11px;color:var(--text2);">${p.hint}</div>
+            <div style="font-size:11px;color:#666;">${p.hint}</div>
           </div>
           ${statusHtml}
         </div>
@@ -2480,7 +2458,7 @@ function renderAIProviderCards(keys){
             id="s-${p.id}Key"
             placeholder="${p.placeholder}"
             value="${(keys && keys[p.id]) || ''}"
-            style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;background:var(--bg3);color:var(--text);font-family:monospace;"
+            style="flex:1;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:7px;font-size:13px;font-family:monospace;"
             oninput="onAIKeyInput('${p.id}')">
 
           <button onclick="testAIProvider('${p.id}')"
@@ -2530,14 +2508,15 @@ function renderAIChain(keys){
       </div>
     `;
   }).join('');
+}
   container.innerHTML=active.map((p,i)=>{
     const info=AI_PROVIDERS.find(x=>x.id===p);
-    return '<div style="display:flex;align-items:center;gap:8px;background:#1a1a2e;border:1px solid rgba(46,204,113,0.2);border-radius:7px;padding:8px 12px;margin-bottom:4px;">'+
-      '<span style="color:#a0a0b8;font-size:12px;width:18px;">#'+(i+1)+'</span>'+
+    return '<div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d1fae5;border-radius:7px;padding:8px 12px;margin-bottom:4px;">'+
+      '<span style="color:#9ca3af;font-size:12px;width:18px;">#'+(i+1)+'</span>'+
       '<div style="width:22px;height:22px;border-radius:5px;background:'+info.color+';color:#fff;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;">'+info.icon+'</div>'+
-      '<span style="flex:1;font-size:13px;font-weight:500;color:#e8e8f0;">'+info.name+'</span>'+
-      '<button data-p="'+p+'" data-d="-1" onclick="moveChain(this.dataset.p,parseInt(this.dataset.d))" style="padding:2px 8px;border:1px solid rgba(46,204,113,0.3);border-radius:4px;background:#0f0f17;color:#e8e8f0;cursor:pointer;font-size:12px;">up</button>'+
-      '<button data-p="'+p+'" data-d="1" onclick="moveChain(this.dataset.p,parseInt(this.dataset.d))" style="padding:2px 8px;border:1px solid rgba(46,204,113,0.3);border-radius:4px;background:#0f0f17;color:#e8e8f0;cursor:pointer;font-size:12px;">dn</button>'+
+      '<span style="flex:1;font-size:13px;font-weight:500;">'+info.name+'</span>'+
+      '<button data-p="'+p+'" data-d="-1" onclick="moveChain(this.dataset.p,parseInt(this.dataset.d))" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">up</button>'+
+      '<button data-p="'+p+'" data-d="1" onclick="moveChain(this.dataset.p,parseInt(this.dataset.d))" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;">dn</button>'+
       '</div>';
   }).join('');
 }
@@ -2867,7 +2846,7 @@ function renderCompetitorTable() {
   const tbody = document.getElementById('comp-tbody');
   let h = '';
   if (myBusinessData) {
-    h += '<tr style="background:var(--border);font-weight:700;"><td style="padding:12px;">#' + myBusinessData.rank + '</td><td style="padding:12px;">' + myBusinessData.name + ' <span style="background:#0a5c36;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">YOU</span></td><td style="padding:12px;text-align:center;">' + myBusinessData.rating + '</td><td style="padding:12px;text-align:center;">' + myBusinessData.reviews + '</td><td style="padding:12px;text-align:center;">0 km</td><td style="padding:12px;text-align:center;color:var(--green);font-weight:700;">YOU</td></tr>';
+    h += '<tr style="background:#d4f5e2;font-weight:700;"><td style="padding:12px;">#' + myBusinessData.rank + '</td><td style="padding:12px;">' + myBusinessData.name + ' <span style="background:#0a5c36;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">YOU</span></td><td style="padding:12px;text-align:center;">' + myBusinessData.rating + '</td><td style="padding:12px;text-align:center;">' + myBusinessData.reviews + '</td><td style="padding:12px;text-align:center;">0 km</td><td style="padding:12px;text-align:center;color:#0a5c36;font-weight:700;">YOU</td></tr>';
   }
   competitorData.forEach((c) => {
     const winning = myBusinessData && c.reviews > myBusinessData.reviews;
@@ -2878,7 +2857,7 @@ function renderCompetitorTable() {
   const myRat = myBusinessData ? myBusinessData.rating : 0;
   const avgRev = Math.round(competitorData.reduce((s,c) => s+c.reviews, 0) / (competitorData.length || 1));
   const avgRat = (competitorData.reduce((s,c) => s+c.rating, 0) / (competitorData.length || 1)).toFixed(1);
-  document.getElementById('comp-summary').innerHTML = '<h4 style="color:var(--green);margin-bottom:10px;">YOU vs Competitor Average</h4><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;"><div><strong>Your Reviews:</strong> ' + myRev + ' <span style="color:var(--text2);">vs avg ' + avgRev + '</span></div><div><strong>Your Rating:</strong> ' + myRat + ' <span style="color:var(--text2);">vs avg ' + avgRat + '</span></div><div><strong>Your Rank:</strong> ' + (myBusinessData ? '#' + myBusinessData.rank : 'Not in Top 10') + '</div></div>';
+  document.getElementById('comp-summary').innerHTML = '<h4 style="color:#0a5c36;margin-bottom:10px;">YOU vs Competitor Average</h4><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;"><div><strong>Your Reviews:</strong> ' + myRev + ' <span style="color:#666;">vs avg ' + avgRev + '</span></div><div><strong>Your Rating:</strong> ' + myRat + ' <span style="color:#666;">vs avg ' + avgRat + '</span></div><div><strong>Your Rank:</strong> ' + (myBusinessData ? '#' + myBusinessData.rank : 'Not in Top 10') + '</div></div>';
 }
 
 function renderInsights() {
@@ -2892,7 +2871,7 @@ function renderInsights() {
   if (!myBusinessData) insights.unshift('<strong>You are not in Top 10</strong> for this keyword - Optimize GMB');
   if (insights.length === 0) insights.push('You are competitive. Keep monitoring weekly.');
   const insightsEl = document.getElementById('comp-insights-body');
-  if (insightsEl) insightsEl.innerHTML = insights.map(i => '<div style="padding:10px;margin-bottom:8px;background:rgba(46,204,113,0.05);border-radius:6px;border-left:3px solid #2ecc71;">' + i + '</div>').join('');
+  if (insightsEl) insightsEl.innerHTML = insights.map(i => '<div style="padding:10px;margin-bottom:8px;background:#f0fdf6;border-radius:6px;border-left:3px solid #2ecc71;">' + i + '</div>').join('');
 }
 
 async function saveCompetitorSnapshot() {
@@ -3010,10 +2989,10 @@ async function loadLocationKeywords() {
       const lastUpdated = kw.lastUpdated ? new Date(kw.lastUpdated).toLocaleDateString() : 'Never';
       if(rank<=3) pos13++; else if(rank<=10) pos410++; else if(rank<=20) pos1120++; else pos20++;
       if(rank<bestPos) { bestPos=rank; bestKw=kw.keyword; }
-      const trendIcon = change>0 ? '<span style="color:#2ecc71;">↑ '+change+'</span>' : change<0 ? '<span style="color:#e74c3c;">↓ '+Math.abs(change)+'</span>' : '<span style="color:var(--text2);">— same</span>';
+      const trendIcon = change>0 ? '<span style="color:#2ecc71;">↑ '+change+'</span>' : change<0 ? '<span style="color:#e74c3c;">↓ '+Math.abs(change)+'</span>' : '<span style="color:#888;">— same</span>';
       const rankColor = rank<=3?'#2ecc71':rank<=10?'#a8e6cf':rank<=20?'#e67e22':'#e74c3c';
       const encKw = encodeURIComponent(kw.keyword);
-      tbody.innerHTML += '<tr style="border-bottom:1px solid #f0fdf6;cursor:pointer;" data-kwid="'+kw.id+'" data-kw="'+encKw+'" onclick="showKeywordDetail(this.dataset.kwid, decodeURIComponent(this.dataset.kw))"><td style="padding:14px;font-weight:600;color:var(--green);">'+kw.keyword+'</td><td style="padding:14px;text-align:center;"><span style="background:'+rankColor+';color:#fff;padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">#'+rank+'</span></td><td style="padding:14px;text-align:center;font-weight:600;">'+trendIcon+'</td><td style="padding:14px;text-align:center;color:var(--text2);font-size:12px;">'+lastUpdated+'</td><td style="padding:14px;text-align:center;"><button data-kwid="'+kw.id+'" data-kw="'+encKw+'" onclick="event.stopPropagation();refreshKeywordRank(this.dataset.kwid, decodeURIComponent(this.dataset.kw))" style="padding:5px 10px;background:#2ecc71;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🔄</button> <button data-kwid="'+kw.id+'" onclick="event.stopPropagation();deleteLocationKeyword(this.dataset.kwid)" style="padding:5px 10px;background:#fff;color:#e74c3c;border:1.5px solid #fecaca;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🗑️</button></td></tr>';
+      tbody.innerHTML += '<tr style="border-bottom:1px solid #f0fdf6;cursor:pointer;" data-kwid="'+kw.id+'" data-kw="'+encKw+'" onclick="showKeywordDetail(this.dataset.kwid, decodeURIComponent(this.dataset.kw))"><td style="padding:14px;font-weight:600;color:#0a5c36;">'+kw.keyword+'</td><td style="padding:14px;text-align:center;"><span style="background:'+rankColor+';color:#fff;padding:4px 10px;border-radius:6px;font-weight:700;font-size:13px;">#'+rank+'</span></td><td style="padding:14px;text-align:center;font-weight:600;">'+trendIcon+'</td><td style="padding:14px;text-align:center;color:#888;font-size:12px;">'+lastUpdated+'</td><td style="padding:14px;text-align:center;"><button data-kwid="'+kw.id+'" data-kw="'+encKw+'" onclick="event.stopPropagation();refreshKeywordRank(this.dataset.kwid, decodeURIComponent(this.dataset.kw))" style="padding:5px 10px;background:#2ecc71;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🔄</button> <button data-kwid="'+kw.id+'" onclick="event.stopPropagation();deleteLocationKeyword(this.dataset.kwid)" style="padding:5px 10px;background:#fff;color:#e74c3c;border:1.5px solid #fecaca;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🗑️</button></td></tr>';
     }
     const total = keywords.length || 1;
     document.getElementById('overview-top3-percent').textContent = Math.round((pos13/total)*100) + '%';
@@ -3125,7 +3104,7 @@ async function showKeywordDetail(kwId, keyword) {
     const gridEl = document.getElementById('overview-detail-grid');
     if (gridEl) {
       window._overviewGridKw = keyword;
-      gridEl.innerHTML = '<div style="color:var(--text2);font-size:12px;padding:12px;text-align:center;">Checking cached grid...</div>';
+      gridEl.innerHTML = '<div style="color:#888;font-size:12px;padding:12px;text-align:center;">Checking cached grid...</div>';
       const cache = await loadGridCache(keyword);
 
       if (cache && cache.results && cache.results.length) {
@@ -3133,14 +3112,14 @@ async function showKeywordDetail(kwId, keyword) {
         const ageStr = ageHours < 1 ? 'just now' : ageHours + 'h ago';
 
         gridEl.innerHTML =
-          '<div style="margin-bottom:8px;font-size:12px;color:var(--text2);">Last grid: <b>' + ageStr + '</b> · ' +
+          '<div style="margin-bottom:8px;font-size:12px;color:#888;">Last grid: <b>' + ageStr + '</b> · ' +
           '<button onclick="runGridFromOverview(window._overviewGridKw)" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Re-run Grid</button></div>' +
           '<div id="overview-mini-grid"></div>';
 
         renderMiniGrid(cache.results, cache.size || 5, 'overview-mini-grid');
       } else {
         gridEl.innerHTML =
-          '<div style="color:var(--text2);font-size:12px;padding:16px;text-align:center;">' +
+          '<div style="color:#666;font-size:12px;padding:16px;text-align:center;">' +
           'No cached grid for this keyword yet.<br>' +
           '<button onclick="runGridFromOverview(window._overviewGridKw)" ' +
           'style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:700;">Run Grid Check Here</button></div>';
@@ -3157,7 +3136,7 @@ async function runGridFromOverview(keyword) {
   const gridEl = document.getElementById('overview-detail-grid');
   if (gridEl) {
     gridEl.innerHTML =
-      '<div style="padding:18px;text-align:center;color:var(--green);font-weight:700;">Running live grid check for<br><span style="font-size:13px;color:var(--text);">' + keyword + '</span><br><span style="font-size:12px;color:var(--text2);font-weight:400;">This may take 1-2 minutes.</span></div>';
+      '<div style="padding:18px;text-align:center;color:#0a5c36;font-weight:700;">Running live grid check for<br><span style="font-size:13px;color:#333;">' + keyword + '</span><br><span style="font-size:12px;color:#888;font-weight:400;">This may take 1-2 minutes.</span></div>';
   }
 
   try {
@@ -3172,7 +3151,7 @@ async function runGridFromOverview(keyword) {
 
     if (gridEl) {
       gridEl.innerHTML =
-        '<div style="margin-bottom:8px;font-size:12px;color:var(--text2);">Last grid: <b>just now</b> · ' +
+        '<div style="margin-bottom:8px;font-size:12px;color:#888;">Last grid: <b>just now</b> · ' +
         '<button onclick="runGridFromOverview(window._overviewGridKw)" style="background:#0a5c36;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:700;">Re-run Grid</button></div>' +
         '<div id="overview-mini-grid"></div>';
       renderMiniGrid(results, gridSize, 'overview-mini-grid');
@@ -3183,7 +3162,7 @@ async function runGridFromOverview(keyword) {
     console.log('Overview grid error:', e);
     if (gridEl) {
       gridEl.innerHTML =
-        '<div style="padding:18px;text-align:center;color:#c0392b;font-size:13px;">Grid check failed.<br><span style="font-size:12px;color:var(--text2);">' + e.message + '</span><br>' +
+        '<div style="padding:18px;text-align:center;color:#c0392b;font-size:13px;">Grid check failed.<br><span style="font-size:12px;color:#666;">' + e.message + '</span><br>' +
         '<button onclick="runGridFromOverview(window._overviewGridKw)" style="margin-top:10px;background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:700;">Try Again</button></div>';
     }
   }
@@ -3208,7 +3187,7 @@ function switchGMBTab(n) {
   document.querySelectorAll('.gmb-tab-btn').forEach(b => {
     b.style.background = '#fff';
     b.style.color = '#0a5c36';
-    b.style.borderColor = 'var(--border)';
+    b.style.borderColor = '#d4f5e2';
     b.classList.remove('active');
   });
 
@@ -3319,11 +3298,11 @@ function renderRankResult(results, gmbName, keyword, scope) {
   let html = `
     <div style="background:linear-gradient(135deg,#f0fdf6,#e8f8ee);border:2px solid #2ecc71;border-radius:12px;padding:20px;margin-bottom:16px;text-align:center;">
       <div style="font-size:48px;margin-bottom:8px;">${posIcon}</div>
-      <div style="font-size:15px;color:var(--text2);margin-bottom:4px;">Your position for <b>"${keyword}"</b> in ${scope === 'gachibowli' ? 'Gachibowli' : 'Hyderabad'}</div>
+      <div style="font-size:15px;color:#666;margin-bottom:4px;">Your position for <b>"${keyword}"</b> in ${scope === 'gachibowli' ? 'Gachibowli' : 'Hyderabad'}</div>
       <div style="font-size:52px;font-weight:900;color:${posColor};">#${myPos}</div>
-      <div style="font-size:13px;color:var(--text2);margin-top:4px;">out of ${results.length} businesses found</div>
+      <div style="font-size:13px;color:#888;margin-top:4px;">out of ${results.length} businesses found</div>
     </div>
-    <h4 style="color:var(--green);margin-bottom:12px;">Top 10 Competitors</h4>
+    <h4 style="color:#0a5c36;margin-bottom:12px;">Top 10 Competitors</h4>
     <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <thead>
@@ -3339,7 +3318,7 @@ function renderRankResult(results, gmbName, keyword, scope) {
 
   results.slice(0, 10).forEach((r, i) => {
     const isMe = i === myIndex;
-    const bg   = isMe ? 'var(--border)' : (i % 2 === 0 ? '#fff' : '#f8fffe');
+    const bg   = isMe ? '#d4f5e2' : (i % 2 === 0 ? '#fff' : '#f8fffe');
     const rank = i + 1;
     const rankBadge = rank <= 3
       ? `<span style="background:#2ecc71;color:#fff;padding:2px 8px;border-radius:12px;font-weight:700;">${rank}</span>`
@@ -3352,7 +3331,7 @@ function renderRankResult(results, gmbName, keyword, scope) {
         <td style="padding:10px 12px;font-weight:${isMe ? '700' : '400'};color:${isMe ? '#0a5c36' : '#333'};">${r.name}</td>
         <td style="padding:10px 12px;">⭐ ${r.rating || 'N/A'}</td>
         <td style="padding:10px 12px;">${r.user_ratings_total || 0}</td>
-        <td style="padding:10px 12px;font-size:11px;color:var(--text2);">${(r.formatted_address || '').split(',').slice(0,2).join(',')}</td>
+        <td style="padding:10px 12px;font-size:11px;color:#666;">${(r.formatted_address || '').split(',').slice(0,2).join(',')}</td>
       </tr>`;
   });
 
@@ -3364,23 +3343,23 @@ function renderRankResult(results, gmbName, keyword, scope) {
   const myData = myIndex >= 0 ? results[myIndex] : null;
 
   html += `</tbody></table></div>
-    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-top:16px;">
-      <h4 style="color:var(--green);margin-bottom:10px;">📊 Gap Analysis vs Top 3</h4>
+    <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:10px;padding:16px;margin-top:16px;">
+      <h4 style="color:#0a5c36;margin-bottom:10px;">📊 Gap Analysis vs Top 3</h4>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-        <div style="background:rgba(46,204,113,0.05);border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:var(--text2);">Avg Top 3 Rating</div>
-          <div style="font-size:22px;font-weight:800;color:var(--green);">${avgTopRating} ⭐</div>
-          <div style="font-size:11px;color:var(--text2);">Your: ${myData ? myData.rating || 'N/A' : 'N/A'}</div>
+        <div style="background:#f0fdf6;border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#888;">Avg Top 3 Rating</div>
+          <div style="font-size:22px;font-weight:800;color:#0a5c36;">${avgTopRating} ⭐</div>
+          <div style="font-size:11px;color:#666;">Your: ${myData ? myData.rating || 'N/A' : 'N/A'}</div>
         </div>
-        <div style="background:rgba(46,204,113,0.05);border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:var(--text2);">Avg Top 3 Reviews</div>
-          <div style="font-size:22px;font-weight:800;color:var(--green);">${avgTopReviews}</div>
-          <div style="font-size:11px;color:var(--text2);">Your: ${myData ? myData.user_ratings_total || 0 : 0}</div>
+        <div style="background:#f0fdf6;border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#888;">Avg Top 3 Reviews</div>
+          <div style="font-size:22px;font-weight:800;color:#0a5c36;">${avgTopReviews}</div>
+          <div style="font-size:11px;color:#666;">Your: ${myData ? myData.user_ratings_total || 0 : 0}</div>
         </div>
-        <div style="background:rgba(46,204,113,0.05);border-radius:8px;padding:12px;text-align:center;">
-          <div style="font-size:11px;color:var(--text2);">Reviews Needed</div>
+        <div style="background:#f0fdf6;border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#888;">Reviews Needed</div>
           <div style="font-size:22px;font-weight:800;color:#e74c3c;">+${Math.max(0, avgTopReviews - (myData ? myData.user_ratings_total || 0 : 0))}</div>
-          <div style="font-size:11px;color:var(--text2);">to match Top 3</div>
+          <div style="font-size:11px;color:#666;">to match Top 3</div>
         </div>
       </div>
     </div>`;
@@ -3493,7 +3472,7 @@ function renderGrid(results, size, keyword, label) {
   const total = results.length;
 
   const stats = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;">
-    <div style="background:var(--border);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--green);">
+    <div style="background:#d4f5e2;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#0a5c36;">
       🟢 Top 3: ${top3}/${total} zones
     </div>
     <div style="background:#fff8e6;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:#b7770d;">
@@ -3505,8 +3484,8 @@ function renderGrid(results, size, keyword, label) {
   </div>`;
 
   container.innerHTML = `
-    <h4 style="color:var(--green);margin-bottom:6px;">${size}×${size} Rank Grid — ${label} — "${keyword}"</h4>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:10px;">Each cell = one search zone. Number = your Google Maps rank in that area.</p>
+    <h4 style="color:#0a5c36;margin-bottom:6px;">${size}×${size} Rank Grid — ${label} — "${keyword}"</h4>
+    <p style="font-size:12px;color:#666;margin-bottom:10px;">Each cell = one search zone. Number = your Google Maps rank in that area.</p>
     ${stats}
     <div style="position:relative;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.15);margin-bottom:12px;">
       <iframe
@@ -3607,7 +3586,7 @@ function renderMiniGrid(results, size, containerId) {
         cells +
       '</div>' +
     '</div>' +
-    '<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:10px;text-align:center;">🟢 Top 3 in ' + top3 + '/' + total + ' zones</div>';
+    '<div style="font-size:12px;color:#0a5c36;font-weight:700;margin-top:10px;text-align:center;">🟢 Top 3 in ' + top3 + '/' + total + ' zones</div>';
 }
 
 function showGridPointDetail(rank, keyword) {
@@ -3617,7 +3596,7 @@ function showGridPointDetail(rank, keyword) {
     : rank <= 10
       ? `📊 You rank <b>#${rank}</b> in this zone. You're on Page 1 but need to improve to reach Top 3.`
       : `⚠ You rank <b>#${rank}</b> in this zone. Low visibility — needs immediate action.`;
-  el.innerHTML = `<div style="background:rgba(46,204,113,0.05);border:1.5px solid #2ecc71;border-radius:8px;padding:14px;font-size:13px;">${msg}</div>`;
+  el.innerHTML = `<div style="background:#f0fdf6;border:1.5px solid #2ecc71;border-radius:8px;padding:14px;font-size:13px;">${msg}</div>`;
 }
 
 // ---- TAB 2: OPTIMIZATION SCORE ----
@@ -3702,7 +3681,7 @@ function renderOptimizationScore(myData, top3, gmbName) {
   let html = `
     <div style="text-align:center;margin-bottom:20px;">
       <div style="font-size:64px;font-weight:900;color:${color};">${pct}</div>
-      <div style="font-size:16px;color:var(--text2);">/ 100 — GMB Optimization Score</div>
+      <div style="font-size:16px;color:#666;">/ 100 — GMB Optimization Score</div>
       <div style="background:#f0f0f0;border-radius:20px;height:14px;margin:12px auto;max-width:300px;">
         <div style="background:${color};height:14px;border-radius:20px;width:${pct}%;transition:width 1s;"></div>
       </div>
@@ -3728,8 +3707,8 @@ function renderOptimizationScore(myData, top3, gmbName) {
   });
 
   html += `</tbody></table></div>
-    <div style="margin-top:16px;background:rgba(46,204,113,0.05);border-radius:10px;padding:14px;font-size:13px;">
-      <b style="color:var(--green);">📈 To reach score 90+:</b>
+    <div style="margin-top:16px;background:#f0fdf6;border-radius:10px;padding:14px;font-size:13px;">
+      <b style="color:#0a5c36;">📈 To reach score 90+:</b>
       <ul style="margin:8px 0 0 16px;line-height:1.8;">
         ${checks.filter(c=>!c.pass).map(c=>`<li>${c.tip}</li>`).join('')}
       </ul>
@@ -3965,7 +3944,7 @@ Many thanks! 🙏`;
       
       if (t.copyText) {
         const escaped = t.copyText.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        extra += `<div style="margin-top:8px;padding:10px;background:#f8fdf8;border:1px dashed #2ecc71;border-radius:6px;font-size:12px;color:var(--text2);white-space:pre-line;">${t.copyText.split(String.fromCharCode(10)).join("<br>")}</div>
+        extra += `<div style="margin-top:8px;padding:10px;background:#f8fdf8;border:1px dashed #2ecc71;border-radius:6px;font-size:12px;color:#444;white-space:pre-line;">${t.copyText.split(String.fromCharCode(10)).join("<br>")}</div>
           <button data-copy="${escaped}" onclick="copyToClipboard(this.dataset.copy)" style="margin-top:6px;padding:6px 12px;background:#2ecc71;color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">📋 Copy Message</button>`;
       }
       if (t.link) {
@@ -3974,14 +3953,14 @@ Many thanks! 🙏`;
       if (t.directoryList) {
         extra += '<div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">';
         t.directoryList.forEach(d => {
-          extra += `<a href="${d.url}" target="_blank" style="padding:8px;background:#f8fdf8;border:1px solid var(--border);border-radius:6px;text-decoration:none;color:var(--green);font-size:12px;font-weight:600;">📍 ${d.name}<div style="font-size:10px;color:var(--text2);font-weight:400;margin-top:2px;">${d.desc}</div></a>`;
+          extra += `<a href="${d.url}" target="_blank" style="padding:8px;background:#f8fdf8;border:1px solid #d4f5e2;border-radius:6px;text-decoration:none;color:#0a5c36;font-size:12px;font-weight:600;">📍 ${d.name}<div style="font-size:10px;color:#666;font-weight:400;margin-top:2px;">${d.desc}</div></a>`;
         });
         extra += '</div>';
       }
       if (t.areaList) {
         extra += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">';
         t.areaList.forEach(a => {
-          extra += `<span style="padding:4px 10px;background:var(--border);color:var(--green);border-radius:12px;font-size:11px;font-weight:600;">${a}</span>`;
+          extra += `<span style="padding:4px 10px;background:#d4f5e2;color:#0a5c36;border-radius:12px;font-size:11px;font-weight:600;">${a}</span>`;
         });
         extra += '</div>';
       }
@@ -3994,8 +3973,8 @@ Many thanks! 🙏`;
         <div style="display:flex;gap:12px;padding:14px;border-bottom:1px solid #f0f0f0;align-items:flex-start;${isDone ? 'opacity:0.5;background:#fafafa;' : ''}">
           <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleActionTask('${t.id}', this.checked)" style="margin-top:3px;width:18px;height:18px;cursor:pointer;accent-color:#2ecc71;">
           <div style="flex:1;">
-            <div style="font-weight:600;color:var(--green);font-size:14px;${isDone ? 'text-decoration:line-through;' : ''}">${t.title}</div>
-            <div style="font-size:12px;color:var(--text2);margin-top:4px;white-space:pre-line;">${t.action}</div>
+            <div style="font-weight:600;color:#0a5c36;font-size:14px;${isDone ? 'text-decoration:line-through;' : ''}">${t.title}</div>
+            <div style="font-size:12px;color:#666;margin-top:4px;white-space:pre-line;">${t.action}</div>
             ${extra}
             <div style="font-size:11px;color:#2ecc71;margin-top:6px;font-weight:600;">📊 ${t.impact}</div>
           </div>
@@ -4096,7 +4075,7 @@ async function generateAIContent(actionType, keyword, taskId) {
     outDiv.innerHTML = `
       <div style="padding:12px;background:linear-gradient(135deg,#faf3ff,#fff);border:1.5px solid #9b59b6;border-radius:8px;margin-top:8px;">
         <div style="font-weight:700;color:#9b59b6;margin-bottom:8px;font-size:12px;">🤖 AI Generated Content:</div>
-        <div style="font-size:12px;color:var(--text);white-space:pre-line;line-height:1.6;">${out}</div>
+        <div style="font-size:12px;color:#333;white-space:pre-line;line-height:1.6;">${out}</div>
         <button onclick="copyAIOutput('${taskId}')" style="margin-top:8px;padding:6px 12px;background:#9b59b6;color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">📋 Copy All</button>
         <textarea id="ai-raw-${taskId}" style="display:none;">${out}</textarea>
       </div>`;
@@ -4129,7 +4108,7 @@ async function generateGMBStrategy() {
 
   document.getElementById('ai-strategy-loading').style.display = 'block';
   document.getElementById('ai-strategy-result').style.display  = 'none';
-  document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:var(--green);font-weight:600;">Step 1/3: Fetching your real GMB data...</p>';
+  document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 1/3: Fetching your real GMB data...</p>';
 
   const company  = getCurrentCompany();
   const gmbName  = company.gmbName  || 'TIC (TURNKEY INTERIOR CONTRACTORS)';
@@ -4140,7 +4119,7 @@ async function generateGMBStrategy() {
   try {
     // STEP 1: Get real ranking data
     const results = await fetchNearbyPlaces(keyword, GMB_ZONES.gachibowli.lat, GMB_ZONES.gachibowli.lng, apiKey);
-    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:var(--green);font-weight:600;">Step 2/3: Analyzing top 5 competitors...</p>';
+    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 2/3: Analyzing top 5 competitors...</p>';
     
     const myIndex = findMyBusiness(results, gmbName, company);
     const myData  = myIndex >= 0 ? results[myIndex] : null;
@@ -4161,7 +4140,7 @@ async function generateGMBStrategy() {
     const reviewGap     = avgTopReviews - myReviews;
     const ratingGap     = (avgTopRating - myRating).toFixed(1);
 
-    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:var(--green);font-weight:600;">Step 3/3: AI generating personalized strategy...</p>';
+    document.getElementById('ai-strategy-loading').innerHTML = '<p style="color:#0a5c36;font-weight:600;">Step 3/3: AI generating personalized strategy...</p>';
 
     // STEP 2: Build data-rich prompt with REAL numbers
     const prompt = `You are a local SEO expert. Analyze this REAL data and give a HYPER-SPECIFIC GMB strategy.
@@ -4236,36 +4215,36 @@ Be brutally specific. Use the actual numbers above. No generic advice.`;
     el.style.display = 'block';
     el.innerHTML = `
       <div style="background:#fff;border:2px solid #0a5c36;border-radius:12px;padding:16px;margin-bottom:14px;">
-        <h4 style="color:var(--green);margin-bottom:10px;">📊 Real-Time Data Used by AI</h4>
+        <h4 style="color:#0a5c36;margin-bottom:10px;">📊 Real-Time Data Used by AI</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:12px;">
-          <div style="background:rgba(46,204,113,0.05);padding:10px;border-radius:6px;text-align:center;">
-            <div style="color:var(--text2);">Your Rank</div>
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Rank</div>
             <div style="font-size:20px;font-weight:800;color:${myRank<=3?'#2ecc71':myRank<=10?'#f39c12':'#e74c3c'};">#${myRank}</div>
           </div>
-          <div style="background:rgba(46,204,113,0.05);padding:10px;border-radius:6px;text-align:center;">
-            <div style="color:var(--text2);">Your Rating</div>
-            <div style="font-size:20px;font-weight:800;color:var(--green);">${myRating} ⭐</div>
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Rating</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${myRating} ⭐</div>
           </div>
-          <div style="background:rgba(46,204,113,0.05);padding:10px;border-radius:6px;text-align:center;">
-            <div style="color:var(--text2);">Your Reviews</div>
-            <div style="font-size:20px;font-weight:800;color:var(--green);">${myReviews}</div>
+          <div style="background:#f0fdf6;padding:10px;border-radius:6px;text-align:center;">
+            <div style="color:#666;">Your Reviews</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${myReviews}</div>
           </div>
           <div style="background:#fff3cd;padding:10px;border-radius:6px;text-align:center;">
-            <div style="color:var(--text2);">Reviews Gap</div>
+            <div style="color:#666;">Reviews Gap</div>
             <div style="font-size:20px;font-weight:800;color:#e74c3c;">+${reviewGap}</div>
           </div>
           <div style="background:#fff3cd;padding:10px;border-radius:6px;text-align:center;">
-            <div style="color:var(--text2);">Top 5 Avg Rating</div>
-            <div style="font-size:20px;font-weight:800;color:var(--green);">${avgTopRating} ⭐</div>
+            <div style="color:#666;">Top 5 Avg Rating</div>
+            <div style="font-size:20px;font-weight:800;color:#0a5c36;">${avgTopRating} ⭐</div>
           </div>
         </div>
       </div>
-      <div style="background:rgba(46,204,113,0.05);border:1.5px solid #2ecc71;border-radius:12px;padding:20px;">
+      <div style="background:#f0fdf6;border:1.5px solid #2ecc71;border-radius:12px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <h4 style="color:var(--green);margin:0;">🚀 AI Strategy Based on YOUR Real Data — "${keyword}"</h4>
+          <h4 style="color:#0a5c36;margin:0;">🚀 AI Strategy Based on YOUR Real Data — "${keyword}"</h4>
           <button onclick="copyStrategy()" style="padding:6px 14px;background:#0a5c36;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;">Copy</button>
         </div>
-        <div id="strategy-text" style="white-space:pre-wrap;font-size:13px;line-height:1.7;color:var(--text);">${strategy}</div>
+        <div id="strategy-text" style="white-space:pre-wrap;font-size:13px;line-height:1.7;color:#333;">${strategy}</div>
       </div>`;
   } catch(e) {
     document.getElementById('ai-strategy-loading').style.display = 'none';
@@ -4660,16 +4639,16 @@ async function addSelectedKeywords() {
   <div style="background:#fff;border-radius:16px;width:680px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
     
     <!-- Header -->
-    <div style="padding:20px 24px 0;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <div style="padding:20px 24px 0;border-bottom:1.5px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-size:18px;font-weight:800;color:var(--green);">💡 Keyword Suggestions</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px;">Discover new keywords to track — select and add in bulk</div>
+        <div style="font-size:18px;font-weight:800;color:#0a5c36;">💡 Keyword Suggestions</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;">Discover new keywords to track — select and add in bulk</div>
       </div>
       <button onclick="closeKeywordSuggest()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1;">×</button>
     </div>
 
     <!-- Tabs -->
-    <div style="display:flex;gap:0;padding:0 24px;border-bottom:1.5px solid var(--border);margin-top:0;">
+    <div style="display:flex;gap:0;padding:0 24px;border-bottom:1.5px solid #d4f5e2;margin-top:0;">
       <button id="kwTab-gsc"     onclick="switchKwTab('gsc')"     class="kw-suggest-tab kw-tab-active">📈 From GSC</button>
       <button id="kwTab-ai"      onclick="switchKwTab('ai')"      class="kw-suggest-tab">🤖 From AI</button>
       <button id="kwTab-adcsv"   onclick="switchKwTab('adcsv')"   class="kw-suggest-tab">📊 Ads CSV</button>
@@ -4682,7 +4661,7 @@ async function addSelectedKeywords() {
       <!-- GSC Tab -->
       <div id="kwPanel-gsc">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:13px;color:var(--text2);">Keywords from your Google Search Console data</span>
+          <span style="font-size:13px;color:#555;">Keywords from your Google Search Console data</span>
           <button onclick="loadGSCSuggestions()" style="padding:6px 14px;background:#0a5c36;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">🔄 Load</button>
         </div>
         <div id="kwGSCList"><div style="color:#aaa;font-size:13px;text-align:center;padding:30px 0;">Click Load to pull from GSC data</div></div>
@@ -4691,7 +4670,7 @@ async function addSelectedKeywords() {
       <!-- AI Tab -->
       <div id="kwPanel-ai" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <span style="font-size:13px;color:var(--text2);">AI-generated keyword variations for your business</span>
+          <span style="font-size:13px;color:#555;">AI-generated keyword variations for your business</span>
           <button onclick="loadAISuggestions()" style="padding:6px 14px;background:#0a5c36;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">✨ Generate</button>
         </div>
         <div id="kwAIList"><div style="color:#aaa;font-size:13px;text-align:center;padding:30px 0;">Click Generate to get AI keyword ideas</div></div>
@@ -4700,7 +4679,7 @@ async function addSelectedKeywords() {
       <!-- Ads CSV Tab -->
       <div id="kwPanel-adcsv" style="display:none;">
         <div style="margin-bottom:14px;">
-          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">Upload Google Ads <b>Search Terms Report</b> CSV</div>
+          <div style="font-size:13px;color:#555;margin-bottom:8px;">Upload Google Ads <b>Search Terms Report</b> CSV</div>
           <div style="font-size:11px;color:#aaa;margin-bottom:10px;">Columns needed: Search term, Impressions, Clicks, Cost</div>
           <input type="file" id="kwAdsCsvInput" accept=".csv" onchange="parseAdsCsv()" style="font-size:13px;">
         </div>
@@ -4710,7 +4689,7 @@ async function addSelectedKeywords() {
       <!-- Planner CSV Tab -->
       <div id="kwPanel-planner" style="display:none;">
         <div style="margin-bottom:14px;">
-          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">Upload Google Keyword Planner <b>export CSV</b></div>
+          <div style="font-size:13px;color:#555;margin-bottom:8px;">Upload Google Keyword Planner <b>export CSV</b></div>
           <div style="font-size:11px;color:#aaa;margin-bottom:10px;">Columns needed: Keyword, Avg. monthly searches, Competition, Top of page bid</div>
           <input type="file" id="kwPlannerCsvInput" accept=".csv" onchange="parsePlannerCsv()" style="font-size:13px;">
         </div>
@@ -4720,10 +4699,10 @@ async function addSelectedKeywords() {
     </div>
 
     <!-- Footer -->
-    <div style="padding:16px 24px;border-top:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(46,204,113,0.05);border-radius:0 0 16px 16px;">
-      <div id="kwSelectedCount" style="font-size:13px;color:var(--green);font-weight:700;">0 keywords selected</div>
+    <div style="padding:16px 24px;border-top:1.5px solid #d4f5e2;display:flex;align-items:center;justify-content:space-between;background:#f0fdf6;border-radius:0 0 16px 16px;">
+      <div id="kwSelectedCount" style="font-size:13px;color:#0a5c36;font-weight:700;">0 keywords selected</div>
       <div style="display:flex;gap:10px;">
-        <button onclick="selectAllKwSuggest()" style="padding:8px 16px;background:var(--border);color:var(--green);border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Select All</button>
+        <button onclick="selectAllKwSuggest()" style="padding:8px 16px;background:#d4f5e2;color:#0a5c36;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Select All</button>
         <button onclick="addSelectedKeywords()" style="padding:8px 22px;background:#2ecc71;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;">➕ Add Selected</button>
       </div>
     </div>
@@ -4764,7 +4743,7 @@ async function addSelectedKeywords() {
 .kw-suggest-row.already { opacity: 0.5; }
 .kw-badge-tracking {
   font-size: 10px;
-  background: var(--border);
+  background: #d4f5e2;
   color: #0a5c36;
   border-radius: 4px;
   padding: 2px 6px;
