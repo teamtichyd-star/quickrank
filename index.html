@@ -2759,7 +2759,7 @@ async function analyzeGMBDescription(){
           '<div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:8px;padding:12px;margin-bottom:8px;">' +
             '<div style="font-size:11px;font-weight:700;color:#888;margin-bottom:6px;">VERSION '+(i+1)+' ('+v.length+' chars)</div>' +
             '<div style="font-size:13px;color:#333;line-height:1.6;margin-bottom:8px;">'+v+'</div>' +
-            '<button onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent);this.textContent='Copied! ✅';setTimeout(()=>this.textContent='📋 Copy',2000)" '+
+            '<button data-copied="false" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent);this.textContent=\'Copied! ✅\';setTimeout(()=>this.textContent=\'📋 Copy\',2000)" '+
             'style="padding:6px 14px;background:#0a5c36;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📋 Copy</button>' +
           '</div>'
         ).join('') +
