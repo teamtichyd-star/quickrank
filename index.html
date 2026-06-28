@@ -3724,7 +3724,7 @@ function renderGrid(results, size, keyword, label) {
                : rank <= 3 ? '#2ecc71'
                : rank <= 10 ? '#f39c12'
                : '#e74c3c';
-      const label2 = isCenter ? '★' : rank >= 20 ? '20+' : rank;
+      const label2 = isCenter ? '★' : rank >= 20 ? rank : rank;
       const opacity = isCenter ? '0.95' : '0.82';
       gridCells += `<div style="width:52px;height:52px;background:${bg};border-radius:10px;display:flex;
         align-items:center;justify-content:center;color:#fff;font-weight:800;
