@@ -3695,8 +3695,21 @@ async function runGridCheck() {
     const zone = built.zone;
 
     document.getElementById('grid-loading').style.display = 'none';
+    // Load previous history before saving new
+    const history = await loadGridHistory(keyword);
+    const prevResults = history.length > 0 ? history[0].results : null;
+
     renderGrid(results, gridSize, keyword, zone.label);
     await saveGridCache(keyword, results, gridSize, zone.label);
+
+    // Show comparison if history exists
+    if (prevResults && prevResults.length) {
+      // Add comparison container after grid
+      const compDiv = document.createElement('div');
+      compDiv.id = 'grid-comparison';
+      document.getElementById('map-grid-container').appendChild(compDiv);
+      renderGridComparison(results, prevResults, 'grid-comparison');
+    }
   } catch(e) {
     document.getElementById('grid-loading').style.display = 'none';
     document.getElementById('map-grid-container').innerHTML =
@@ -3804,21 +3817,101 @@ async function saveGridCache(keyword, results, size, label) {
     const companyId = currentCompanyId || getCurrentCompanyId();
     if (!companyId) return;
     const key = keyword.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const top3 = results.filter(p => p.rank <= 3).length;
+    const top10 = results.filter(p => p.rank > 3 && p.rank <= 10).length;
+    const found = results.filter(p => p.rank <= 20).length;
+    const payload = {
+      keyword, size, label, results,
+      cachedAt: Date.now(),
+      top3, top10, found,
+      total: results.length
+    };
+    // Save latest cache
     await firebase.firestore()
       .collection('users').doc(user.uid)
       .collection('companies').doc(companyId)
       .collection('gridCache').doc(key)
-      .set({
-        keyword: keyword,
-        size: size,
-        label: label,
-        results: results,
-        cachedAt: Date.now(),
-        top3: results.filter(p => p.rank <= 3).length,
-        total: results.length
-      });
-    console.log('[14D] Grid cached for:', keyword);
-  } catch(e) { console.log('[14D] Grid cache save error:', e); }
+      .set(payload);
+    // Save to history (one entry per week)
+    const weekKey = key + '_' + new Date().toISOString().slice(0,10);
+    await firebase.firestore()
+      .collection('users').doc(user.uid)
+      .collection('companies').doc(companyId)
+      .collection('gridHistory').doc(weekKey)
+      .set(payload);
+    console.log('[Grid] Cached and history saved for:', keyword);
+  } catch(e) { console.log('[Grid] Cache save error:', e); }
+}
+
+async function loadGridHistory(keyword) {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return [];
+    const companyId = currentCompanyId || getCurrentCompanyId();
+    if (!companyId) return [];
+    const key = keyword.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const snap = await firebase.firestore()
+      .collection('users').doc(user.uid)
+      .collection('companies').doc(companyId)
+      .collection('gridHistory')
+      .where(firebase.firestore.FieldPath.documentId(), '>=', key + '_')
+      .where(firebase.firestore.FieldPath.documentId(), '<=', key + '_')
+      .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
+      .limit(8)
+      .get();
+    return snap.docs.map(d => d.data());
+  } catch(e) { return []; }
+}
+
+function renderGridComparison(currentResults, prevResults, containerId) {
+  if (!prevResults || !prevResults.length) return;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  let improved = 0, worsened = 0, same = 0, newFound = 0;
+  const changes = currentResults.map(cur => {
+    const prev = prevResults.find(p => p.row === cur.row && p.col === cur.col);
+    if (!prev) return { ...cur, change: 0 };
+    const diff = (prev.rank > 20 ? 21 : prev.rank) - (cur.rank > 20 ? 21 : cur.rank);
+    if (diff > 0) improved++;
+    else if (diff < 0) worsened++;
+    else same++;
+    if (prev.rank > 20 && cur.rank <= 20) newFound++;
+    return { ...cur, change: diff };
+  });
+
+  const prevDate = prevResults[0] ? new Date(prevResults[0].cachedAt).toLocaleDateString('en-IN') : 'last check';
+  const prevTop3 = prevResults.filter(p => p.rank <= 3).length;
+  const curTop3 = currentResults.filter(p => p.rank <= 3).length;
+  const prevFound = prevResults.filter(p => p.rank <= 20).length;
+  const curFound = currentResults.filter(p => p.rank <= 20).length;
+
+  el.innerHTML =
+    '<div style="background:#f0fdf6;border:1.5px solid #d4f5e2;border-radius:12px;padding:16px;margin-top:16px;">' +
+      '<div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:12px;">📈 vs Previous Check (' + prevDate + ')</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">' +
+        '<div style="text-align:center;background:#fff;border-radius:8px;padding:10px;">' +
+          '<div style="font-size:20px;font-weight:800;color:#2ecc71;">+' + improved + '</div>' +
+          '<div style="font-size:11px;color:#666;">Zones Improved</div>' +
+        '</div>' +
+        '<div style="text-align:center;background:#fff;border-radius:8px;padding:10px;">' +
+          '<div style="font-size:20px;font-weight:800;color:#e74c3c;">' + worsened + '</div>' +
+          '<div style="font-size:11px;color:#666;">Zones Worsened</div>' +
+        '</div>' +
+        '<div style="text-align:center;background:#fff;border-radius:8px;padding:10px;">' +
+          '<div style="font-size:20px;font-weight:800;color:#3498db;">+' + newFound + '</div>' +
+          '<div style="font-size:11px;color:#666;">New Zones Found</div>' +
+        '</div>' +
+        '<div style="text-align:center;background:#fff;border-radius:8px;padding:10px;">' +
+          '<div style="font-size:20px;font-weight:800;color:#0a5c36;">' + curFound + '</div>' +
+          '<div style="font-size:11px;color:#666;">Total Zones Visible</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#555;">' +
+        'Top 3 zones: <b style="color:' + (curTop3 > prevTop3 ? '#2ecc71' : curTop3 < prevTop3 ? '#e74c3c' : '#888') + ';">' + curTop3 + '</b> ' +
+        (curTop3 > prevTop3 ? '▲ +' + (curTop3 - prevTop3) : curTop3 < prevTop3 ? '▼ ' + (curTop3 - prevTop3) : '— no change') + ' vs ' + prevTop3 + ' last time' +
+      '</div>' +
+    '</div>';
 }
 
 async function loadGridCache(keyword) {
