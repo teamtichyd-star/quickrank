@@ -2716,38 +2716,23 @@ async function analyzeGMBDescription(){
   const provider = keys.groq?'groq':keys.gemini?'gemini':keys.openai?'openai':keys.anthropic?'anthropic':null;
   if(!provider){ el.innerHTML='<div style="color:#e74c3c;font-size:13px;">Add an AI API key in Settings first.</div>'; return; }
 
-  const prompt = 'You are a local SEO expert specializing in Google Business Profile optimization.
-
-'+
-    'BUSINESS: '+gmbName+'
-'+
-    'INDUSTRY: '+industry+'
-'+
-    'CITY: '+city+'
-'+
-    'TARGET AREAS: '+targetAreas+'
-'+
-    'SERVICES: '+services+'
-
-'+
-    'CURRENT GMB DESCRIPTION:
-'+desc+'
-
-'+
-    'Analyze this GMB description and provide:
-'+
-    '1. Score out of 10 with reason
-'+
-    '2. What is missing (keywords, areas, services)
-'+
-    '3. Three improved versions ready to copy-paste (max 750 chars each)
-'+
-    '4. Top 5 keywords that should be in the description
-
-'+
-    'Return ONLY JSON:
-'+
-    '{"score":7,"reason":"...","missing":["...","..."],"versions":["full version 1","full version 2","full version 3"],"keywords":["kw1","kw2","kw3","kw4","kw5"]}';
+  const prompt = [
+    'You are a local SEO expert specializing in Google Business Profile optimization.',
+    'BUSINESS: '+gmbName,
+    'INDUSTRY: '+industry,
+    'CITY: '+city,
+    'TARGET AREAS: '+targetAreas,
+    'SERVICES: '+services,
+    'CURRENT GMB DESCRIPTION:',
+    desc,
+    'Analyze this GMB description and provide:',
+    '1. Score out of 10 with reason',
+    '2. What is missing (keywords, areas, services)',
+    '3. Three improved versions ready to copy-paste (max 750 chars each)',
+    '4. Top 5 keywords that should be in the description',
+    'Return ONLY JSON:',
+    '{"score":7,"reason":"...","missing":["...","..."],"versions":["v1","v2","v3"],"keywords":["kw1","kw2","kw3","kw4","kw5"]}'
+  ].join('\n');
 
   try {
     const result = await callAI(provider, prompt, keys);
