@@ -2941,7 +2941,7 @@ async function loadDashboard(){
     const qwEl = document.getElementById('dash-quick-wins');
     if(quickWins.length){
       qwEl.innerHTML = quickWins.map(k=>
-        '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f0fdf6;border-radius:8px;cursor:pointer;" onclick="showPage('ranktracker',document.getElementById('nav-ranktracker'))">'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f0fdf6;border-radius:8px;cursor:pointer;" onclick="showPage(&apos;ranktracker&apos;,document.getElementById(&apos;nav-ranktracker&apos;))">'+
           '<div style="width:32px;height:32px;border-radius:8px;background:'+(k.currentRank<=5?'#2ecc71':k.currentRank<=10?'#f39c12':'#e67e22')+';color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;">#'+k.currentRank+'</div>'+
           '<div style="flex:1;font-size:13px;color:#333;font-weight:500;">'+k.keyword+'</div>'+
           '<div style="font-size:11px;color:#2ecc71;font-weight:700;">Push to Top 3 →</div>'+
