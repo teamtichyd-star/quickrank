@@ -1240,6 +1240,66 @@ tr:hover td{background:#f9fffe;}
             Click "Refresh Action Plan" to load your personalized tasks.
           </div>
         </div>
+
+        <!-- GMB HEALTH TAB -->
+        <div id="gmb-health-tab" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#0a5c36;">🏥 GMB Health Checker</div>
+              <div style="font-size:13px;color:#888;margin-top:2px;">Profile completeness, reviews, activity and competitor comparison</div>
+            </div>
+            <button onclick="runGMBHealthCheck()" style="background:#0a5c36;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-weight:700;cursor:pointer;font-size:13px;">🔍 Run Health Check</button>
+          </div>
+          <div id="gmb-health-score-banner" style="background:linear-gradient(135deg,#0a5c36,#1a7a4a);border-radius:16px;padding:24px;margin-bottom:20px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;opacity:0.8;margin-bottom:6px;">GMB HEALTH SCORE</div>
+              <div style="display:flex;align-items:baseline;gap:10px;">
+                <div id="gmb-health-score" style="font-size:56px;font-weight:900;line-height:1;">—</div>
+                <div style="font-size:20px;opacity:0.7;">/100</div>
+              </div>
+              <div id="gmb-health-label" style="font-size:14px;opacity:0.8;margin-top:4px;">Click Run Health Check to start</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+              <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
+                <div id="gmb-score-reviews" style="font-size:24px;font-weight:800;">—</div>
+                <div style="font-size:11px;opacity:0.8;margin-top:2px;">Reviews</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
+                <div id="gmb-score-profile" style="font-size:24px;font-weight:800;">—</div>
+                <div style="font-size:11px;opacity:0.8;margin-top:2px;">Profile</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
+                <div id="gmb-score-activity" style="font-size:24px;font-weight:800;">—</div>
+                <div style="font-size:11px;opacity:0.8;margin-top:2px;">Activity</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px;">
+            <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
+              <div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:12px;">⭐ Reviews</div>
+              <div id="gmb-reviews-content"><div style="color:#888;font-size:13px;">Run health check to load</div></div>
+            </div>
+            <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
+              <div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:12px;">📋 Profile Completeness</div>
+              <div id="gmb-profile-content"><div style="color:#888;font-size:13px;">Run health check to load</div></div>
+            </div>
+            <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
+              <div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:12px;">📅 Activity</div>
+              <div id="gmb-activity-content"><div style="color:#888;font-size:13px;">Run health check to load</div></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:4px;">🏆 Competitor Comparison</div>
+            <div style="font-size:12px;color:#888;margin-bottom:16px;">Top businesses near you from Google Places API</div>
+            <div id="gmb-competitor-content"><div style="color:#888;font-size:13px;">Run health check to load competitor data</div></div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:#0a5c36;margin-bottom:4px;">🤖 AI Fix Recommendations</div>
+            <div style="font-size:12px;color:#888;margin-bottom:16px;">Specific copy-paste actions to improve your GMB score</div>
+            <div id="gmb-ai-fixes"><div style="color:#888;font-size:13px;">Run health check to generate AI recommendations</div></div>
+          </div>
+        </div>
+
       </div>
 
 
