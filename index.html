@@ -2901,7 +2901,13 @@ async function loadDashboard(){
   // ── Load website keywords ──
   try {
     const kwSnap = await db.collection('users').doc(user.uid).collection('companies').doc(companyId).collection('keywords').get();
-    const kws = kwSnap.docs.map(d=>d.data());
+    const kws = kwSnap.docs.map(d=>{
+      const raw = d.data();
+      return Object.assign({}, raw, {
+        currentRank: raw.currentRank || raw.position || null,
+        previousRank: raw.previousRank || raw.prevPosition || null
+      });
+    });
     window._dashKws = kws;
     const total = kws.length;
     const top3 = kws.filter(k=>k.currentRank && k.currentRank <= 3).length;
@@ -2952,7 +2958,7 @@ async function loadDashboard(){
     }
 
     // Top keywords table
-    const topKws = kws.filter(k=>k.currentRank).sort((a,b)=>a.currentRank-b.currentRank).slice(0,8);
+    const topKws = kws.filter(k=>k.currentRank && k.currentRank < 999).sort((a,b)=>a.currentRank-b.currentRank).slice(0,8);
     const tableEl = document.getElementById('dash-kw-table');
     if(topKws.length){
       tableEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'+
