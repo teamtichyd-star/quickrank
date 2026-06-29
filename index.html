@@ -1658,7 +1658,7 @@ function renderKeywords(kwList){
     const impr=k.impressions?k.impressions.toLocaleString():'—';
     const ctr=k.ctr?`${(k.ctr*100).toFixed(1)}%`:'—';
     const estTraffic=k.clicks?k.clicks:'—';
-    const bestPos=k.bestPosition?`<span style="color:#0a5c36;font-weight:700;">#${k.bestPosition}</span>`:'—';
+    const bestPos=(k.bestPosition && k.bestPosition !== k.position)?`<span style="color:#0a5c36;font-weight:700;">#${k.bestPosition}</span>`:(k.position?`<span style="color:#aaa;font-size:11px;">same</span>`:'—');
     const oppBadge=(pos && pos>=4 && pos<=20)?'<span style="font-size:9px;background:#fff3cd;color:#b8860b;border:1px solid #ffc107;border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">⚡ WIN</span>':'';
     return `<tr ${k.gscSynced?'class="gsc-kw-row-matched"':''}>
       <td><div style="font-weight:600;color:#222;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${k.keyword}${oppBadge}</div>${k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':''}</td>
@@ -3551,7 +3551,7 @@ function showPage(page,el){
   if(window.innerWidth<=768)closeSidebar();
   if(page==='settings'){loadCompanySettings();loadAIKeyStatuses();}
   if(page==='dashboard'){loadDashboard();}
-  if(page==='ranktracker'){if(typeof keywords!=='undefined' && keywords.length) renderKeywords(keywords);}
+  if(page==='ranktracker'){if(typeof keywords!=='undefined' && keywords.length){renderKeywords(keywords);}else{loadKeywords();}}
   if(page==='charts')renderChartsPage();
   if(page==='gsc'&&gscAccessToken&&gscDataFull.length)renderGSCTable(gscDataView);
   if(page==='watchdog') runWatchdog();
