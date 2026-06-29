@@ -1583,45 +1583,6 @@ async function addCompany(){
 /* ══════════════════════════════
    KEYWORDS LOAD
 ══════════════════════════════ */
-function updateRankTrackerStats(keywords){
-  const top3 = keywords.filter(k=>k.position && k.position <= 3).length;
-  const top10 = keywords.filter(k=>k.position && k.position > 3 && k.position <= 10).length;
-  const top30 = keywords.filter(k=>k.position && k.position > 10 && k.position <= 30).length;
-  const beyond = keywords.filter(k=>!k.position || k.position > 30).length;
-  const traffic = keywords.reduce((s,k)=>s+(k.clicks||0),0);
-
-  const t3=document.getElementById('rt-top3');
-  const t10=document.getElementById('rt-top10');
-  const t30=document.getElementById('rt-top30');
-  const tb=document.getElementById('rt-beyond');
-  const tf=document.getElementById('rt-traffic');
-
-  if(t3) t3.textContent=top3;
-  if(t10) t10.textContent=top10;
-  if(t30) t30.textContent=top30;
-  if(tb) tb.textContent=beyond;
-  if(tf) tf.textContent=traffic.toLocaleString();
-
-  const opps = keywords.filter(k=>k.position && k.position >= 4 && k.position <= 20);
-  const oppEl = document.getElementById('rt-opportunities');
-  const oppText = document.getElementById('rt-opp-text');
-  if(oppEl && opps.length){
-    oppEl.style.display='block';
-    const best = opps.slice().sort((a,b)=>a.position-b.position)[0];
-    if(oppText) oppText.textContent = opps.length + ' keywords in positions 4-20 can reach Top 3. Best opportunity: "' + best.keyword + '" at #' + best.position;
-  } else if(oppEl){
-    oppEl.style.display='none';
-  }
-}
-
-function getPosColor(pos){
-  if(!pos) return '#e74c3c';
-  if(pos<=3) return '#2ecc71';
-  if(pos<=10) return '#f39c12';
-  if(pos<=30) return '#e67e22';
-  return '#e74c3c';
-}
-
 function loadKeywords(){
   if(!currentUser||!currentCompanyId)return;
   if(unsubscribeKeywords)unsubscribeKeywords();
