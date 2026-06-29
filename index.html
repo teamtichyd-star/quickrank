@@ -3058,7 +3058,7 @@ function generateDashboardActions(settings){
 
   const top3 = actions.slice(0,3);
   el.innerHTML = top3.map((a,i)=>
-    '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:'+(i===0?'#fff3f3':i===1?'#fff8f0':'#f0fdf6')+';border-radius:10px;border-left:4px solid '+a.color+';cursor:pointer;" onclick="showPage(''+a.link+'',document.getElementById('nav-'+a.link+''))">'+
+    '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:'+(i===0?'#fff3f3':i===1?'#fff8f0':'#f0fdf6')+';border-radius:10px;border-left:4px solid '+a.color+';cursor:pointer;" onclick="showPage(&apos;'+a.link+'&apos;,document.getElementById(&apos;nav-'+a.link+'&apos;))">'+
       '<div style="font-size:20px;">'+a.icon+'</div>'+
       '<div style="flex:1;">'+
         '<div style="font-size:11px;font-weight:700;color:'+a.color+';margin-bottom:3px;">'+a.priority+' PRIORITY</div>'+
