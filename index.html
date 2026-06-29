@@ -4192,7 +4192,14 @@ function switchGMBTab(n) {
     loadLocationOverview();
   } else if(n === 'health') {
     const ht = document.getElementById('gmb-health-tab');
-    if(ht) ht.style.display = 'block';
+    if(ht){
+      ht.style.display = 'block';
+      setTimeout(()=>ht.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+      if(!ht.dataset.loaded){
+        ht.dataset.loaded = '1';
+        runGMBHealthCheck();
+      }
+    }
   } else {
     const tab = document.getElementById('gmb-tab-' + n);
     if(tab) tab.style.display = 'block';
