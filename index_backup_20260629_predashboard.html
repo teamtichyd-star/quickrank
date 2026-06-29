@@ -362,10 +362,6 @@ tr:hover td{background:#f9fffe;}
       <svg class="nav-arrow" id="nav-arrow-ranktracker" viewBox="0 0 24 24" style="width:14px;height:14px;margin-left:auto;transition:transform 0.2s;"><path d="M7 10l5 5 5-5z"/></svg>
     </div>
     <div class="nav-children" id="nav-children-ranktracker">
-      <div class="nav-item nav-child" id="nav-dashboard" onclick="showPage('dashboard',this);event.stopPropagation()">
-        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard
-        <span class="nav-badge" style="background:#a855f7;">NEW</span>
-      </div>
       <div class="nav-item nav-child active" id="nav-ranktracker" onclick="showPage('ranktracker',this);event.stopPropagation()">
         <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>Websites
       </div>
@@ -404,111 +400,6 @@ tr:hover td{background:#f9fffe;}
   <div class="main">
 
     <!-- ═══ RANK TRACKER ═══ -->
-    <div id="page-dashboard" style="display:none;">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🏠 Dashboard</div>
-          <div class="page-subtitle" id="dashboard-subtitle">Loading your SEO health...</div>
-        </div>
-        <button class="btn-primary" onclick="loadDashboard()" style="display:flex;align-items:center;gap:8px;">
-          🔄 Refresh
-        </button>
-      </div>
-
-      <!-- Overall Health Score -->
-      <div style="background:linear-gradient(135deg,#0a5c36,#1a7a4a);border-radius:16px;padding:24px;margin-bottom:24px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-        <div>
-          <div style="font-size:13px;font-weight:600;opacity:0.8;margin-bottom:6px;">OVERALL SEO HEALTH</div>
-          <div style="display:flex;align-items:baseline;gap:10px;">
-            <div id="dash-overall-score" style="font-size:56px;font-weight:900;line-height:1;">—</div>
-            <div style="font-size:20px;opacity:0.7;">/100</div>
-          </div>
-          <div id="dash-overall-label" style="font-size:14px;opacity:0.8;margin-top:4px;">Calculating...</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-          <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
-            <div id="dash-website-score" style="font-size:24px;font-weight:800;">—</div>
-            <div style="font-size:11px;opacity:0.8;margin-top:2px;">Website SEO</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
-            <div id="dash-gmb-score" style="font-size:24px;font-weight:800;">—</div>
-            <div style="font-size:11px;opacity:0.8;margin-top:2px;">GMB Health</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;text-align:center;">
-            <div id="dash-ai-score" style="font-size:24px;font-weight:800;">—</div>
-            <div style="font-size:11px;opacity:0.8;margin-top:2px;">AI Visibility</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Today's Actions -->
-      <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:16px;padding:24px;margin-bottom:24px;">
-        <div style="font-size:16px;font-weight:700;color:#0a5c36;margin-bottom:16px;">🎯 Today's Priority Actions</div>
-        <div id="dash-actions" style="display:flex;flex-direction:column;gap:10px;">
-          <div style="color:#888;font-size:13px;padding:20px;text-align:center;">Loading actions...</div>
-        </div>
-      </div>
-
-      <!-- 4 Score Cards -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;cursor:pointer;" onclick="showPage('ranktracker',document.getElementById('nav-ranktracker'))">
-          <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Keywords Tracked</div>
-          <div id="dash-kw-count" style="font-size:32px;font-weight:800;color:#0a5c36;">—</div>
-          <div id="dash-kw-top3" style="font-size:12px;color:#2ecc71;font-weight:600;margin-top:4px;">— in Top 3</div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">Click to view →</div>
-        </div>
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;cursor:pointer;" onclick="showPage('local',document.getElementById('nav-local'))">
-          <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">GMB Visibility</div>
-          <div id="dash-gmb-zones" style="font-size:32px;font-weight:800;color:#0a5c36;">—</div>
-          <div id="dash-gmb-zones-label" style="font-size:12px;color:#888;font-weight:600;margin-top:4px;">zones in top 10</div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">Click to view →</div>
-        </div>
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;cursor:pointer;" onclick="showPage('aivisibility',document.getElementById('nav-aivisibility'))">
-          <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">AI Visibility</div>
-          <div id="dash-ai-vis-score" style="font-size:32px;font-weight:800;color:#0a5c36;">—</div>
-          <div id="dash-ai-vis-label" style="font-size:12px;color:#888;font-weight:600;margin-top:4px;">/100 score</div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">Click to view →</div>
-        </div>
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;cursor:pointer;" onclick="showPage('gsc',document.getElementById('nav-gsc'))">
-          <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">GSC Clicks</div>
-          <div id="dash-gsc-clicks" style="font-size:32px;font-weight:800;color:#0a5c36;">—</div>
-          <div id="dash-gsc-label" style="font-size:12px;color:#888;font-weight:600;margin-top:4px;">last 28 days</div>
-          <div style="font-size:11px;color:#888;margin-top:6px;">Click to view →</div>
-        </div>
-      </div>
-
-      <!-- Position Distribution + Quick Wins side by side -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-
-        <!-- Position Distribution -->
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
-          <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:16px;">📊 Position Distribution</div>
-          <div id="dash-pos-dist" style="display:flex;flex-direction:column;gap:8px;">
-            <div style="color:#888;font-size:13px;">Loading...</div>
-          </div>
-        </div>
-
-        <!-- Quick Wins -->
-        <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;">
-          <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:4px;">⚡ Quick Wins</div>
-          <div style="font-size:12px;color:#888;margin-bottom:12px;">Keywords in pos 4-20 — easy to push to top 3</div>
-          <div id="dash-quick-wins" style="display:flex;flex-direction:column;gap:8px;">
-            <div style="color:#888;font-size:13px;">Loading...</div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Top Keywords Table -->
-      <div style="background:#fff;border:1.5px solid #d4f5e2;border-radius:14px;padding:20px;margin-bottom:24px;">
-        <div style="font-size:14px;font-weight:700;color:#0a5c36;margin-bottom:16px;">🔑 Top Keywords Status</div>
-        <div id="dash-kw-table" style="overflow-x:auto;">
-          <div style="color:#888;font-size:13px;">Loading...</div>
-        </div>
-      </div>
-
-    </div>
-
     <div id="page-ranktracker">
       <div class="page-header">
         <div><div class="page-title">📊 Rank Tracker</div><div class="page-subtitle">Track keywords + AI-powered bulk audits</div></div>
@@ -2514,7 +2405,7 @@ async function runAI(){
   catch(e){out.innerHTML='<div style="color:#e74c3c;padding:12px;">❌ Error: '+e.message+'</div>';}
 }
 function watchdogInvestigate(keyword){
-  showPage('dashboard', document.getElementById('nav-dashboard'));
+  showPage('ranktracker', document.getElementById('nav-ranktracker'));
   setTimeout(function(){
     // Get URL from gscDataFull (now includes page dimension)
     var url = '';
@@ -2884,188 +2775,6 @@ async function loadCompSettings(){
     const doc = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
     return doc.exists ? doc.data() : {};
   } catch(e){ return {}; }
-}
-
-/* ══════════════════════════════
-   DASHBOARD
-══════════════════════════════ */
-async function loadDashboard(){
-  const companyId = getCurrentCompanyId();
-  const user = firebase.auth().currentUser;
-  if(!user || !companyId) return;
-
-  const settings = await loadCompSettings();
-  const bizName = settings.name || 'Your Business';
-  document.getElementById('dashboard-subtitle').textContent = bizName + ' — ' + new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
-
-  // ── Load website keywords ──
-  try {
-    const kwSnap = await db.collection('users').doc(user.uid).collection('companies').doc(companyId).collection('keywords').get();
-    const kws = kwSnap.docs.map(d=>d.data());
-    const total = kws.length;
-    const top3 = kws.filter(k=>k.currentRank && k.currentRank <= 3).length;
-    const top10 = kws.filter(k=>k.currentRank && k.currentRank > 3 && k.currentRank <= 10).length;
-    const top30 = kws.filter(k=>k.currentRank && k.currentRank > 10 && k.currentRank <= 30).length;
-    const beyond = kws.filter(k=>!k.currentRank || k.currentRank > 30).length;
-    const totalClicks = kws.reduce((s,k)=>s+(k.clicks||0),0);
-
-    document.getElementById('dash-kw-count').textContent = total;
-    document.getElementById('dash-kw-top3').textContent = top3 + ' in Top 3';
-    document.getElementById('dash-gsc-clicks').textContent = totalClicks.toLocaleString();
-
-    // Position distribution
-    const distEl = document.getElementById('dash-pos-dist');
-    const bars = [
-      {label:'Top 3', count:top3, total, color:'#2ecc71'},
-      {label:'Pos 4-10', count:top10, total, color:'#f39c12'},
-      {label:'Pos 11-30', count:top30, total, color:'#e67e22'},
-      {label:'Pos 30+', count:beyond, total, color:'#e74c3c'}
-    ];
-    distEl.innerHTML = bars.map(b=>{
-      const pct = total > 0 ? Math.round((b.count/total)*100) : 0;
-      return '<div>'+
-        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">'+
-          '<span style="color:#555;font-weight:600;">'+b.label+'</span>'+
-          '<span style="color:'+b.color+';font-weight:700;">'+b.count+' ('+pct+'%)</span>'+
-        '</div>'+
-        '<div style="background:#f0f0f0;border-radius:4px;height:8px;overflow:hidden;">'+
-          '<div style="width:'+pct+'%;height:100%;background:'+b.color+';border-radius:4px;transition:width 0.5s;"></div>'+
-        '</div>'+
-      '</div>';
-    }).join('');
-
-    // Quick wins — pos 4-20
-    const quickWins = kws.filter(k=>k.currentRank && k.currentRank >= 4 && k.currentRank <= 20)
-      .sort((a,b)=>a.currentRank - b.currentRank).slice(0,5);
-    const qwEl = document.getElementById('dash-quick-wins');
-    if(quickWins.length){
-      qwEl.innerHTML = quickWins.map(k=>
-        '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#f0fdf6;border-radius:8px;cursor:pointer;" onclick="showPage('ranktracker',document.getElementById('nav-ranktracker'))">'+
-          '<div style="width:32px;height:32px;border-radius:8px;background:'+(k.currentRank<=5?'#2ecc71':k.currentRank<=10?'#f39c12':'#e67e22')+';color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;">#'+k.currentRank+'</div>'+
-          '<div style="flex:1;font-size:13px;color:#333;font-weight:500;">'+k.keyword+'</div>'+
-          '<div style="font-size:11px;color:#2ecc71;font-weight:700;">Push to Top 3 →</div>'+
-        '</div>'
-      ).join('');
-    } else {
-      qwEl.innerHTML = '<div style="color:#888;font-size:13px;padding:10px;">No quick wins found — add more keywords</div>';
-    }
-
-    // Top keywords table
-    const topKws = kws.filter(k=>k.currentRank).sort((a,b)=>a.currentRank-b.currentRank).slice(0,8);
-    const tableEl = document.getElementById('dash-kw-table');
-    if(topKws.length){
-      tableEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'+
-        '<thead><tr style="background:#f0fdf6;">'+
-          '<th style="padding:10px 12px;text-align:left;font-size:11px;color:#0a5c36;font-weight:700;text-transform:uppercase;">Keyword</th>'+
-          '<th style="padding:10px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;text-transform:uppercase;">Position</th>'+
-          '<th style="padding:10px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;text-transform:uppercase;">Change</th>'+
-          '<th style="padding:10px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;text-transform:uppercase;">Clicks</th>'+
-        '</tr></thead><tbody>'+
-        topKws.map((k,i)=>{
-          const change = k.previousRank && k.currentRank ? k.previousRank - k.currentRank : 0;
-          const posColor = k.currentRank<=3?'#2ecc71':k.currentRank<=10?'#f39c12':k.currentRank<=30?'#e67e22':'#e74c3c';
-          const changeHtml = change>0?'<span style="color:#2ecc71;font-weight:700;">▲ '+change+'</span>':change<0?'<span style="color:#e74c3c;font-weight:700;">▼ '+Math.abs(change)+'</span>':'<span style="color:#888;">—</span>';
-          return '<tr style="border-bottom:1px solid #f0f0f0;'+(i%2===0?'background:#fff':'background:#fafafa')+'">' +
-            '<td style="padding:10px 12px;font-size:13px;color:#222;font-weight:500;">'+k.keyword+'</td>'+
-            '<td style="padding:10px 12px;text-align:center;"><span style="background:'+posColor+';color:#fff;border-radius:6px;padding:3px 10px;font-weight:700;font-size:13px;">#'+k.currentRank+'</span></td>'+
-            '<td style="padding:10px 12px;text-align:center;">'+changeHtml+'</td>'+
-            '<td style="padding:10px 12px;text-align:center;font-size:13px;color:#1a73e8;font-weight:600;">'+(k.clicks||'—')+'</td>'+
-          '</tr>';
-        }).join('')+
-        '</tbody></table>';
-    }
-
-    // Website SEO score
-    const websiteScore = Math.round(Math.min(100, (top3/Math.max(total,1))*40 + (top10/Math.max(total,1))*30 + Math.min(total/20,1)*30));
-    document.getElementById('dash-website-score').textContent = websiteScore;
-
-    // Store for overall
-    window._dashWebsiteScore = websiteScore;
-    updateOverallScore();
-
-  } catch(e){ console.log('Dashboard kw error:', e); }
-
-  // ── Load GMB data ──
-  try {
-    const gmbSnap = await db.collection('users').doc(user.uid).collection('companies').doc(companyId).collection('locationKeywords').get();
-    const gmbKws = gmbSnap.docs.map(d=>d.data());
-    const gmbTop10 = gmbKws.filter(k=>k.currentRank && k.currentRank <= 10).length;
-    document.getElementById('dash-gmb-zones').textContent = gmbTop10;
-    const gmbScore = Math.round(Math.min(100, (gmbTop10/Math.max(gmbKws.length,1))*60 + (settings.gmbDescription?20:0) + Math.min((parseInt(settings.gmbReviews)||0)/50,1)*20));
-    document.getElementById('dash-gmb-score').textContent = gmbScore;
-    window._dashGmbScore = gmbScore;
-    updateOverallScore();
-  } catch(e){ console.log('Dashboard gmb error:', e); }
-
-  // ── Load AI Visibility score ──
-  try {
-    const aiSnap = await db.collection('users').doc(user.uid).collection('companies').doc(companyId).collection('aivisibility').orderBy('checkedAt','desc').limit(1).get();
-    if(!aiSnap.empty){
-      const aiData = aiSnap.docs[0].data();
-      const aiScore = aiData.results?.score || aiData.score || 0;
-      document.getElementById('dash-ai-vis-score').textContent = aiScore;
-      document.getElementById('dash-ai-score').textContent = aiScore;
-      document.getElementById('dash-ai-vis-label').textContent = '/100 — last checked '+new Date(aiData.checkedAt?.seconds*1000||Date.now()).toLocaleDateString('en-IN');
-      window._dashAiScore = aiScore;
-      updateOverallScore();
-    } else {
-      document.getElementById('dash-ai-vis-score').textContent = '—';
-      document.getElementById('dash-ai-score').textContent = '—';
-      document.getElementById('dash-ai-vis-label').textContent = 'Not checked yet';
-    }
-  } catch(e){ console.log('Dashboard ai error:', e); }
-
-  // ── Generate Today Actions ──
-  generateDashboardActions(settings);
-}
-
-function updateOverallScore(){
-  const ws = window._dashWebsiteScore || 0;
-  const gs = window._dashGmbScore || 0;
-  const as = window._dashAiScore || 0;
-  const count = (ws?1:0)+(gs?1:0)+(as?1:0);
-  if(!count) return;
-  const overall = Math.round((ws + gs + (as||50)) / 3);
-  const el = document.getElementById('dash-overall-score');
-  const lbl = document.getElementById('dash-overall-label');
-  if(el) el.textContent = overall;
-  if(lbl) lbl.textContent = overall>=70?'Good — keep improving!':overall>=40?'Fair — several areas need attention':'Needs work — focus on quick wins first';
-}
-
-function generateDashboardActions(settings){
-  const el = document.getElementById('dash-actions');
-  const actions = [];
-
-  // Check keywords
-  const kws = window._dashKws || [];
-  const hasLowRank = kws.some(k=>k.currentRank && k.currentRank > 20);
-  if(hasLowRank) actions.push({priority:'HIGH', color:'#e74c3c', icon:'📉', text:'You have keywords ranking below #20 — click AI button next to each keyword for specific fix', link:'ranktracker'});
-
-  // Check GMB description
-  if(!settings.gmbDescription) actions.push({priority:'HIGH', color:'#e74c3c', icon:'📝', text:'Add your GMB description in Settings → AI will analyze and improve it for you', link:'settings'});
-
-  // Check AI visibility
-  if(!window._dashAiScore) actions.push({priority:'MEDIUM', color:'#f39c12', icon:'🤖', text:'Run AI Visibility check to see if you appear on ChatGPT and Gemini', link:'aivisibility'});
-
-  // Check reviews
-  const reviews = parseInt(settings.gmbReviews)||0;
-  if(reviews < 25) actions.push({priority:'HIGH', color:'#e74c3c', icon:'⭐', text:'You need more Google reviews — ask your last 3 clients today. Reviews are #1 GMB ranking factor', link:'local'});
-
-  // Default actions
-  actions.push({priority:'MEDIUM', color:'#f39c12', icon:'📸', text:'Post a project photo on Google Business Profile today — active profiles rank higher', link:'local'});
-  actions.push({priority:'LOW', color:'#2ecc71', icon:'🔗', text:'Sync Google Search Console to see your latest keyword impressions and clicks', link:'gsc'});
-
-  const top3 = actions.slice(0,3);
-  el.innerHTML = top3.map((a,i)=>
-    '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:'+(i===0?'#fff3f3':i===1?'#fff8f0':'#f0fdf6')+';border-radius:10px;border-left:4px solid '+a.color+';cursor:pointer;" onclick="showPage(''+a.link+'',document.getElementById('nav-'+a.link+''))">'+
-      '<div style="font-size:20px;">'+a.icon+'</div>'+
-      '<div style="flex:1;">'+
-        '<div style="font-size:11px;font-weight:700;color:'+a.color+';margin-bottom:3px;">'+a.priority+' PRIORITY</div>'+
-        '<div style="font-size:13px;color:#333;line-height:1.5;">'+a.text+'</div>'+
-      '</div>'+
-      '<div style="font-size:11px;color:#888;white-space:nowrap;">→</div>'+
-    '</div>'
-  ).join('');
 }
 
 // Auto-open parent if child page is active
@@ -3448,7 +3157,6 @@ function showPage(page,el){
   if(el)el.classList.add('active');
   if(window.innerWidth<=768)closeSidebar();
   if(page==='settings'){loadCompanySettings();loadAIKeyStatuses();}
-  if(page==='dashboard'){loadDashboard();}
   if(page==='charts')renderChartsPage();
   if(page==='gsc'&&gscAccessToken&&gscDataFull.length)renderGSCTable(gscDataView);
   if(page==='watchdog') runWatchdog();
