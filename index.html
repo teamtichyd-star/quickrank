@@ -3231,6 +3231,180 @@ function generateDashboardActions(settings){
   ).join('');
 }
 
+/* ══════════════════════════════
+   GMB HEALTH CHECKER
+══════════════════════════════ */
+async function runGMBHealthCheck(){
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  const settings = await loadCompSettings();
+  const companyId = getCurrentCompanyId();
+
+  const scoreEl = document.getElementById('gmb-health-score');
+  const labelEl = document.getElementById('gmb-health-label');
+  if(scoreEl) scoreEl.textContent = '...';
+  if(labelEl) labelEl.textContent = 'Checking...';
+
+  let reviewScore = 0, profileScore = 0, activityScore = 0;
+
+  // ── Reviews Score (0-40) ──
+  const reviewCount = parseInt(settings.gmbReviews) || 0;
+  const rating = parseFloat(settings.gmbRating) || 0;
+  reviewScore = Math.min(40, Math.round((reviewCount/50)*25 + (rating/5)*15));
+  const reviewsEl = document.getElementById('gmb-reviews-content');
+  if(reviewsEl){
+    const reviewColor = reviewCount>=50?'#2ecc71':reviewCount>=20?'#f39c12':'#e74c3c';
+    reviewsEl.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
+        '<div style="font-size:32px;font-weight:800;color:'+reviewColor+';">'+reviewCount+'</div>'+
+        '<div><div style="font-size:13px;font-weight:600;color:#333;">Google Reviews</div>'+
+        '<div style="font-size:12px;color:#888;">'+rating+' ★ rating</div></div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:#555;background:#f8f8f8;border-radius:8px;padding:10px;">'+
+        (reviewCount<25?'<span style="color:#e74c3c;font-weight:600;">⚠ Need 25+ reviews to compete</span><br>Ask your last 3 clients for a review today.':
+         reviewCount<50?'<span style="color:#f39c12;font-weight:600;">📈 Good — aim for 50+ reviews</span><br>Send review requests weekly.':
+         '<span style="color:#2ecc71;font-weight:600;">✅ Strong review count</span><br>Keep responding to all reviews.')+
+      '</div>';
+  }
+  const reviewsScoreEl = document.getElementById('gmb-score-reviews');
+  if(reviewsScoreEl) reviewsScoreEl.textContent = reviewScore;
+
+  // ── Profile Completeness Score (0-35) ──
+  const checks = [
+    {label:'Business Name', done: !!settings.gmbName},
+    {label:'Address', done: !!settings.gmbAddress},
+    {label:'Description', done: !!settings.gmbDescription && settings.gmbDescription.length > 50},
+    {label:'Website', done: !!settings.website},
+    {label:'Services listed', done: !!settings.services && settings.services.length > 10},
+    {label:'GMB Place ID', done: !!settings.gmbPlaceId},
+    {label:'Target Areas', done: !!settings.targetAreas && settings.targetAreas.length > 5}
+  ];
+  const doneCnt = checks.filter(c=>c.done).length;
+  profileScore = Math.round((doneCnt/checks.length)*35);
+  const profileEl = document.getElementById('gmb-profile-content');
+  if(profileEl){
+    profileEl.innerHTML = checks.map(c=>
+      '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f5f5f5;">'+
+        '<span style="font-size:14px;">'+(c.done?'✅':'❌')+'</span>'+
+        '<span style="font-size:13px;color:'+(c.done?'#333':'#e74c3c')+';font-weight:'+(c.done?'400':'600')+';">'+c.label+'</span>'+
+      '</div>'
+    ).join('')+
+    '<div style="margin-top:10px;font-size:12px;color:#888;">'+doneCnt+'/'+checks.length+' items complete</div>';
+  }
+  const profileScoreEl = document.getElementById('gmb-score-profile');
+  if(profileScoreEl) profileScoreEl.textContent = profileScore;
+
+  // ── Activity Score (0-25) ──
+  activityScore = 15;
+  const activityEl = document.getElementById('gmb-activity-content');
+  if(activityEl){
+    activityEl.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:8px;">'+
+        '<div style="padding:10px;background:#fff8f0;border-radius:8px;border-left:3px solid #f39c12;">'+
+          '<div style="font-size:12px;font-weight:700;color:#b8860b;">📸 Photos</div>'+
+          '<div style="font-size:12px;color:#666;margin-top:3px;">Add a new project photo today — businesses with recent photos get 42% more direction requests</div>'+
+        '</div>'+
+        '<div style="padding:10px;background:#fff8f0;border-radius:8px;border-left:3px solid #f39c12;">'+
+          '<div style="font-size:12px;font-weight:700;color:#b8860b;">📝 GMB Posts</div>'+
+          '<div style="font-size:12px;color:#666;margin-top:3px;">Post weekly updates — share completed projects, offers or tips to stay active</div>'+
+        '</div>'+
+        '<div style="padding:10px;background:#f0fdf6;border-radius:8px;border-left:3px solid #2ecc71;">'+
+          '<div style="font-size:12px;font-weight:700;color:#0a5c36;">💬 Review Responses</div>'+
+          '<div style="font-size:12px;color:#666;margin-top:3px;">Respond to all reviews within 24 hours — shows Google your profile is active</div>'+
+        '</div>'+
+      '</div>';
+  }
+  const activityScoreEl = document.getElementById('gmb-score-activity');
+  if(activityScoreEl) activityScoreEl.textContent = activityScore;
+
+  // ── Competitor Comparison (Places API) ──
+  const compEl = document.getElementById('gmb-competitor-content');
+  const apiKey = settings.googlePlacesKey || window.PLACES_API_KEY;
+  const lat = settings.gmbLat || 17.4506074;
+  const lng = settings.gmbLng || 78.3624082;
+  const industry = settings.industry || 'interior contractors';
+  const city = settings.city || '';
+
+  if(apiKey && lat && lng && compEl){
+    compEl.innerHTML = '<div style="color:#888;font-size:13px;">Loading competitor data...</div>';
+    try {
+      const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='+lat+','+lng+'&radius=5000&keyword='+encodeURIComponent(industry)+'&key='+apiKey;
+      const resp = await fetch('https://corsproxy.io/?'+encodeURIComponent(url));
+      const data = await resp.json();
+      const results = (data.results||[]).slice(0,5);
+      if(results.length){
+        const myName = (settings.gmbName||'').toLowerCase();
+        compEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'+
+          '<thead><tr style="background:#f0fdf6;">'+
+            '<th style="padding:8px 12px;text-align:left;font-size:11px;color:#0a5c36;font-weight:700;">Business</th>'+
+            '<th style="padding:8px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;">Rating</th>'+
+            '<th style="padding:8px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;">Reviews</th>'+
+            '<th style="padding:8px 12px;text-align:center;font-size:11px;color:#0a5c36;font-weight:700;">Status</th>'+
+          '</tr></thead><tbody>'+
+          results.map((r,i)=>{
+            const isMe = r.name.toLowerCase().includes(myName.split(' ')[0]||'tic');
+            const rating = r.rating||'—';
+            const reviews = r.user_ratings_total||0;
+            const ratingColor = rating>=4.5?'#2ecc71':rating>=4?'#f39c12':'#e74c3c';
+            return '<tr style="border-bottom:1px solid #f0f0f0;background:'+(isMe?'#f0fdf6':i%2===0?'#fff':'#fafafa')+'">' +
+              '<td style="padding:10px 12px;font-size:13px;font-weight:'+(isMe?'700':'400')+';color:'+(isMe?'#0a5c36':'#333')+'">'+(isMe?'👑 ':'')+r.name+'</td>'+
+              '<td style="padding:10px 12px;text-align:center;"><span style="color:'+ratingColor+';font-weight:700;">'+rating+' ★</span></td>'+
+              '<td style="padding:10px 12px;text-align:center;font-size:13px;font-weight:600;">'+reviews+'</td>'+
+              '<td style="padding:10px 12px;text-align:center;"><span style="font-size:11px;background:'+(r.opening_hours?.open_now?'#d4f5e2':'#fde8e8')+';color:'+(r.opening_hours?.open_now?'#0a5c36':'#e74c3c')+';border-radius:4px;padding:2px 8px;font-weight:600;">'+(r.opening_hours?.open_now?'Open':'Closed')+'</span></td>'+
+            '</tr>';
+          }).join('')+
+          '</tbody></table>';
+      } else {
+        compEl.innerHTML = '<div style="color:#888;font-size:13px;padding:10px;">No competitor data found — check your Places API key in Settings</div>';
+      }
+    } catch(e){
+      compEl.innerHTML = '<div style="color:#888;font-size:13px;padding:10px;">Could not load competitor data. Check Places API key.</div>';
+    }
+  } else {
+    if(compEl) compEl.innerHTML = '<div style="color:#888;font-size:13px;padding:10px;">Add Google Places API key in Settings to see competitor data</div>';
+  }
+
+  // ── Overall Score ──
+  const total = reviewScore + profileScore + activityScore;
+  if(scoreEl) scoreEl.textContent = total;
+  if(labelEl) labelEl.textContent = total>=70?'Good GMB Health — keep it up!':total>=40?'Fair — fix the red items above':'Needs work — focus on reviews and profile first';
+
+  // ── AI Fix Recommendations ──
+  const aiEl = document.getElementById('gmb-ai-fixes');
+  if(aiEl){
+    aiEl.innerHTML = '<div style="color:#888;font-size:13px;">Generating AI recommendations...</div>';
+    const keys = await loadAIKeys();
+    const weakAreas = [];
+    if(reviewScore < 20) weakAreas.push('low review count ('+reviewCount+' reviews)');
+    if(profileScore < 25) weakAreas.push('incomplete profile ('+doneCnt+'/'+checks.length+' items)');
+    if(!settings.gmbDescription) weakAreas.push('missing GMB description');
+    if(!settings.services) weakAreas.push('no services listed');
+
+    const prompt = 'You are a Google Business Profile expert for '+settings.name+' in '+settings.city+'. GMB Health Score: '+total+'/100. Weak areas: '+weakAreas.join(', ')+'. Give exactly 3 specific copy-paste ready actions to improve GMB ranking. Each action must have a title and exact text to copy-paste. Format: ACTION 1: [title] | COPY: [exact text]. Keep each copy text under 100 words.';
+    try {
+      const resp = await callAI('auto', prompt, keys);
+      const actions = resp.split(/ACTION \d+:/i).filter(s=>s.trim());
+      if(actions.length){
+        aiEl.innerHTML = actions.slice(0,3).map((a,i)=>{
+          const parts = a.split(/COPY:/i);
+          const title = parts[0].trim().replace(/\|/g,'').trim();
+          const copy = parts[1]?parts[1].trim():'';
+          return '<div style="background:'+(i===0?'#fff3f3':i===1?'#fff8f0':'#f0fdf6')+';border-radius:10px;padding:16px;margin-bottom:12px;border-left:4px solid '+(i===0?'#e74c3c':i===1?'#f39c12':'#2ecc71')+';">'+
+            '<div style="font-size:13px;font-weight:700;color:#333;margin-bottom:8px;">'+(i+1)+'. '+title+'</div>'+
+            (copy?'<div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:10px;font-size:12px;color:#555;line-height:1.5;margin-bottom:8px;">'+copy+'</div>'+
+            '<button onclick="navigator.clipboard.writeText('+JSON.stringify(copy)+').then(()=>showToast('Copied ✅'))" style="background:#0a5c36;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">📋 Copy</button>':'')+'</div>';
+        }).join('');
+      } else {
+        aiEl.innerHTML = '<div style="color:#888;font-size:13px;">Could not generate recommendations — check your AI key in Settings</div>';
+      }
+    } catch(e){
+      aiEl.innerHTML = '<div style="color:#888;font-size:13px;">AI error: '+e.message+'</div>';
+    }
+  }
+
+  showToast('GMB Health Check complete ✅');
+}
+
 // Auto-open parent if child page is active
 function openParentIfChild(pageId){
   const childToParent = { ranktracker: 'ranktracker', local: 'ranktracker' };
@@ -4016,6 +4190,9 @@ function switchGMBTab(n) {
     document.getElementById('gmb-tab-overview').style.display = 'block';
     document.getElementById('gmb-tab-1').style.display = 'none';
     loadLocationOverview();
+  } else if(n === 'health') {
+    const ht = document.getElementById('gmb-health-tab');
+    if(ht) ht.style.display = 'block';
   } else {
     const tab = document.getElementById('gmb-tab-' + n);
     if(tab) tab.style.display = 'block';
@@ -4033,7 +4210,7 @@ function switchGMBTab(n) {
   const btns = document.querySelectorAll('.gmb-tab-btn');
   btns.forEach(b => {
     const onclick = b.getAttribute('onclick') || '';
-    if((n === 'overview' && onclick.includes("'overview'")) || (n !== 'overview' && onclick.includes('(' + n + ')'))) {
+    if((n === 'overview' && onclick.includes("'overview'")) || (n === 'health' && onclick.includes("'health'")) || (n !== 'overview' && n !== 'health' && onclick.includes('(' + n + ')'))) {
       b.style.background = '#2ecc71';
       b.style.color = '#fff';
       b.style.borderColor = '#2ecc71';
