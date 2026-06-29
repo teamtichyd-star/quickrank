@@ -1601,12 +1601,12 @@ function loadKeywords(){
 ══════════════════════════════ */
 function renderKeywords(kwList){
   const body=document.getElementById('keywordsBody');
+  updateRankTrackerStats(kwList);
+  if(!body) return;
   if(!kwList.length){
     body.innerHTML=`<tr><td colspan="9"><div class="empty-state"><h3>No keywords yet</h3><p>Add keywords or sync Google Search Console</p></div></td></tr>`;
     return;
   }
-  // Update stat cards if visible
-  updateRankTrackerStats(kwList);
   body.innerHTML=kwList.map(k=>{
     const pos=k.position;
     const rankClass=!pos?'rank-none':pos<=3?'rank-top3':pos<=10?'rank-top10':pos<=20?'rank-top20':'rank-low';
