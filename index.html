@@ -3035,13 +3035,7 @@ async function analyzeGMBDescription(){
   }
 }
 
-async function loadCompSettings(){
-  if(!currentUser||!currentCompanyId) return {};
-  try {
-    const doc = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
-    return doc.exists ? doc.data() : {};
-  } catch(e){ return {}; }
-}
+// loadCompSettings defined below (line ~3912)
 
 /* ══════════════════════════════
    DASHBOARD
