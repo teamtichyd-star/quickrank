@@ -3977,7 +3977,7 @@ async function loadLocationOverview() {
                 const u = firebase.auth().currentUser;
                 const cid = getCurrentCompanyId();
                 if(u && cid && fetchedReviews > 0){
-                  await db.collection('users').doc(u.uid).collection('companies').doc(cid).collection('settings').doc('fields').update({
+                  await db.collection('users').doc(u.uid).collection('companies').doc(cid).update({
                     gmbReviews: String(fetchedReviews),
                     gmbRating: String(fetchedRating)
                   });
