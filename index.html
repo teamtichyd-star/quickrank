@@ -3317,7 +3317,7 @@ async function runGMBHealthCheck(){
 
   // ── Competitor Comparison (Places API) ──
   const compEl = document.getElementById('gmb-competitor-content');
-  const apiKey = settings.googlePlacesKey || window.PLACES_API_KEY;
+  const apiKey = settings.googlePlacesKey;
   const lat = settings.gmbLat || 17.4506074;
   const lng = settings.gmbLng || 78.3624082;
   const industry = settings.industry || 'interior contractors';
@@ -3801,7 +3801,11 @@ async function loadCompetitors() {
   if (!kw) return showToast('Enter a keyword first', true);
   const settings = await loadCompSettings();
   if (!settings || !settings.gmbLat || !settings.gmbLng) return showToast('Set GMB Lat/Lng in Settings first', true);
-  if (!settings.googlePlacesKey) return showToast('Add Google Places API key in Settings', true);
+  if (!settings.googlePlacesKey) {
+    showToast('Add your Google Places API key in Settings to use GMB features', true);
+    setTimeout(()=>showPage('settings', document.getElementById('nav-settings')), 1500);
+    return;
+  }
   document.getElementById('comp-empty').style.display = 'none';
   document.getElementById('comp-results').style.display = 'none';
   document.getElementById('comp-loading').style.display = 'block';
