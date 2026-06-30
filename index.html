@@ -2765,6 +2765,23 @@ async function runAI(){
     const keys=await loadAIKeys();
     const compSettings = await loadCompSettings();
     let compData = window._lastCompetitorData || null;
+    // Inject verified business data into competitor block
+    var _kwRow = null;
+    if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
+      _kwRow = gscDataFull.find(function(k){ return k.keyword === currentAiKeyword; });
+    }
+    var _pos = _kwRow ? Math.round(_kwRow.position||0) : 0;
+    var _gmbOk = compSettings && compSettings.gmbPlaceId ? true : false;
+    var _gmbRev = compSettings ? (compSettings.gmbReviews||0) : 0;
+    var _gmbRat = compSettings ? (compSettings.gmbRating||0) : 0;
+    var _site = compSettings ? (compSettings.website||'') : '';
+    var _bizCtx = '\n=== VERIFIED BUSINESS DATA ===\n'
+      + 'Website: ' + _site + '\n'
+      + 'GSC Rank for this keyword: ' + (_pos > 0 ? '#' + _pos : 'not tracked') + '\n'
+      + 'GMB Status: ' + (_gmbOk ? 'ALREADY SET UP - ' + _gmbRev + ' reviews, ' + _gmbRat + ' stars. DO NOT suggest claiming or creating GMB.' : 'not configured') + '\n'
+      + 'IMPORTANT: Find ' + _site + ' in the Google results below to confirm actual rank. Do not assume #1.\n'
+      + '=== END VERIFIED DATA ===\n';
+    compData = _bizCtx + (compData || '');
     // Fetch real SERP data via Serper if available
     const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
     if(serpData){
