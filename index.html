@@ -1590,14 +1590,10 @@ async function loadCompanies(){
   const snap=await db.collection('users').doc(currentUser.uid).collection('companies').get();
   companies=snap.docs.map(d=>({id:d.id,...d.data()}));
   if(!companies.length){
-    await db.collection('users').doc(currentUser.uid).collection('companies').doc('sbis-tic').set({
-      name:'SBIS — TIC',website:'https://turnkeyinteriorcontractors.com',
-      gscProperty:'https://turnkeyinteriorcontractors.com/',
-      gmbName:'',
-      gmbAddress:'4 Jayabheri Enclave, Gachibowli, Hyderabad',
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    companies=[{id:'sbis-tic',name:'SBIS — TIC',website:'https://turnkeyinteriorcontractors.com',gscProperty:'https://turnkeyinteriorcontractors.com/'}];
+    // No companies — show add company prompt, do not create default
+    showPage('settings', document.getElementById('nav-settings'));
+    showToast('Welcome! Add your first business to get started.');
+    return;
   }
   currentCompanyId=companies[0].id;
   currentCompanyName=companies[0].name;
@@ -3387,7 +3383,8 @@ async function runGMBHealthCheck(){
 
     const prompt = 'You are a Google Business Profile expert for '+settings.name+' in '+settings.city+'. GMB Health Score: '+total+'/100. Weak areas: '+weakAreas.join(', ')+'. Give exactly 3 specific copy-paste ready actions to improve GMB ranking. Each action must have a title and exact text to copy-paste. Format: ACTION 1: [title] | COPY: [exact text]. Keep each copy text under 100 words.';
     try {
-      const resp = await callAI('auto', prompt, keys);
+      const rawResp = await callAI('auto', prompt, keys);
+      const resp = typeof rawResp === 'string' ? rawResp : (rawResp?.text || rawResp?.content || rawResp?.choices?.[0]?.message?.content || JSON.stringify(rawResp));
       const actions = resp.split(/ACTION \d+:/i).filter(s=>s.trim());
       if(actions.length){
         aiEl.innerHTML = actions.slice(0,3).map((a,i)=>{
