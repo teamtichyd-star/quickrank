@@ -3500,7 +3500,8 @@ async function autoFindURLs(){
       if(bestScore < 2) bestUrl = '';
     }
     const confColor = confidence==='saved'?'#1a73e8':confidence==='high'?'#2ecc71':confidence==='medium'?'#f39c12':'#e74c3c';
-    const confLabel = confidence==='saved'?'✅ Already saved':confidence==='high'?'✅ High confidence':confidence==='medium'?'⚠ Medium — verify':'❌ No match — enter manually';
+    const confLabel = confidence==='saved'?'Already saved':confidence==='high'?'High confidence match':confidence==='medium'?'Medium match - verify':'No match - enter manually';
+    const borderColor = confidence==='saved'?'#d4f5e2':bestScore>=4?'#d4f5e2':bestScore>=2?'#fde68a':'#fecaca';
     return '<tr style="border-bottom:1px solid #f0f0f0;">'+
       '<td style="padding:8px 10px;font-size:13px;color:#333;font-weight:500;min-width:180px;">'+
         k.keyword+
