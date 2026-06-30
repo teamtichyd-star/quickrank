@@ -1786,7 +1786,7 @@ function renderKeywords(kwList){
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
           <button class="update-rank-btn" onclick="openUpdateRank('${k.id}','${k.keyword.replace(/'/g,"\\'")}',${pos||0})">📍 Update</button>
           <button class="chart-btn" onclick="openHistoryModal('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">📈 History</button>
-          <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}')">
+          <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}',${pos||0})">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>AI
           </button>
           <button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">🗑️</button>
