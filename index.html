@@ -3485,10 +3485,13 @@ async function autoFindURLs(){
       if(bestScore < 2) bestUrl = '';
     }
     return '<tr style="border-bottom:1px solid #f0f0f0;">'+
-      '<td style="padding:8px 10px;font-size:13px;color:#333;font-weight:500;min-width:200px;">'+k.keyword+'</td>'+
+      '<td style="padding:8px 10px;font-size:13px;color:#333;font-weight:500;min-width:180px;">'+
+        k.keyword+
+        '<div style="font-size:10px;color:'+confColor+';font-weight:600;margin-top:2px;">'+confLabel+'</div>'+
+      '</td>'+
       '<td style="padding:8px 10px;">'+
         '<input type="text" data-kwid="'+k.id+'" value="'+bestUrl+'" placeholder="'+website+'/page-url" '+
-        'style="width:100%;padding:6px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:12px;">'+
+        'style="width:100%;padding:6px 10px;border:1.5px solid '+(bestScore>=4?'#d4f5e2':bestScore>=2?'#fde68a':'#fecaca')+';border-radius:6px;font-size:12px;">'+
       '</td>'+
     '</tr>';
   }).join('');
