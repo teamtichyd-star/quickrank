@@ -2638,7 +2638,112 @@ async function callAI(provider,prompt,keys){
   }
   throw new Error(`All AI providers failed. Last error: ${lastErr}`);
 }
-function buildPrompt(keyword,url,pageData,mode,compSettings,competitorData,kwData){\n  const bizName=compSettings?(compSettings.name||'the business'):'the business';\n  const bizCity=compSettings?(compSettings.city||''):'';\n  const bizIndustry=compSettings?(compSettings.industry||''):'';\n  const bizServices=compSettings?(compSettings.services||''):'';\n  const bizWebsite=compSettings?(compSettings.website||url||''):(url||'');\n  const gmbReviews=compSettings?(compSettings.gmbReviews||0):0;\n  const gmbRating=compSettings?(compSettings.gmbRating||0):0;\n  const gmbPlaceId=compSettings?(compSettings.gmbPlaceId||''):'';\n  const currentPos=kwData?Math.round(kwData.position||0):0;\n  const kwClicks=kwData?(kwData.clicks||0):0;\n  const kwImpressions=kwData?(kwData.impressions||0):0;\n  const kwCTR=kwData?((kwData.ctr||0)*100).toFixed(1):'0';\n  const kwChange=kwData?(kwData.change||0):0;\n  const trendLabel=kwChange>0?'Rising (+'+kwChange+' positions)':kwChange<0?'Falling ('+kwChange+' positions)':'Stable';\n  const gmbBlock=gmbPlaceId\n    ?'GMB: ALREADY SET UP. Reviews: '+gmbReviews+' reviews, '+gmbRating+' stars. DO NOT suggest claiming or creating GMB. Only suggest improvement actions.'\n    :'GMB: Not configured yet — setup is priority #1.';\n  const posBlock=currentPos>0\n    ?'GSC Verified Position: #'+currentPos+' ('+trendLabel+'). Clicks: '+kwClicks+' | Impressions: '+kwImpressions+' | CTR: '+kwCTR+'%'\n    :'Position: Not yet verified in GSC.';\n  let pp='';\n  if(pageData){\n    const kwCount=pageData.bodyText?(pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length-1):0;\n    const kwDensity=pageData.wordCount>0?((kwCount/pageData.wordCount)*100).toFixed(2):'0';\n    const titleSt=pageData.titleLen===0?'MISSING':pageData.titleLen<30?'TOO SHORT':pageData.titleLen>60?'TOO LONG':'OK';\n    const metaSt=pageData.metaDescLen===0?'MISSING':pageData.metaDescLen<120?'TOO SHORT':pageData.metaDescLen>160?'TOO LONG':'OK';\n    const wcSt=pageData.wordCount<500?'TOO THIN':pageData.wordCount<1000?'COULD BE LONGER':'GOOD';\n    const altSt=pageData.imgsNoAlt===0?'ALL IMAGES HAVE ALT TAGS - DO NOT FLAG THIS':'MISSING ALT ON '+pageData.imgsNoAlt+' images';\n    pp='ON-PAGE AUDIT for '+url+':\n'\n      +'Title: "'+pageData.title+'" ('+pageData.titleLen+' chars - '+titleSt+')\n'\n      +'Meta: "'+pageData.metaDesc+'" ('+pageData.metaDescLen+' chars - '+metaSt+')\n'\n      +'H1 ('+pageData.h1.length+'): '+(pageData.h1.join(' | ')||'NONE - CRITICAL')+'\n'\n      +'H2 ('+(pageData.h2?pageData.h2.length:0)+'): '+(pageData.h2?pageData.h2.slice(0,5).join(' | '):'None')+'\n'\n      +'Word Count: '+pageData.wordCount+' words - '+wcSt+'\n'\n      +'Keyword "'+keyword+'" appears: '+kwCount+' times (density: '+kwDensity+'%)\n'\n      +'Internal Links: '+pageData.internalLinks+' | External: '+pageData.externalLinks+'\n'\n      +'Images: '+altSt+'\n'\n      +'PAGE SAMPLE:\n'+(pageData.bodyText?pageData.bodyText.slice(0,600):'Not available');\n  } else {\n    pp=url?'URL: '+url+' (not fetched - keyword analysis only)':'No URL provided.';\n  }\n  let gscCtx='';\n  if(typeof gscDataFull!=='undefined'&&gscDataFull.length>0){\n    const row=gscDataFull.find(function(k){return k.keyword===keyword;});\n    if(row)gscCtx='\nGSC: Position #'+Math.round(row.position)+', Clicks='+row.clicks+', Impressions='+row.impressions+', CTR='+(row.ctr*100).toFixed(1)+'%';\n  }\n  const compBlock=competitorData?'\nREAL GOOGLE TOP 10 (live Serper):\n'+competitorData+'\n--- END SERP ---':'';\n  const baseCtx='BUSINESS CONTEXT:\n'\n    +'Name: '+bizName+'\n'\n    +'City: '+bizCity+'\n'\n    +'Industry: '+bizIndustry+'\n'\n    +'Services: '+bizServices+'\n'\n    +'Website: '+bizWebsite+'\n'\n    +gmbBlock+'\n'\n    +posBlock+'\n';\n  const altRule=pageData?(pageData.imgsNoAlt===0?'Images: ALL OK - do not mention image alt as an issue.':'Images: '+pageData.imgsNoAlt+' missing alt tags - flag this.'):'Image alt status unknown.';\n  const coreRules='\nCRITICAL RULES:\n'\n    +'1. Business website is: '+bizWebsite+'. Check SERP data to find its actual rank. Do NOT assume #1 unless it appears at position #1.\n'\n    +'2. GSC verified rank is #'+currentPos+'. Give advice to move from #'+currentPos+' to Top 3.\n'\n    +'3. '+gmbBlock+'\n'\n    +'4. '+altRule+'\n'\n    +'5. Use ONLY real data. No invented facts.\n'\n    +'6. Name competitors from SERP data specifically (e.g. Justdial at #1).\n'\n    +'7. People Also Ask questions = content gaps. Suggest adding as page sections.\n';\n  const modes={\n    general:'You are an expert SEO consultant. Give SPECIFIC advice based on real data only.\n\n'\n      +baseCtx+'\nKEYWORD: "'+keyword+'"\n\n'+pp+gscCtx+compBlock+coreRules\n      +'\n**Assessment**\n(cite real numbers: position #'+currentPos+', CTR '+kwCTR+'%, competitors by name)\n\n'\n      +'**Top 5 Quick Wins** (copy-paste ready)\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Content Recommendations**\n1.\n2.\n3.\n\n'\n      +'**Technical Issues**\n(only flag real issues found in audit data)\n1.\n2.\n3.\n\n'\n      +'**Local SEO Actions**\n(improvement only if GMB already configured)\n1.\n2.\n3.\n\n'\n      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',\n    local:'You are a Local SEO expert for '+bizCity+'. Give SPECIFIC local advice.\n\n'\n      +baseCtx+'\nKEYWORD: "'+keyword+'"\n\n'+pp+gscCtx+compBlock+coreRules\n      +'\n**GMB Optimization** (improvement only - already set up with '+gmbReviews+' reviews)\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Local Citations** (specific Indian directories)\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Location Keywords**\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Map Pack Strategy**\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Review Campaign**\n(exact WhatsApp template - currently '+gmbReviews+' reviews, target '+(gmbReviews*2+10)+')\n\n'\n      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',\n    content:'You are a Content SEO expert. Analyze actual page data.\n\n'\n      +baseCtx+'\nKEYWORD: "'+keyword+'"\n\n'+pp+gscCtx+compBlock+coreRules\n      +'\n**Content Gaps** (based on PAA and competitor content)\n1.\n2.\n3.\n4.\n5.\n\n'\n      +'**Ideal Word Count** (based on top ranking pages)\n\n'\n      +'**Semantic Keywords** (10 LSI keywords)\n\n'\n      +'**Exact Content Structure**\nH1: (exact text)\nH2s: (list)\n\n'\n      +'**Featured Snippet Opportunity**\n(exact content for "'+keyword+'")\n\n'\n      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',\n    technical:'You are a Technical SEO expert. Base advice on audit data only.\n\n'\n      +baseCtx+'\nKEYWORD: "'+keyword+'"\nURL: '+(url||'not provided')+'\n\n'+pp+gscCtx+coreRules\n      +'\n**Page Speed Fixes**\n1.\n2.\n3.\n\n'\n      +'**Core Web Vitals**\n\n'\n      +'**Schema Markup**\n(exact JSON-LD for '+bizName+' in '+bizCity+')\n\n'\n      +'**Crawlability**\n1.\n2.\n3.\n\n'\n      +'**Internal Linking**\n1.\n2.\n3.\n\n'\n      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',\n    competitor:'You are a Competitor Intelligence expert. Use real SERP data only.\n\n'\n      +baseCtx+'\nKEYWORD: "'+keyword+'"\n'+gscCtx+compBlock+coreRules\n      +'\n**Competitor Analysis** (from real SERP only)\n\n'\n      +'**Why They Outrank Us at #'+currentPos+'**\n1.\n2.\n3.\n\n'\n      +'**Our Specific Advantages**\n1.\n2.\n3.\n\n'\n      +'**Keyword Difficulty [1-10]**\n\n'\n      +'**30-Day Plan to Reach Top 3 from #'+currentPos+'**\nWeek 1:\nWeek 2:\nWeek 3:\nWeek 4:\n\n'\n      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]'\n  };\n  return modes[mode]||modes.general;\n}\nfunction formatAIOutput(text){
+function buildPrompt(keyword,url,pageData,mode,compSettings,competitorData,kwData){
+  const bizName=compSettings?(compSettings.name||'the business'):'the business';
+  const bizCity=compSettings?(compSettings.city||''):'';
+  const bizIndustry=compSettings?(compSettings.industry||''):'';
+  const bizServices=compSettings?(compSettings.services||''):'';
+  const bizWebsite=compSettings?(compSettings.website||url||''):(url||'');
+  const gmbReviews=compSettings?(compSettings.gmbReviews||0):0;
+  const gmbRating=compSettings?(compSettings.gmbRating||0):0;
+  const gmbPlaceId=compSettings?(compSettings.gmbPlaceId||''):'';
+  const currentPos=kwData?Math.round(kwData.position||0):0;
+  const kwClicks=kwData?(kwData.clicks||0):0;
+  const kwImpressions=kwData?(kwData.impressions||0):0;
+  const kwCTR=kwData?((kwData.ctr||0)*100).toFixed(1):'0';
+  const kwChange=kwData?(kwData.change||0):0;
+  const trendLabel=kwChange>0?'Rising (+'+kwChange+' pos)':kwChange<0?'Falling ('+kwChange+' pos)':'Stable';
+  const gmbBlock=gmbPlaceId
+    ?'GMB: ALREADY SET UP. Reviews: '+gmbReviews+', Rating: '+gmbRating+' stars. DO NOT suggest claiming or creating GMB. Suggest improvement only.'
+    :'GMB: Not configured yet. Setup is priority #1.';
+  const posBlock=currentPos>0
+    ?'GSC Verified Position: #'+currentPos+' ('+trendLabel+'). Clicks: '+kwClicks+' | Impressions: '+kwImpressions+' | CTR: '+kwCTR+'%'
+    :'Position: Not yet verified in GSC.';
+  let pp='';
+  if(pageData){
+    const kwCount=pageData.bodyText?(pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length-1):0;
+    const kwDensity=pageData.wordCount>0?((kwCount/pageData.wordCount)*100).toFixed(2):'0';
+    const titleSt=pageData.titleLen===0?'MISSING':pageData.titleLen<30?'TOO SHORT':pageData.titleLen>60?'TOO LONG':'OK';
+    const metaSt=pageData.metaDescLen===0?'MISSING':pageData.metaDescLen<120?'TOO SHORT':pageData.metaDescLen>160?'TOO LONG':'OK';
+    const wcSt=pageData.wordCount<500?'TOO THIN':pageData.wordCount<1000?'COULD BE LONGER':'GOOD';
+    const altSt=pageData.imgsNoAlt===0?'ALL IMAGES HAVE ALT TAGS - DO NOT MENTION THIS AS ISSUE':'MISSING ALT ON '+pageData.imgsNoAlt+' images';
+    pp='ON-PAGE AUDIT for '+url+':\n'
+      +'Title: '+pageData.title+' ('+pageData.titleLen+' chars - '+titleSt+')\n'
+      +'Meta: '+pageData.metaDesc+' ('+pageData.metaDescLen+' chars - '+metaSt+')\n'
+      +'H1 ('+pageData.h1.length+'): '+(pageData.h1.join(' | ')||'NONE - CRITICAL')+'\n'
+      +'H2 ('+(pageData.h2?pageData.h2.length:0)+'): '+(pageData.h2?pageData.h2.slice(0,5).join(' | '):'None')+'\n'
+      +'Word Count: '+pageData.wordCount+' ('+wcSt+')\n'
+      +'Keyword appears: '+kwCount+' times (density: '+kwDensity+'%)\n'
+      +'Links: '+pageData.internalLinks+' internal, '+pageData.externalLinks+' external\n'
+      +'Images: '+altSt+'\n'
+      +'PAGE SAMPLE: '+(pageData.bodyText?pageData.bodyText.slice(0,500):'Not available');
+  } else {
+    pp=url?'URL: '+url+' (not fetched)':'No URL provided.';
+  }
+  let gscCtx='';
+  if(typeof gscDataFull!=='undefined'&&gscDataFull.length>0){
+    const row=gscDataFull.find(function(k){return k.keyword===keyword;});
+    if(row) gscCtx=' GSC: Pos #'+Math.round(row.position)+', Clicks='+row.clicks+', Impressions='+row.impressions+', CTR='+(row.ctr*100).toFixed(1)+'%';
+  }
+  const compBlock=competitorData?'\nREAL GOOGLE TOP 10:\n'+competitorData+'\n---END SERP---':'';
+  const ctx='BUSINESS: '+bizName+' | City: '+bizCity+' | Industry: '+bizIndustry+'\n'
+    +'Services: '+bizServices+'\n'
+    +'Website: '+bizWebsite+'\n'
+    +gmbBlock+'\n'
+    +posBlock+'\n';
+  const altRule=pageData?(pageData.imgsNoAlt===0?'Images all have alt tags - do NOT flag this as an issue.':'Flag: '+pageData.imgsNoAlt+' images missing alt tags.'):'';
+  const rules='\nRULES:\n'
+    +'1. Find '+bizWebsite+' in SERP to confirm its rank. Never assume #1 unless shown at position 1.\n'
+    +'2. Current rank is #'+currentPos+'. Focus on moving to Top 3.\n'
+    +'3. '+gmbBlock+'\n'
+    +'4. '+altRule+'\n'
+    +'5. Only use real data. Name real competitors from SERP.\n'
+    +'6. PAA questions = content gaps to address.\n';
+  const modes={
+    general:'You are an expert SEO consultant. Be specific, use real data only.\n\n'
+      +ctx+'\nKEYWORD: '+keyword+'\n\n'+pp+gscCtx+compBlock+rules
+      +'\n**Assessment** (use real numbers: pos #'+currentPos+', CTR '+kwCTR+'%, name real competitors)\n\n'
+      +'**Top 5 Quick Wins** (copy-paste ready)\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Content Recommendations**\n1.\n2.\n3.\n\n'
+      +'**Technical Issues** (only real issues from audit)\n1.\n2.\n3.\n\n'
+      +'**Local SEO Actions** (improvement only - no setup advice if GMB exists)\n1.\n2.\n3.\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+    local:'You are a Local SEO expert for '+bizCity+'.\n\n'
+      +ctx+'\nKEYWORD: '+keyword+'\n\n'+pp+gscCtx+compBlock+rules
+      +'\n**GMB Optimization** (improvement only - '+gmbReviews+' reviews already)\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Local Citations** (Indian directories)\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Location Keywords**\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Map Pack Strategy**\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Review Campaign** (WhatsApp template - have '+gmbReviews+', target '+(gmbReviews*2+10)+')\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+    content:'You are a Content SEO expert.\n\n'
+      +ctx+'\nKEYWORD: '+keyword+'\n\n'+pp+gscCtx+compBlock+rules
+      +'\n**Content Gaps** (PAA + competitor gaps)\n1.\n2.\n3.\n4.\n5.\n\n'
+      +'**Ideal Word Count**\n\n'
+      +'**Semantic Keywords** (10 LSI)\n\n'
+      +'**Content Structure**\nH1:\nH2s:\n\n'
+      +'**Featured Snippet Target**\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+    technical:'You are a Technical SEO expert.\n\n'
+      +ctx+'\nKEYWORD: '+keyword+'\nURL: '+(url||'not provided')+'\n\n'+pp+gscCtx+rules
+      +'\n**Page Speed**\n1.\n2.\n3.\n\n'
+      +'**Core Web Vitals**\n\n'
+      +'**Schema Markup** (JSON-LD for '+bizName+' in '+bizCity+')\n\n'
+      +'**Crawlability**\n1.\n2.\n3.\n\n'
+      +'**Internal Linking**\n1.\n2.\n3.\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+    competitor:'You are a Competitor Intelligence expert.\n\n'
+      +ctx+'\nKEYWORD: '+keyword+'\n'+gscCtx+compBlock+rules
+      +'\n**Competitor Analysis** (real SERP data only)\n\n'
+      +'**Why They Outrank #'+currentPos+'**\n1.\n2.\n3.\n\n'
+      +'**Our Advantages**\n1.\n2.\n3.\n\n'
+      +'**Keyword Difficulty [1-10]**\n\n'
+      +'**30-Day Plan: #'+currentPos+' to Top 3**\nWeek 1:\nWeek 2:\nWeek 3:\nWeek 4:\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]'
+  };
+  return modes[mode]||modes.general;
+}
+function formatAIOutput(text){
   // Extract score and critical issues
   var scoreMatch = text.match(/SEO_SCORE:\s*(\d+)/i);
   var critMatch = text.match(/CRITICAL_ISSUES:\s*(\d+)/i);
