@@ -2524,6 +2524,11 @@ function openAiPanelForKeyword(keyword, fallbackUrl){
 
 function openAiPanel(keyword,url){
   currentAiKeyword=keyword;currentAiUrl=url||'';fetchedPageData=null;
+  window._currentKwData = null;
+  if(gscDataFull && gscDataFull.length > 0){
+    const match = gscDataFull.find(k => k.keyword === keyword);
+    if(match) window._currentKwData = match;
+  }
   document.getElementById('aiKeyword').textContent=keyword;
   document.getElementById('fetchUrl').value=url||'';
   document.getElementById('aiOutput').innerHTML='<div style="color:#888;padding:20px;text-align:center;">Enter URL and click Fetch Page, or click Run AI for keyword-only analysis.</div>';
@@ -2633,7 +2638,7 @@ async function callAI(provider,prompt,keys){
   }
   throw new Error(`All AI providers failed. Last error: ${lastErr}`);
 }
-function buildPrompt(keyword,url,pageData,mode,compSettings,competitorData){
+function buildPrompt(keyword,url,pageData,mode,compSettings,competitorData,kwData){
   let pp = '';
   if(pageData){
     const kwCount = pageData.bodyText ? (pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length - 1) : 0;
@@ -2776,7 +2781,7 @@ async function runAI(){
         (serpData.featuredSnippet?'\n\nFEATURED SNIPPET:\n'+(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||''):'');
       compData = (compData?compData+'\n\n':'') + serpText;
     }
-    const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode,compSettings,compData),keys);
+    const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode,compSettings,compData,window._currentKwData),keys);
     out.innerHTML=formatAIOutput(r.text);
     meta.textContent='Model: '+r.model+' · Provider: '+provider;
     meta.style.display='block';
@@ -4174,7 +4179,7 @@ async function startBulkAudit(){
     document.getElementById('progressCurrent').textContent=`Analyzing: ${kw.keyword}`;
     document.getElementById('progressFill').style.width=`${((i+1)/keywords.length)*100}%`;
     let pd=null;if(kw.url)pd=await fetchAndParsePage(kw.url);
-    try{const r=await callAI(provider,buildPrompt(kw.keyword,kw.url,pd,'general',await loadCompSettings(),null),aiKeys);const sm=r.text.match(/SEO_SCORE:\s*(\d+)/i);const cm=r.text.match(/CRITICAL_ISSUES:\s*(\d+)/i);auditResults.push({keyword:kw.keyword,url:kw.url||'',score:sm?parseInt(sm[1]):50,critical:cm?parseInt(cm[1]):0,pageFetched:!!pd,analysis:r.text,model:r.model});}
+    try{const r=await callAI(provider,buildPrompt(kw.keyword,kw.url,pd,'general',await loadCompSettings(),null,gscDataFull.find(g=>g.keyword===kw.keyword)||null),aiKeys);const sm=r.text.match(/SEO_SCORE:\s*(\d+)/i);const cm=r.text.match(/CRITICAL_ISSUES:\s*(\d+)/i);auditResults.push({keyword:kw.keyword,url:kw.url||'',score:sm?parseInt(sm[1]):50,critical:cm?parseInt(cm[1]):0,pageFetched:!!pd,analysis:r.text,model:r.model});}
     catch(e){auditResults.push({keyword:kw.keyword,url:kw.url||'',score:0,critical:0,pageFetched:false,analysis:'Error: '+e.message,model:provider});}
     await new Promise(r=>setTimeout(r,500));
   }
