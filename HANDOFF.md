@@ -225,13 +225,16 @@ Phase 14 — Rank Tracker Upgrade ✅ DONE 30 June 2026
   updateRankTrackerStats() — new helper function
   getPosColor() — new helper function
 
-Phase 15 — GMB Health Checker
-  Reviews count vs top 3 competitors
-  Last photo upload date
-  Last GMB post date
-  Description keyword check
-  NAP consistency check
-  AI gives specific GMB actions with copy-paste text
+Phase 15 — GMB Health Checker ✅ DONE 30 June 2026
+  GMB Health Score 0-100 (Reviews 40pts + Profile 35pts + Activity 25pts)
+  Reviews + rating auto-fetched from Google Places API and saved to Firestore
+  Profile completeness 7-point checklist
+  Activity recommendations (photos, posts, review responses)
+  Competitor comparison table from Places API (top 5 nearby businesses)
+  AI Fix Recommendations — 3 copy-paste actions
+  Tab inside Locations page — 🏥 GMB Health
+  Auto-runs when tab is opened
+  runGMBHealthCheck() — main function
 
 Phase 16 — Content Planner
   Weekly blog topic suggestions based on keywords and rank gaps

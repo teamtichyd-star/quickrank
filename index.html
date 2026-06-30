@@ -3913,10 +3913,21 @@ async function loadCompSettings() {
   const user = firebase.auth().currentUser;
   if (!user) return null;
   try {
-    const snap = await firebase.firestore().collection('users').doc(user.uid).collection('companies').limit(1).get();
-    if (snap.empty) return null;
-    const data = snap.docs[0].data();
-    data._companyId = snap.docs[0].id;
+    const compId = getCurrentCompanyId();
+    let data = null;
+    if(compId) {
+      const doc = await firebase.firestore().collection('users').doc(user.uid).collection('companies').doc(compId).get();
+      if(doc.exists) {
+        data = doc.data();
+        data._companyId = doc.id;
+      }
+    }
+    if(!data) {
+      const snap = await firebase.firestore().collection('users').doc(user.uid).collection('companies').limit(1).get();
+      if(snap.empty) return null;
+      data = snap.docs[0].data();
+      data._companyId = snap.docs[0].id;
+    }
     const keysDoc = await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('aikeys').get();
     if (keysDoc.exists) Object.assign(data, keysDoc.data());
     return data;
