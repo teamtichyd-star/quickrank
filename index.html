@@ -2514,8 +2514,9 @@ function getBestKeywordUrl(keyword, fallbackUrl){
   return bestUrl;
 }
 
-function openAiPanelForKeyword(keyword, fallbackUrl){
+function openAiPanelForKeyword(keyword, fallbackUrl, kwPosition){
   const bestUrl = getBestKeywordUrl(keyword, fallbackUrl);
+  window._currentKwPosition = kwPosition || 0;
   openAiPanel(keyword, bestUrl);
   if(!bestUrl){
     showToast('No ranking page URL found yet. Sync GSC or enter URL manually.', true);
@@ -2765,8 +2766,7 @@ async function runAI(){
     const keys=await loadAIKeys();
     const compSettings = await loadCompSettings();
     let compData = window._lastCompetitorData || null;
-    var _pos=0;
-    if(typeof gscDataFull!=='undefined'&&gscDataFull.length>0){var _row=gscDataFull.find(function(k){return k.keyword===currentAiKeyword;});if(_row)_pos=Math.round(_row.position);}
+    var _pos = window._currentKwPosition || 0;
     var _site=compSettings?(compSettings.website||''):'';
     var _gmbOk=compSettings&&compSettings.gmbPlaceId?true:false;
     var _gmbRev=compSettings?(compSettings.gmbReviews||0):0;
