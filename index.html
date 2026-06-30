@@ -2763,7 +2763,20 @@ async function runAI(){
   out.innerHTML='<div style="color:#888;padding:20px;text-align:center;">⏳ Running AI analysis...</div>';meta.style.display='none';
   try{
     const keys=await loadAIKeys();
-    const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode,await loadCompSettings(),window._lastCompetitorData||null),keys);
+    const compSettings = await loadCompSettings();
+    let compData = window._lastCompetitorData || null;
+    // Fetch real SERP data via Serper if available
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    if(serpData){
+      window._lastSerpData = serpData;
+      const serpText = 'TOP 10 GOOGLE RESULTS for "'+currentAiKeyword+'":\n'+
+        serpData.organic.map(r=>'#'+r.position+' '+r.title+' ('+r.link+')\n   '+r.snippet).join('\n')+
+        (serpData.peopleAlsoAsk.length?'\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.map(q=>'- '+q).join('\n'):'')+
+        (serpData.relatedSearches.length?'\n\nRELATED SEARCHES:\n'+serpData.relatedSearches.map(q=>'- '+q).join('\n'):'')+
+        (serpData.featuredSnippet?'\n\nFEATURED SNIPPET:\n'+(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||''):'');
+      compData = (compData?compData+'\n\n':'') + serpText;
+    }
+    const r=await callAI(provider,buildPrompt(currentAiKeyword,currentAiUrl,fetchedPageData,aiMode,compSettings,compData),keys);
     out.innerHTML=formatAIOutput(r.text);
     meta.textContent='Model: '+r.model+' · Provider: '+provider;
     meta.style.display='block';
