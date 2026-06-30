@@ -2638,97 +2638,318 @@ async function callAI(provider,prompt,keys){
   }
   throw new Error(`All AI providers failed. Last error: ${lastErr}`);
 }
-
 function buildPrompt(keyword,url,pageData,mode,compSettings,competitorData,kwData){
+  const bizName     = compSettings ? (compSettings.name      || 'the business') : 'the business';
+  const bizCity     = compSettings ? (compSettings.city      || '')              : '';
+  const bizIndustry = compSettings ? (compSettings.industry  || '')              : '';
+  const bizServices = compSettings ? (compSettings.services  || '')              : '';
+  const bizWebsite  = compSettings ? (compSettings.website   || url || '')       : (url || '');
+  const gmbReviews  = compSettings ? (compSettings.gmbReviews || 0)             : 0;
+  const gmbRating   = compSettings ? (compSettings.gmbRating  || 0)             : 0;
+  const gmbPlaceId  = compSettings ? (compSettings.gmbPlaceId || '')            : '';
 
-  const bizName = compSettings ? (compSettings.name || 'the business') : 'the business';
-  const bizCity = compSettings ? (compSettings.city || '') : '';
-  const gmbReviews = compSettings ? (compSettings.gmbReviews || 0) : 0;
-  const gmbRating = compSettings ? (compSettings.gmbRating || 0) : 0;
-  const gmbPlaceId = compSettings ? (compSettings.gmbPlaceId || '') : '';
-
-  const currentPos = kwData ? Math.round(kwData.position || 0) : 0;
-  const kwClicks = kwData ? (kwData.clicks || 0) : 0;
-  const kwImpressions = kwData ? (kwData.impressions || 0) : 0;
-  const kwCTR = kwData ? ((kwData.ctr || 0) * 100).toFixed(1) : '0';
-
-  const positionBlock = currentPos > 0
-    ? `Current Verified Google Position (from GSC): #${currentPos}
-Clicks: ${kwClicks} | Impressions: ${kwImpressions} | CTR: ${kwCTR}%`
-    : `This keyword has no verified GSC position yet.`;
+  const currentPos    = kwData ? Math.round(kwData.position || 0) : 0;
+  const kwClicks      = kwData ? (kwData.clicks || 0)              : 0;
+  const kwImpressions = kwData ? (kwData.impressions || 0)         : 0;
+  const kwCTR         = kwData ? ((kwData.ctr || 0)*100).toFixed(1): '0';
+  const kwChange      = kwData ? (kwData.change || 0)              : 0;
+  const trendLabel    = kwChange > 0 ? 'Rising (+'+kwChange+' positions)' :
+                        kwChange < 0 ? 'Falling ('+kwChange+' positions)' : 'Stable';
 
   const gmbBlock = gmbPlaceId
-    ? `GMB Status: ✅ Already configured
-Reviews: ${gmbReviews} reviews, ${gmbRating} stars
-DO NOT suggest claiming or creating GMB. Focus only on improvement strategies.`
-    : `GMB not configured yet — setup required.`;
+    ? 'GMB Status: ALREADY SET UP. Reviews: '+gmbReviews+' reviews, '+gmbRating+' stars. DO NOT suggest claiming or creating GMB. Only suggest improvement actions.'
+    : 'GMB Status: Not configured yet — setup is priority #1.';
 
-  let pageAudit = '';
+  const posBlock = currentPos > 0
+    ? 'VERIFIED GSC Position: #'+currentPos+' ('+trendLabel+'). Clicks: '+kwClicks+' | Impressions: '+kwImpressions+' | CTR: '+kwCTR+'%'
+    : 'Position: Not yet verified in GSC.';
+
+  let pp = '';
   if(pageData){
-    const kwCount = pageData.bodyText ? (pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length - 1) : 0;
-    const kwDensity = pageData.wordCount > 0 ? ((kwCount / pageData.wordCount) * 100).toFixed(2) : '0';
-
-    pageAudit = `
-ON-PAGE AUDIT:
-Title: "${pageData.title}" (${pageData.titleLen} chars)
-Meta: "${pageData.metaDesc}" (${pageData.metaDescLen} chars)
-Word Count: ${pageData.wordCount}
-Keyword Usage: ${kwCount} times (${kwDensity}% density)
-Internal Links: ${pageData.internalLinks}
-External Links: ${pageData.externalLinks}
-Images Missing Alt: ${pageData.imgsNoAlt}
-`;
+    const kwCount   = pageData.bodyText ? (pageData.bodyText.toLowerCase().split(keyword.toLowerCase()).length-1) : 0;
+    const kwDensity = pageData.wordCount > 0 ? ((kwCount/pageData.wordCount)*100).toFixed(2) : '0';
+    const titleSt   = pageData.titleLen===0?'MISSING':pageData.titleLen<30?'TOO SHORT':pageData.titleLen>60?'TOO LONG':'OK';
+    const metaSt    = pageData.metaDescLen===0?'MISSING':pageData.metaDescLen<120?'TOO SHORT':pageData.metaDescLen>160?'TOO LONG':'OK';
+    const wcSt      = pageData.wordCount<500?'TOO THIN':pageData.wordCount<1000?'COULD BE LONGER':'GOOD';
+    const altSt     = pageData.imgsNoAlt===0?'ALL IMAGES HAVE ALT TAGS — DO NOT FLAG THIS AS AN ISSUE':'MISSING ALT ON '+pageData.imgsNoAlt+' images';
+    pp = 'ON-PAGE AUDIT for '+url+':
+'
+       + 'Title: "'+pageData.title+'" ('+pageData.titleLen+' chars — '+titleSt+')
+'
+       + 'Meta: "'+pageData.metaDesc+'" ('+pageData.metaDescLen+' chars — '+metaSt+')
+'
+       + 'H1 ('+pageData.h1.length+'): '+(pageData.h1.join(' | ')||'NONE — CRITICAL')+'
+'
+       + 'H2 ('+(pageData.h2?pageData.h2.length:0)+'): '+(pageData.h2?pageData.h2.slice(0,5).join(' | '):'None')+'
+'
+       + 'Word Count: '+pageData.wordCount+' words — '+wcSt+'
+'
+       + 'Keyword "'+keyword+'" appears: '+kwCount+' times (density: '+kwDensity+'%)
+'
+       + 'Internal Links: '+pageData.internalLinks+' | External: '+pageData.externalLinks+'
+'
+       + 'Images: '+altSt+'
+'
+       + 'PAGE SAMPLE:
+'+(pageData.bodyText?pageData.bodyText.slice(0,600):'Not available');
+  } else {
+    pp = url ? 'URL: '+url+' (not fetched — keyword analysis only)' : 'No URL provided.';
   }
 
-  const competitorBlock = competitorData
-    ? `REAL GOOGLE TOP RESULTS:
-${competitorData}
-IMPORTANT:
-The website being analyzed is: turnkeyinteriorcontractors.com
-If this exact domain appears in the REAL GOOGLE TOP RESULTS list, that indicates its ranking position.
-If it does NOT appear at #1 in the list, then it is NOT ranking #1.
-NEVER assume it is #1 unless the domain explicitly appears at position #1.
+  let gscCtx = '';
+  if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
+    const row = gscDataFull.find(function(k){ return k.keyword === keyword; });
+    if(row) gscCtx = '
+GSC: Position #'+Math.round(row.position)+', Clicks='+row.clicks+', Impressions='+row.impressions+', CTR='+(row.ctr*100).toFixed(1)+'%';
+  }
 
-`
+  const compBlock = competitorData
+    ? '
+REAL GOOGLE TOP 10 (live Serper data):
+'+competitorData+'
+--- END SERP ---'
     : '';
 
-  return `
-You are an expert SEO consultant. Use ONLY the verified data provided below.
+  const baseCtx = 'BUSINESS CONTEXT:
+'
+    + 'Name: '+bizName+'
+'
+    + 'City: '+bizCity+'
+'
+    + 'Industry: '+bizIndustry+'
+'
+    + 'Services: '+bizServices+'
+'
+    + 'Website: '+bizWebsite+'
+'
+    + gmbBlock+'
+'
+    + posBlock+'
+';
 
-BUSINESS:
-Name: ${bizName}
-City: ${bizCity}
+  const altRule = pageData
+    ? (pageData.imgsNoAlt===0
+        ? 'Images: ALL images have alt tags — this is NOT an issue. Do not mention it.'
+        : 'Images: '+pageData.imgsNoAlt+' images missing alt tags — flag this.')
+    : '';
 
-${gmbBlock}
+  const coreRules = '
+CRITICAL RULES — FOLLOW EXACTLY:
+'
+    + '1. Business website is: '+bizWebsite+'. Find it in SERP data to confirm actual rank. Do NOT assume #1 unless it appears at position #1 in the list.
+'
+    + '2. GSC verified rank is #'+currentPos+'. Give specific advice to move from #'+currentPos+' to Top 3.
+'
+    + '3. '+gmbBlock+'
+'
+    + '4. '+altRule+'
+'
+    + '5. Use ONLY real data provided. No invented facts.
+'
+    + '6. Name competitors specifically from SERP data (e.g. "Justdial at #1", "Vinod Interior at #2").
+'
+    + '7. People Also Ask questions = content gap opportunities. Suggest adding them as page sections.
+';
 
-KEYWORD: "${keyword}"
+  const modes = {
+    general: 'You are an expert SEO consultant. Give SPECIFIC actionable advice based on real data only.
 
-${positionBlock}
+'
+      +baseCtx+'
+KEYWORD: "'+keyword+'"
 
-${pageAudit}
-
-${competitorBlock}
-
-CRITICAL RULES:
-1. Never assume this business is #1 unless clearly shown.
-2. If current position is #${currentPos}, give strategy to move to Top 3.
-3. Never suggest claiming GMB if already configured.
-4. Reference actual competitor URLs from REAL GOOGLE TOP RESULTS.
-5. Use real numbers from audit.
-
+'+pp+gscCtx+compBlock+coreRules
+      +'
 Provide:
 
-Assessment
-Top 5 Quick Wins (copy-paste ready)
-Content Recommendations
-Technical Issues
-Local SEO Actions (improvement only if GMB exists)
+**Assessment**
+(cite real numbers: position #'+currentPos+', CTR '+kwCTR+'%, word count, competitors by name)
 
-SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]
-`;
+'
+      +'**Top 5 Quick Wins** (copy-paste ready fixes)
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Content Recommendations**
+1.
+2.
+3.
+
+'
+      +'**Technical Issues**
+(ONLY flag issues confirmed in audit data above — do not invent issues)
+1.
+2.
+3.
+
+'
+      +'**Local SEO Actions**
+(improvement actions only — no generic setup advice if GMB already configured)
+1.
+2.
+3.
+
+'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+
+    local: 'You are a Local SEO expert for '+bizCity+'. Give SPECIFIC local advice.
+
+'
+      +baseCtx+'
+KEYWORD: "'+keyword+'"
+
+'+pp+gscCtx+compBlock+coreRules
+      +'
+**GMB Optimization** (improvement only — GMB already set up with '+gmbReviews+' reviews, '+gmbRating+' stars)
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Local Citations** (specific Indian directories)
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Location Keywords**
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Map Pack Strategy**
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Review Campaign**
+(exact WhatsApp message template — currently '+gmbReviews+' reviews, target '+(gmbReviews*2+10)+')
+
+'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+
+    content: 'You are a Content SEO expert. Analyze actual page data only.
+
+'
+      +baseCtx+'
+KEYWORD: "'+keyword+'"
+
+'+pp+gscCtx+compBlock+coreRules
+      +'
+**Content Gaps** (based on PAA questions and competitor content)
+1.
+2.
+3.
+4.
+5.
+
+'
+      +'**Ideal Word Count** (based on top ranking competitor pages)
+
+'
+      +'**Semantic Keywords** (10 exact LSI keywords to include)
+
+'
+      +'**Exact Content Structure**
+H1: (exact suggested text)
+H2s: (list)
+
+'
+      +'**Featured Snippet Opportunity**
+(exact content to target snippet for "'+keyword+'")
+
+'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+
+    technical: 'You are a Technical SEO expert. Base advice on audit data only.
+
+'
+      +baseCtx+'
+KEYWORD: "'+keyword+'"
+URL: '+(url||'not provided')+'
+
+'+pp+gscCtx+coreRules
+      +'
+**Page Speed Fixes**
+1.
+2.
+3.
+
+'
+      +'**Core Web Vitals**
+
+'
+      +'**Schema Markup**
+(exact JSON-LD schema for '+bizName+' in '+bizCity+')
+
+'
+      +'**Crawlability**
+1.
+2.
+3.
+
+'
+      +'**Internal Linking**
+1.
+2.
+3.
+
+'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]',
+
+    competitor: 'You are a Competitor Intelligence expert. Use real SERP data only.
+
+'
+      +baseCtx+'
+KEYWORD: "'+keyword+'"
+'+gscCtx+compBlock+coreRules
+      +'
+**Competitor Analysis** (from real SERP data only — no guessing)
+
+'
+      +'**Why They Outrank Us at #'+currentPos+'**
+1.
+2.
+3.
+
+'
+      +'**Our Specific Advantages**
+1.
+2.
+3.
+
+'
+      +'**Keyword Difficulty [1-10]** (with reasoning)
+
+'
+      +'**30-Day Plan to Reach Top 3 from #'+currentPos+'**
+'
+      +'Week 1:
+Week 2:
+Week 3:
+Week 4:
+
+'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]'
+  };
+
+  return modes[mode] || modes.general;
 }
 
-function formatAIOutput
 function formatAIOutput(text){
   // Extract score and critical issues
   var scoreMatch = text.match(/SEO_SCORE:\s*(\d+)/i);
