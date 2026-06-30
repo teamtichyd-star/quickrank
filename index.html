@@ -562,6 +562,7 @@ tr:hover td{background:#f9fffe;}
         <div style="display:flex;gap:8px;">
           <button class="add-btn" onclick="openAddKeyword()">+ Add Keyword</button>
           <button class="audit-btn" id="bulkAuditBtn" onclick="startBulkAudit()">⚡ Bulk AI Audit</button>
+          <button class="btn-secondary" onclick="autoFindURLs()" style="display:flex;align-items:center;gap:6px;font-size:13px;">🔍 Auto-Find URLs</button>
         </div>
       </div>
 
@@ -3436,6 +3437,102 @@ async function runGMBHealthCheck(){
   }
 
   showToast('GMB Health Check complete ✅');
+}
+
+/* ══════════════════════════════
+   AUTO-FIND URLs FOR KEYWORDS
+══════════════════════════════ */
+async function autoFindURLs(){
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  const settings = await loadCompSettings();
+  const website = settings.website || settings.url || '';
+  if(!website){ showToast('Add your website URL in Settings first', true); return; }
+
+  showToast('Fetching your website to find keyword pages...');
+
+  // Fetch website via Jina.ai to get all internal links
+  let siteLinks = [];
+  try {
+    const jinaUrl = 'https://r.jina.ai/' + website;
+    const resp = await fetch(jinaUrl, {headers:{'Accept':'text/plain'}});
+    const text = await resp.text();
+    // Extract all URLs from the fetched content
+    const urlMatches = text.match(/https?:\/\/[^\s\)"']+/g) || [];
+    siteLinks = [...new Set(urlMatches.filter(u=>u.includes(website.replace('https://','').replace('http://','').split('/')[0])))];
+    console.log('Found site links:', siteLinks.length, siteLinks);
+  } catch(e){
+    console.log('Jina fetch error:', e);
+  }
+
+  // Show URL assignment modal
+  const kwSnap = await db.collection('users').doc(user.uid).collection('companies').doc(getCurrentCompanyId()).collection('keywords').get();
+  const kws = kwSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+  // Build modal HTML
+  let rows = kws.map(k=>{
+    // Try to find best matching URL from site links
+    const kwWords = k.keyword.toLowerCase().split(' ').filter(w=>w.length>3);
+    let bestUrl = k.url || '';
+    if(!bestUrl && siteLinks.length){
+      // Score each link by keyword word matches
+      let bestScore = 0;
+      siteLinks.forEach(link=>{
+        const linkLow = link.toLowerCase();
+        const score = kwWords.filter(w=>linkLow.includes(w)).length;
+        if(score > bestScore){ bestScore=score; bestUrl=link; }
+      });
+      if(bestScore < 2) bestUrl = '';
+    }
+    return '<tr style="border-bottom:1px solid #f0f0f0;">'+
+      '<td style="padding:8px 10px;font-size:13px;color:#333;font-weight:500;min-width:200px;">'+k.keyword+'</td>'+
+      '<td style="padding:8px 10px;">'+
+        '<input type="text" data-kwid="'+k.id+'" value="'+bestUrl+'" placeholder="'+website+'/page-url" '+
+        'style="width:100%;padding:6px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:12px;">'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+
+  // Show in modal
+  const modal = document.getElementById('addKeywordModal');
+  if(modal){
+    modal.innerHTML = '<div class="modal-box" style="max-width:700px;width:95%;">'+
+      '<h3 style="color:#0a5c36;margin-bottom:4px;">🔍 Assign URLs to Keywords</h3>'+
+      '<p style="font-size:13px;color:#888;margin-bottom:16px;">Set the specific page URL for each keyword. AI will analyze the correct page.</p>'+
+      '<div style="max-height:60vh;overflow-y:auto;">'+
+      '<table style="width:100%;border-collapse:collapse;">'+
+      '<thead><tr style="background:#f0fdf6;">'+
+        '<th style="padding:8px 10px;text-align:left;font-size:12px;color:#0a5c36;font-weight:700;">Keyword</th>'+
+        '<th style="padding:8px 10px;text-align:left;font-size:12px;color:#0a5c36;font-weight:700;">Target Page URL</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<div style="display:flex;gap:10px;margin-top:16px;">'+
+        '<button onclick="saveAllURLs()" class="btn-primary">💾 Save All URLs</button>'+
+        '<button onclick="closeModal('addKeywordModal')" class="btn-secondary">Cancel</button>'+
+      '</div>'+
+    '</div>';
+    modal.classList.add('open');
+  }
+}
+
+async function saveAllURLs(){
+  const user = firebase.auth().currentUser;
+  if(!user) return;
+  const inputs = document.querySelectorAll('#addKeywordModal input[data-kwid]');
+  const batch = db.batch();
+  let count = 0;
+  inputs.forEach(inp=>{
+    const kwId = inp.dataset.kwid;
+    const url = inp.value.trim();
+    if(kwId){
+      const ref = db.collection('users').doc(user.uid).collection('companies').doc(getCurrentCompanyId()).collection('keywords').doc(kwId);
+      batch.update(ref, {url: url});
+      count++;
+    }
+  });
+  await batch.commit();
+  showToast(count+' keyword URLs saved ✅');
+  closeModal('addKeywordModal');
+  loadKeywords();
 }
 
 // Auto-open parent if child page is active
