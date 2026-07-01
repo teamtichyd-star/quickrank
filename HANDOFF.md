@@ -170,3 +170,9 @@ Find function: grep -n "functionName" /Users/haritalla/Desktop/quickrank/index.h
 - Shows businesses above you in Google Maps
 - Honest results - no fake data
 - 2 Serper credits per keyword check
+
+## Phase 25 — Keyword Sync (COMPLETED 2 Jul 2026)
+- addKeyword() now auto-syncs to locationKeywords collection
+- addSelectedKeywords() (Suggest modal) now saves to both Website + Locations
+- Delete is independent - removing from one tab does not affect the other
+- Both tabs refresh automatically after add
