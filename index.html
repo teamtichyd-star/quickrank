@@ -1783,6 +1783,7 @@ async function checkLiveRank(kw, gscPos, btn) {
     if (rawSite.endsWith('/')) rawSite = rawSite.slice(0,-1);
     var targetDomain = rawSite.split('/')[0].toLowerCase();
     console.log('DEBUG targetDomain:', targetDomain);
+    console.log('DEBUG website from comp:', comp.website);
     var city = comp.city || 'Hyderabad';
     var serperKey = await getApiKey('serperKey');
     if (!serperKey) {
