@@ -1796,20 +1796,23 @@ async function checkLiveRank(kw, gscPos, btn) {
     var competitorsAbove = [];
     if (data.organic) {
       data.organic.forEach(function(item, idx) {
-        var itemDomain = (item.link || '').replace('https://','').replace('http://','').replace('www.','').split('/')[0].toLowerCase();
-        if (itemDomain === targetDomain && organicPos === null) {
+        var itemLink = (item.link || '').toLowerCase();
+        var isMatch = itemLink.includes(targetDomain);
+        if (isMatch && organicPos === null) {
           organicPos = idx + 1;
         } else if (organicPos === null) {
+          var itemDomain = itemLink.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
           competitorsAbove.push({ pos: idx + 1, title: item.title, domain: itemDomain });
         }
       });
     }
     var mapPos = null;
     var mapCompetitors = [];
-    if (data.localResults) {
-      data.localResults.forEach(function(item, idx) {
+    var mapData = data.localResults || data.local_results || data.places || [];
+    var compName = (comp.name || '').toLowerCase().split(' ')[0];
+    if (mapData.length > 0) {
+      mapData.forEach(function(item, idx) {
         var t = (item.title || '').toLowerCase();
-        var compName = (comp.name || '').toLowerCase().split(' ')[0];
         if (t.includes(compName) && mapPos === null) {
           mapPos = idx + 1;
         } else if (mapPos === null) {
@@ -1831,7 +1834,7 @@ async function checkLiveRank(kw, gscPos, btn) {
       }
     }
     var organicLabel = organicPos ? '#' + organicPos : 'Not in top 20';
-    var mapLabel = mapPos ? '#' + mapPos : 'Not in Map Pack';
+    var mapLabel = mapData.length === 0 ? 'No Map Pack' : (mapPos ? '#' + mapPos : 'Not found');
     var gscLabel = gscPos ? '#' + gscPos : '-';
     var compAboveHtml = '';
     if (competitorsAbove.length) {
@@ -1842,7 +1845,9 @@ async function checkLiveRank(kw, gscPos, btn) {
       compAboveHtml = '<div style="color:#2ecc71;font-size:12px;padding:6px 0;">You are at the top!</div>';
     }
     var mapAboveHtml = '';
-    if (mapCompetitors.length) {
+    if (mapData.length === 0) {
+      mapAboveHtml = '<div style="color:#888;font-size:12px;padding:6px 0;">No Map Pack shown for this keyword. Try a more local query.</div>';
+    } else if (mapCompetitors.length) {
       mapCompetitors.slice(0,3).forEach(function(c) {
         mapAboveHtml += '<div style="padding:6px 0;font-size:12px;"><span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' + c.title + '</div>';
       });
