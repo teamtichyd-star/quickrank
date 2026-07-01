@@ -1798,7 +1798,7 @@ async function checkLiveRank(kw, gscPos, btn) {
     var resp = await fetch('https://google.serper.dev/search', {
       method: 'POST',
       headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: kw + ' ' + city, gl: 'in', hl: 'en', num: 20 })
+      body: JSON.stringify({ q: kw + ' ' + city, gl: 'in', hl: 'en', num: 100 })
     });
     console.log('DEBUG serper status:', resp.status);
     var data = await resp.json();
