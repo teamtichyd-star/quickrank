@@ -2865,10 +2865,11 @@ ${pageData.bodyText?pageData.bodyText.slice(0,800):'Not available'}`;
       const _pos=window._currentKwPosition?'#'+window._currentKwPosition:'check GSC data below';
       return `STRICT RULES - FOLLOW EXACTLY:
 1. GMB IS ALREADY CLAIMED AND ACTIVE - NEVER say claim GMB, create GMB, or set up GMB
-2. Business already has ${_rev} reviews at ${_rat} stars - NEVER say get more reviews as first priority
-3. DO NOT suggest IndiaMART or JustDial as first action - they are already listed
-4. Use EXACT business name, city, and services from context below
-5. Give SPECIFIC actions - not generic SEO theory
+2. Business already has ${_rev} reviews at ${_rat} stars - DO NOT mention getting more reviews anywhere in your response
+3. DO NOT suggest IndiaMART or JustDial listing - business is already listed there
+4. DO NOT say add NAP consistently - this is already done
+5. DO NOT give generic local SEO advice - give SPECIFIC actions for ${_name} in ${_city}
+6. Every action must mention a specific GMB field, specific Hyderabad area, or specific content change
 
 You are a Local SEO expert for Hyderabad, India.
 
