@@ -160,3 +160,13 @@ Find function: grep -n "functionName" /Users/haritalla/Desktop/quickrank/index.h
 3. Admin approves - user gets 200 Serper/month
 4. Future: paid tiers via Stripe
 5. Each user brings own API keys for free tier
+
+## Phase 24 — Live Rank Check (FINAL - COMPLETED 1 July 2026)
+- Live button on every keyword row
+- Uses Serper /search for organic position
+- Uses Serper /maps for Google Maps position (separate API call)
+- Shows GSC Avg vs Live Today vs Google Maps rank
+- Shows competitors above you in organic
+- Shows businesses above you in Google Maps
+- Honest results - no fake data
+- 2 Serper credits per keyword check
