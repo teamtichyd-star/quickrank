@@ -6,23 +6,253 @@
 <title>QuickRank — Keyword Rank Tracker</title>
     <link rel="icon" type="image/png" href="Fevicon.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 <style>
@@ -1766,16 +1996,7 @@ function loadKeywords(){
 /* ══════════════════════════════
    KEYWORDS RENDER (with sort)
 ══════════════════════════════ */
-
-
-
-
-
-
-
-
-
-async function checkLiveRank(kw, gscPos, btn) {\n  var origHtml = btn.innerHTML;\n  btn.innerHTML = 'Checking...';\n  btn.disabled = true;\n  try {\n    var comp = await loadCompSettings();\n    var city = (comp.city || 'Hyderabad').trim();\n    var website = (comp.website || '').toLowerCase().trim();\n    if (website.indexOf('https://') === 0) website = website.slice(8);\n    if (website.indexOf('http://') === 0) website = website.slice(7);\n    if (website.indexOf('www.') === 0) website = website.slice(4);\n    website = website.split('/')[0];\n    var q = (kw || '').trim();\n    if (city && q.toLowerCase().indexOf(city.toLowerCase()) === -1) q = q + ' ' + city;\n    var serperKey = await getApiKey('serperKey');\n    if (!serperKey) {\n      alert('Serper API key not set. Go to Settings > API Manager.');\n      btn.innerHTML = origHtml;\n      btn.disabled = false;\n      return;\n    }\n    var resp = await fetch('https://google.serper.dev/search', {\n      method: 'POST',\n      headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },\n      body: JSON.stringify({ q: q, gl: 'in', hl: 'en', num: 10 })\n    });\n    var data = await resp.json();\n    var organic = Array.isArray(data.organic) ? data.organic : [];\n    var livePos = null;\n    var above = [];\n    organic.forEach(function(item, idx) {\n      var link = (item.link || '').toLowerCase();\n      var domain = link.replace('https://','').replace('http://','').replace('www.','').split('/')[0];\n      var isMine = (domain === website);\n      if (livePos === null && isMine) {\n        livePos = idx + 1;\n      } else if (livePos === null) {\n        above.push({ pos: idx + 1, title: item.title || domain, domain: domain });\n      }\n    });\n    var localPack = data.localResults || data.local_results || data.places || [];\n    var mapPos = null;\n    var mapAbove = [];\n    if (Array.isArray(localPack) && localPack.length) {\n      localPack.forEach(function(item, idx) {\n        var t = (item.title || '').toLowerCase();\n        var site = ((item.website || item.link || '') + '').toLowerCase();\n        var isMine = false;\n        if ((comp.name || '').trim()) {\n          isMine = t.indexOf((comp.name || '').toLowerCase()) !== -1;\n        }\n        if (!isMine && website) {\n          isMine = site.indexOf(website) !== -1;\n        }\n        if (mapPos === null && isMine) {\n          mapPos = idx + 1;\n        } else if (mapPos === null) {\n          mapAbove.push({ pos: idx + 1, title: item.title || 'Result' });\n        }\n      });\n    }\n    try {\n      if (currentUser && currentCompanyId) {\n        var qs = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).collection('keywords').where('keyword','==',kw).limit(1).get();\n        if (!qs.empty) {\n          await qs.docs[0].ref.update({\n            liveRank: livePos || null,\n            liveMapRank: mapPos || null,\n            lastLiveCheck: new Date().toISOString()\n          });\n        }\n      }\n    } catch(saveErr) { console.warn('live rank save skipped', saveErr); }\n    var gscLabel = gscPos ? '#' + gscPos : 'N/A';\n    var liveLabel = livePos ? '#' + livePos : 'Not in top 10';\n    var mapLabel = (Array.isArray(localPack) && localPack.length) ? (mapPos ? '#' + mapPos : 'Not found') : 'Unavailable';\n    var organicTitle = livePos ? 'Competitors Above You Right Now' : 'Top 5 Organic Results Right Now';\n    var aboveHtml = '';\n    if (livePos === 1) {\n      aboveHtml = '<div style="color:#2ecc71;font-size:12px;padding:8px 0;">Nobody is above you in the live top 10.</div>';\n    } else if (above.length) {\n      above.slice(0,5).forEach(function(c) {\n        aboveHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;"><span style="background:#e74c3c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' + c.title + '<div style="font-size:10px;color:#888;">' + c.domain + '</div></div>';\n      });\n    } else {\n      aboveHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">No organic results returned.</div>';\n    }\n    var mapHtml = '';\n    if (!Array.isArray(localPack) || !localPack.length) {\n      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">Current Serper response did not return a local pack for this keyword, so map rank cannot be verified from this call.</div>';\n    } else if (mapPos === 1) {\n      mapHtml = '<div style="color:#2ecc71;font-size:12px;padding:8px 0;">You are #1 in the returned map pack.</div>';\n    } else if (mapAbove.length) {\n      mapAbove.slice(0,3).forEach(function(c) {\n        mapHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;"><span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' + c.title + '</div>';\n      });\n    } else {\n      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">Map pack returned, but your business was not matched in it.</div>';\n    }\n    var overlay = document.createElement('div');\n    overlay.id = 'liveRankOverlay';\n    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';\n    var box = document.createElement('div');\n    box.style.cssText = 'background:#fff;border-radius:16px;padding:28px;max-width:520px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);';\n    box.innerHTML = ''\n      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:16px;font-weight:800;color:#0a5c36;">Live Rank Check</div><button id="liveRankClose" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">x</button></div>'\n      + '<div style="background:#f0fdf6;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;font-weight:600;color:#0a5c36;">' + kw + ' — ' + city + '</div>'\n      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">'\n      + '<div style="background:#d4f5e2;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">GSC Avg</div><div style="font-size:26px;font-weight:900;color:#0a5c36;">' + gscLabel + '</div></div>'\n      + '<div style="background:#e8f4fd;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Live Today</div><div style="font-size:26px;font-weight:900;color:#1565c0;">' + liveLabel + '</div></div>'\n      + '<div style="background:#fff3e0;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Map Pack</div><div style="font-size:18px;font-weight:800;color:#e67e22;">' + mapLabel + '</div></div>'\n      + '</div>'\n      + '<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">' + organicTitle + '</div>' + aboveHtml + '</div>'\n      + '<div><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">Map Pack</div>' + mapHtml + '</div>'\n      + '<div style="margin-top:16px;padding:10px;background:#fffbeb;border-radius:8px;font-size:11px;color:#92400e;">Live SERP can differ from GSC because GSC is a 28-day average, while this is a single live snapshot.</div>'\n      + '<div style="margin-top:12px;text-align:center;font-size:10px;color:#aaa;">Checked: ' + new Date().toLocaleString() + '</div>';\n    overlay.appendChild(box);\n    document.body.appendChild(overlay);\n    document.getElementById('liveRankClose').onclick = function() { overlay.remove(); };\n    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };\n  } catch(err) {\n    console.error('checkLiveRank error:', err);\n    alert('Live rank check failed: ' + err.message);\n  } finally {\n    btn.innerHTML = origHtml;\n    btn.disabled = false;\n  }\n}\nfunction renderKeywords(kwList){
+function renderKeywords(kwList){
   const body=document.getElementById('keywordsBody');
   updateRankTrackerStats(kwList);
   if(!body) return;
@@ -1810,7 +2031,6 @@ async function checkLiveRank(kw, gscPos, btn) {\n  var origHtml = btn.innerHTML;
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
           <button class="update-rank-btn" onclick="openUpdateRank('${k.id}','${k.keyword.replace(/'/g,"\\'")}',${pos||0})">📍 Update</button>
           <button class="chart-btn" onclick="openHistoryModal('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">📈 History</button>
-          <button class="ai-btn" style="background:#e8f4fd;border-color:#90caf9;color:#1565c0;" data-kw="${k.keyword.replace(/''/, '')}" data-pos="${pos||0}" onclick="checkLiveRank(this.dataset.kw,parseInt(this.dataset.pos)||0,this)">Live</button>
           <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}',${pos||0})">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>AI
           </button>
@@ -6284,7 +6504,53 @@ async function addSelectedKeywords() {
 }
 
 
+async function checkLiveRank(kw, btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
+    try {
+        const comp = window._currentComp;
+        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
+        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
+        
+        let foundPos = '100+';
+        let foundMapPos = 'N/A';
+
+        // Organic Search
+        if (res.organic) {
+            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
+            if (idx !== -1) foundPos = idx + 1;
+        }
+
+        // Local Map Pack Search
+        if (res.local_results) {
+            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
+            if (midx !== -1) foundMapPos = midx + 1;
+        }
+
+        // Show Toast/Alert with result
+        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
+        
+        // Update Firebase with live rank
+        const kwId = btoa(kw).replace(/=/g,'');
+        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
+            liveRank: foundPos,
+            liveMapRank: foundMapPos,
+            lastLiveCheck: new Date().toISOString()
+        }, { merge: true });
+
+        // Refresh UI
+        loadKeywords(); 
+
+    } catch (err) {
+        console.error(err);
+        alert('Rank check failed. Check console.');
+    } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
+}
 
 </script>
 
