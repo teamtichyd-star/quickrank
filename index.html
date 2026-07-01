@@ -1808,29 +1808,38 @@ async function checkLiveRank(kw, gscPos, btn) {
     });
 
     // Map pack
-    var localPack = data.localResults || data.local_results || data.places || [];
+    var mapResp = await fetch('https://google.serper.dev/maps', {
+      method: 'POST',
+      headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: q, gl: 'in', hl: 'en' })
+    });
+    var mapData = await mapResp.json();
+    var localPack = Array.isArray(mapData.places) ? mapData.places : (mapData.localResults || mapData.local_results || []);
     var mapPos = null;
     var mapAbove = [];
     if (Array.isArray(localPack) && localPack.length) {
       localPack.forEach(function(item, idx) {
         var t = (item.title || '').toLowerCase();
         var site = ((item.website || item.link || '') + '').toLowerCase();
+        var siteDomain = site.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
         var isMine = false;
         if ((comp.name || '').trim()) {
           isMine = t.indexOf((comp.name || '').toLowerCase()) !== -1;
         }
-        if (!isMine && website) isMine = site.indexOf(website) !== -1;
+        if (!isMine && website) {
+          isMine = (siteDomain === website) || (site.indexOf(website) !== -1);
+        }
         if (mapPos === null && isMine) {
           mapPos = idx + 1;
         } else if (mapPos === null) {
-          mapAbove.push({ pos: idx + 1, title: item.title || 'Result' });
+          mapAbove.push({ pos: idx + 1, title: item.title || 'Result', website: siteDomain });
         }
       });
     }
 
     var gscLabel = gscPos ? '#' + gscPos : 'N/A';
     var liveLabel = livePos ? '#' + livePos : 'Not in top 10';
-    var mapLabel = (!Array.isArray(localPack) || !localPack.length) ? 'Unavailable' : (mapPos ? '#' + mapPos : 'Not found');
+    var mapLabel = (!Array.isArray(localPack) || !localPack.length) ? 'No Maps Data' : (mapPos ? '#' + mapPos : 'Not in top 20');
 
     var aboveHtml = '';
     if (livePos === 1) {
@@ -1848,17 +1857,21 @@ async function checkLiveRank(kw, gscPos, btn) {
 
     var mapHtml = '';
     if (!Array.isArray(localPack) || !localPack.length) {
-      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">No map pack returned for this keyword. Try adding city name to keyword.</div>';
+      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">Serper Maps returned no places for this keyword.</div>';
     } else if (mapPos === 1) {
-      mapHtml = '<div style="color:#2ecc71;font-size:12px;padding:8px 0;">You are #1 in map pack.</div>';
-    } else if (mapAbove.length) {
-      mapAbove.slice(0,3).forEach(function(c) {
+      mapHtml = '<div style="color:#2ecc71;font-size:12px;padding:8px 0;">You are #1 in Google Maps results.</div>';
+    } else if (mapPos && mapAbove.length) {
+      mapAbove.slice(0,5).forEach(function(c) {
         mapHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
           + '<span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>'
-          + c.title + '</div>';
+          + c.title
+          + (c.website ? '<div style="font-size:10px;color:#888;">' + c.website + '</div>' : '')
+          + '</div>';
       });
+    } else if (mapPos) {
+      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">No businesses are above you in Google Maps results.</div>';
     } else {
-      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">Map pack returned but your business was not matched.</div>';
+      mapHtml = '<div style="color:#888;font-size:12px;padding:8px 0;">Your business was not found in the top 20 Google Maps results returned by Serper.</div>';
     }
 
     var overlay = document.createElement('div');
@@ -1874,7 +1887,7 @@ async function checkLiveRank(kw, gscPos, btn) {
       + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">'
       + '<div style="background:#d4f5e2;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;">GSC AVG</div><div style="font-size:26px;font-weight:900;color:#0a5c36;">' + gscLabel + '</div></div>'
       + '<div style="background:#e8f4fd;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;">LIVE TODAY</div><div style="font-size:26px;font-weight:900;color:#1565c0;">' + liveLabel + '</div></div>'
-      + '<div style="background:#fff3e0;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;">MAP PACK</div><div style="font-size:18px;font-weight:800;color:#e67e22;">' + mapLabel + '</div></div>'
+      + '<div style="background:#fff3e0;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:6px;">GOOGLE MAPS</div><div style="font-size:18px;font-weight:800;color:#e67e22;">' + mapLabel + '</div></div>'
       + '</div>'
       + '<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">Competitors Above You (Organic)</div>' + aboveHtml + '</div>'
       + '<div><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">Map Pack</div>' + mapHtml + '</div>'
