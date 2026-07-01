@@ -1770,145 +1770,99 @@ function loadKeywords(){
 
 
 
+
+
+
 async function checkLiveRank(kw, gscPos, btn) {
   var origHtml = btn.innerHTML;
   btn.innerHTML = 'Checking...';
   btn.disabled = true;
   try {
     var comp = await loadCompSettings();
-    var rawSite = (comp.website || '').toLowerCase().trim();
-    if (rawSite.startsWith('https://')) rawSite = rawSite.slice(8);
-    if (rawSite.startsWith('http://')) rawSite = rawSite.slice(7);
-    if (rawSite.startsWith('www.')) rawSite = rawSite.slice(4);
-    if (rawSite.endsWith('/')) rawSite = rawSite.slice(0,-1);
-    var targetDomain = rawSite.split('/')[0].toLowerCase();
-    console.log('DEBUG targetDomain:', targetDomain);
-    console.log('DEBUG website from comp:', comp.website);
     var city = comp.city || 'Hyderabad';
     var serperKey = await getApiKey('serperKey');
-    console.log('DEBUG serperKey found:', serperKey ? serperKey.slice(0,8)+'...' : 'NULL/EMPTY');
     if (!serperKey) {
       alert('Serper API key not set. Go to Settings > API Manager.');
-      btn.innerHTML = origHtml;
-      btn.disabled = false;
-      return;
+      btn.innerHTML = origHtml; btn.disabled = false; return;
     }
-    console.log('DEBUG calling serper with key:', serperKey ? serperKey.slice(0,8)+'...' : 'MISSING');
-    console.log('DEBUG query:', kw + ' ' + city);
-
-    // Call 1 - keyword search for competitors
     var resp = await fetch('https://google.serper.dev/search', {
       method: 'POST',
       headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ q: kw + ' ' + city, gl: 'in', hl: 'en', num: 10 })
     });
-    console.log('DEBUG serper status:', resp.status);
     var data = await resp.json();
-    console.log('DEBUG serper keys:', Object.keys(data));
-    console.log('DEBUG organic count:', (data.organic||[]).length);
-
-    // Call 2 - site: search to check if your domain ranks for this keyword
-    var resp2 = await fetch('https://google.serper.dev/search', {
-      method: 'POST',
-      headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: kw + ' site:' + targetDomain, gl: 'in', hl: 'en', num: 10 })
-    });
-    var data2 = await resp2.json();
-    var siteRankFound = (data2.organic || []).length > 0;
-    console.log('DEBUG site: search found:', siteRankFound, 'results:', (data2.organic||[]).length);
-    var organicPos = null;
+    var organic = data.organic || [];
     var competitorsAbove = [];
-    if (data.organic) {
-      data.organic.forEach(function(item, idx) {
-        var itemLink = (item.link || '').toLowerCase();
-        var isMatch = itemLink.includes(targetDomain);
-        console.log('DEBUG organic #'+(idx+1)+' | match:'+isMatch+' | '+itemLink);
-        if (isMatch && organicPos === null) {
-          organicPos = idx + 1;
-        } else if (organicPos === null) {
-          var itemDomain = itemLink.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-          competitorsAbove.push({ pos: idx + 1, title: item.title, domain: itemDomain });
-        }
-      });
-    }
-    // If not found in top 10 but site: search confirms domain has content for this keyword
-    // use GSC position as fallback
-    if (organicPos === null && siteRankFound) {
-      organicPos = gscPos || 'Beyond top 10';
-      console.log('DEBUG using GSC fallback pos:', organicPos);
-    }
-    console.log('DEBUG organicPos:', organicPos);
-    var mapPos = null;
-    var mapCompetitors = [];
+    organic.slice(0, 5).forEach(function(item, idx) {
+      var itemDomain = (item.link || '').replace('https://','').replace('http://','').replace('www.','').split('/')[0].toLowerCase();
+      competitorsAbove.push({ pos: idx + 1, title: item.title, domain: itemDomain });
+    });
     var mapData = data.localResults || data.local_results || data.places || [];
-    var compName = (comp.name || '').toLowerCase().split(' ')[0];
-    if (mapData.length > 0) {
-      mapData.forEach(function(item, idx) {
-        var t = (item.title || '').toLowerCase();
-        if (t.includes(compName) && mapPos === null) {
-          mapPos = idx + 1;
-        } else if (mapPos === null) {
-          mapCompetitors.push({ pos: idx + 1, title: item.title });
-        }
-      });
-    }
-    if (currentUser && currentCompanyId) {
-      var kwSnap = await db.collection('users').doc(currentUser.uid)
-        .collection('companies').doc(currentCompanyId)
-        .collection('keywords')
-        .where('keyword','==',kw).limit(1).get();
-      if (!kwSnap.empty) {
-        await kwSnap.docs[0].ref.update({
-          liveRank: organicPos || 'Not found',
-          liveMapRank: mapPos || 'N/A',
-          lastLiveCheck: new Date().toISOString()
-        });
-      }
-    }
-    var organicLabel = organicPos ? (typeof organicPos === 'number' ? '#' + organicPos : organicPos) : 'Not in top 10';
-    var mapLabel = mapData.length === 0 ? 'No Map Pack' : (mapPos ? '#' + mapPos : 'Not found');
-    var gscLabel = gscPos ? '#' + gscPos : '-';
+    var mapCompetitors = [];
+    mapData.slice(0, 3).forEach(function(item, idx) {
+      mapCompetitors.push({ pos: idx + 1, title: item.title });
+    });
+    var gscLabel = gscPos ? '#' + gscPos : 'N/A';
+    var mapLabel = mapData.length === 0 ? 'No Map Pack' : '#1-3 shown below';
     var compAboveHtml = '';
-    if (competitorsAbove.length) {
-      competitorsAbove.slice(0,5).forEach(function(c) {
-        compAboveHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;"><span style="background:#e74c3c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' + c.title + '<div style="font-size:10px;color:#888;">' + c.domain + '</div></div>';
-      });
-    } else {
-      compAboveHtml = '<div style="color:#2ecc71;font-size:12px;padding:6px 0;">You are at the top!</div>';
-    }
+    competitorsAbove.forEach(function(c) {
+      compAboveHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
+        + '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>'
+        + c.title
+        + '<div style="font-size:10px;color:#888;">' + c.domain + '</div></div>';
+    });
+    if (!compAboveHtml) compAboveHtml = '<div style="color:#888;font-size:12px;">No data</div>';
     var mapAboveHtml = '';
     if (mapData.length === 0) {
-      mapAboveHtml = '<div style="color:#888;font-size:12px;padding:6px 0;">No Map Pack shown for this keyword. Try a more local query.</div>';
-    } else if (mapCompetitors.length) {
-      mapCompetitors.slice(0,3).forEach(function(c) {
-        mapAboveHtml += '<div style="padding:6px 0;font-size:12px;"><span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' + c.title + '</div>';
-      });
+      mapAboveHtml = '<div style="color:#888;font-size:12px;padding:6px 0;">No Map Pack for this keyword. Add city name to keyword for local pack.</div>';
     } else {
-      mapAboveHtml = '<div style="color:#2ecc71;font-size:12px;padding:6px 0;">You are in Map Pack top!</div>';
+      mapCompetitors.forEach(function(c) {
+        mapAboveHtml += '<div style="padding:6px 0;font-size:12px;">'
+          + '<span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>'
+          + c.title + '</div>';
+      });
     }
     var overlay = document.createElement('div');
     overlay.id = 'liveRankOverlay';
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
     var box = document.createElement('div');
-    box.style.cssText = 'background:#fff;border-radius:16px;padding:28px;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);';
-    box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><div style="font-size:16px;font-weight:800;color:#0a5c36;">Live Rank Result</div><button id="liveRankClose" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">X</button></div>'
-      + '<div style="background:#f8f8f8;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;font-weight:600;color:#333;">' + kw + ' - ' + city + '</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">'
-      + '<div style="background:#e8f4fd;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">GSC Avg</div><div style="font-size:22px;font-weight:800;color:#1565c0;">' + gscLabel + '</div></div>'
-      + '<div style="background:#d4f5e2;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">Live Organic</div><div style="font-size:22px;font-weight:800;color:#0a5c36;">' + organicLabel + '</div></div>'
-      + '<div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">Map Pack</div><div style="font-size:22px;font-weight:800;color:#e67e22;">' + mapLabel + '</div></div>'
+    box.style.cssText = 'background:#fff;border-radius:16px;padding:28px;max-width:500px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);';
+    box.innerHTML = ''
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">'
+      + '<div style="font-size:16px;font-weight:800;color:#0a5c36;">Live SERP Check</div>'
+      + '<button id="liveRankClose" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">x</button>'
       + '</div>'
-      + '<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;">Ranking Above You (Organic)</div>' + compAboveHtml + '</div>'
-      + '<div><div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;">Map Pack Above You</div>' + mapAboveHtml + '</div>'
-      + '<div style="margin-top:20px;text-align:center;font-size:10px;color:#aaa;">Checked: ' + new Date().toLocaleString() + '</div>';
+      + '<div style="background:#f0fdf6;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;font-weight:600;color:#0a5c36;">'
+      + kw + ' — ' + city
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">'
+      + '<div style="background:#d4f5e2;border-radius:10px;padding:14px;text-align:center;">'
+      + '<div style="font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Your GSC Avg Rank</div>'
+      + '<div style="font-size:28px;font-weight:900;color:#0a5c36;">' + gscLabel + '</div>'
+      + '<div style="font-size:10px;color:#888;margin-top:4px;">28-day average</div>'
+      + '</div>'
+      + '<div style="background:#fff3e0;border-radius:10px;padding:14px;text-align:center;">'
+      + '<div style="font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Map Pack</div>'
+      + '<div style="font-size:18px;font-weight:800;color:#e67e22;">' + mapLabel + '</div>'
+      + '<div style="font-size:10px;color:#888;margin-top:4px;">Google Local Pack</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="margin-bottom:16px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">Top 5 Organic Results Right Now</div>'
+      + compAboveHtml
+      + '</div>'
+      + '<div>'
+      + '<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;">Map Pack Results</div>'
+      + mapAboveHtml
+      + '</div>'
+      + '<div style="margin-top:16px;padding:10px;background:#fffbeb;border-radius:8px;font-size:11px;color:#92400e;">'
+      + 'Note: Live SERP varies by location and device. Your GSC rank is the most reliable 28-day average.'
+      + '</div>'
+      + '<div style="margin-top:12px;text-align:center;font-size:10px;color:#aaa;">Checked: ' + new Date().toLocaleString() + '</div>';
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    document.getElementById('liveRankClose').onclick = function() {
-      document.getElementById('liveRankOverlay').remove();
-    };
-    overlay.onclick = function(e) {
-      if (e.target === overlay) overlay.remove();
-    };
+    document.getElementById('liveRankClose').onclick = function() { overlay.remove(); };
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
   } catch(err) {
     console.error('checkLiveRank error:', err);
     alert('Live rank check failed: ' + err.message);
