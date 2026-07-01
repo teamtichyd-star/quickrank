@@ -1792,12 +1792,17 @@ async function checkLiveRank(kw, gscPos, btn) {
       btn.disabled = false;
       return;
     }
+    console.log('DEBUG calling serper with key:', serperKey ? serperKey.slice(0,8)+'...' : 'MISSING');
+    console.log('DEBUG query:', kw + ' ' + city);
     var resp = await fetch('https://google.serper.dev/search', {
       method: 'POST',
       headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ q: kw + ' ' + city, gl: 'in', hl: 'en', num: 20 })
     });
+    console.log('DEBUG serper status:', resp.status);
     var data = await resp.json();
+    console.log('DEBUG serper keys:', Object.keys(data));
+    console.log('DEBUG organic count:', (data.organic||[]).length);
     var organicPos = null;
     var competitorsAbove = [];
     if (data.organic) {
