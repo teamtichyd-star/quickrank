@@ -2014,6 +2014,15 @@ async function addKeyword(){
       .collection('companies').doc(currentCompanyId)
       .collection('keywords').add({keyword:kw,url,position:pos,change:0,clicks:0,impressions:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     if(pos)await saveHistorySnapshot(ref.id,pos,getTodayStr(),'Initial entry');
+    // Auto-sync to Locations
+    try {
+      await db.collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('locationKeywords').doc(ref.id).set({
+          keyword: kw,
+          addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, {merge: true});
+    } catch(e) { console.warn('Location sync skipped', e); }
     closeModal('addKeywordModal');showToast(`"${kw}" added ✅`);
   }catch(e){showToast('Error: '+e.message,true);}
 }
