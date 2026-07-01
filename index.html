@@ -6,253 +6,23 @@
 <title>QuickRank — Keyword Rank Tracker</title>
     <link rel="icon" type="image/png" href="Fevicon.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 <style>
@@ -1996,6 +1766,124 @@ function loadKeywords(){
 /* ══════════════════════════════
    KEYWORDS RENDER (with sort)
 ══════════════════════════════ */
+
+async function checkLiveRank(kw, gscPos, btn) {
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+  btn.disabled = true;
+
+  try {
+    const comp = await loadCompSettings();
+    const rawSite = (comp.website || '').replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'').trim();
+    const targetDomain = rawSite.split('/')[0].toLowerCase();
+    const city = comp.city || 'Hyderabad';
+
+    const serperKey = await getApiKey('serperKey');
+    if (!serperKey) { alert('Serper API key not set. Go to Settings → API Manager.'); btn.innerHTML = origHtml; btn.disabled = false; return; }
+
+    const resp = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
+      headers: { 'X-API-KEY': serperKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: kw + ' ' + city, gl: 'in', hl: 'en', num: 20 })
+    });
+    const data = await resp.json();
+
+    let organicPos = null;
+    let competitorsAbove = [];
+    if (data.organic) {
+      data.organic.forEach((item, idx) => {
+        const itemDomain = (item.link || '').replace('https://','').replace('http://','').replace('www.','').split('/')[0].toLowerCase();
+        if (itemDomain === targetDomain && organicPos === null) {
+          organicPos = idx + 1;
+        } else if (organicPos === null) {
+          competitorsAbove.push({ pos: idx + 1, title: item.title, domain: itemDomain });
+        }
+      });
+    }
+
+    let mapPos = null;
+    let mapCompetitors = [];
+    if (data.localResults) {
+      data.localResults.forEach((item, idx) => {
+        const t = (item.title || '').toLowerCase();
+        const compName = (comp.name || '').toLowerCase().split(' ')[0];
+        if (t.includes(compName) && mapPos === null) {
+          mapPos = idx + 1;
+        } else if (mapPos === null) {
+          mapCompetitors.push({ pos: idx + 1, title: item.title });
+        }
+      });
+    }
+
+    if (currentUser && currentCompanyId) {
+      const kwSnap = await db.collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('keywords')
+        .where('keyword','==',kw).limit(1).get();
+      if (!kwSnap.empty) {
+        await kwSnap.docs[0].ref.update({
+          liveRank: organicPos || 'Not found',
+          liveMapRank: mapPos || 'N/A',
+          lastLiveCheck: new Date().toISOString()
+        });
+      }
+    }
+
+    const organicLabel = organicPos ? '#' + organicPos : 'Not in top 20';
+    const mapLabel = mapPos ? '#' + mapPos : 'Not in Map Pack';
+    const gscLabel = gscPos ? '#' + gscPos : '—';
+
+    const compAboveHtml = competitorsAbove.length
+      ? competitorsAbove.slice(0,5).map(c =>
+          '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">' +
+          '<span style="background:#e74c3c;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' +
+          c.title + '<div style="font-size:10px;color:#888;margin-top:2px;">' + c.domain + '</div></div>'
+        ).join('')
+      : '<div style="color:#2ecc71;font-size:12px;padding:6px 0;">🎉 You are at the top!</div>';
+
+    const mapAboveHtml = mapCompetitors.length
+      ? mapCompetitors.slice(0,3).map(c =>
+          '<div style="padding:6px 0;font-size:12px;">' +
+          '<span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px;">#' + c.pos + '</span>' +
+          c.title + '</div>'
+        ).join('')
+      : '<div style="color:#2ecc71;font-size:12px;padding:6px 0;">🎉 You are in Map Pack top!</div>';
+
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML =
+      '<div style="background:#fff;border-radius:16px;padding:28px;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
+          '<div style="font-size:16px;font-weight:800;color:#0a5c36;">🔴 Live Rank Result</div>' +
+          '<button onclick="this.closest('div').parentElement.remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>' +
+        '</div>' +
+        '<div style="background:#f8f8f8;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;font-weight:600;color:#333;">🔍 ' + kw + ' — ' + city + '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">' +
+          '<div style="background:#e8f4fd;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">GSC Avg</div><div style="font-size:22px;font-weight:800;color:#1565c0;">' + gscLabel + '</div></div>' +
+          '<div style="background:#d4f5e2;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">Live Organic</div><div style="font-size:22px;font-weight:800;color:#0a5c36;">' + organicLabel + '</div></div>' +
+          '<div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#666;margin-bottom:4px;">Map Pack</div><div style="font-size:22px;font-weight:800;color:#e67e22;">' + mapLabel + '</div></div>' +
+        '</div>' +
+        '<div style="margin-bottom:16px;">' +
+          '<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;">🏆 Ranking Above You (Organic)</div>' +
+          compAboveHtml +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:12px;font-weight:700;color:#333;margin-bottom:8px;">📍 Map Pack Above You</div>' +
+          mapAboveHtml +
+        '</div>' +
+        '<div style="margin-top:20px;text-align:center;font-size:10px;color:#aaa;">Checked: ' + new Date().toLocaleString() + '</div>' +
+      '</div>';
+    document.body.appendChild(modal);
+
+  } catch(err) {
+    console.error('checkLiveRank error:', err);
+    alert('Live rank check failed: ' + err.message);
+  } finally {
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
+  }
+}
+
 function renderKeywords(kwList){
   const body=document.getElementById('keywordsBody');
   updateRankTrackerStats(kwList);
@@ -6504,53 +6392,7 @@ async function addSelectedKeywords() {
 }
 
 
-async function checkLiveRank(kw, btn) {
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
 
-    try {
-        const comp = window._currentComp;
-        const targetDomain = comp.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0];
-        const res = await fetchSERP(kw, comp.city || 'Hyderabad');
-        
-        let foundPos = '100+';
-        let foundMapPos = 'N/A';
-
-        // Organic Search
-        if (res.organic) {
-            const idx = res.organic.findIndex(item => item.link.includes(targetDomain));
-            if (idx !== -1) foundPos = idx + 1;
-        }
-
-        // Local Map Pack Search
-        if (res.local_results) {
-            const midx = res.local_results.findIndex(item => item.title.toLowerCase().includes(comp.name.toLowerCase()));
-            if (midx !== -1) foundMapPos = midx + 1;
-        }
-
-        // Show Toast/Alert with result
-        alert('Live Result for: ' + kw + '\n\nOrganic Position: #' + foundPos + '\nMap Pack Position: ' + foundMapPos);
-        
-        // Update Firebase with live rank
-        const kwId = btoa(kw).replace(/=/g,'');
-        await db.doc('users/' + auth.currentUser.uid + '/companies/' + comp.id + '/keywords/' + kwId).set({
-            liveRank: foundPos,
-            liveMapRank: foundMapPos,
-            lastLiveCheck: new Date().toISOString()
-        }, { merge: true });
-
-        // Refresh UI
-        loadKeywords(); 
-
-    } catch (err) {
-        console.error(err);
-        alert('Rank check failed. Check console.');
-    } finally {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-    }
-}
 
 </script>
 
