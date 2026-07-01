@@ -2004,15 +2004,58 @@ function openAddKeyword(){
   document.getElementById('addKeywordModal').classList.add('open');
   setTimeout(()=>document.getElementById('newKeyword').focus(),100);
 }
-async function addKeyword(){
-  const kw=document.getElementById('newKeyword').value.trim();
-  const url=document.getElementById('newKeywordUrl').value.trim();
-  const pos=parseInt(document.getElementById('newKeywordPos').value)||null;
-  if(!kw)return showToast('Enter a keyword',true);
-  try{
-    const ref=await db.collection('users').doc(currentUser.uid)
+
+async function addKeyword() {
+  const kw = document.getElementById('newKeyword').value.trim();
+  const url = document.getElementById('newKeywordUrl').value.trim();
+  const pos = parseInt(document.getElementById('newKeywordPos').value) || null;
+  if (!kw) return showToast('Enter a keyword', true);
+
+  try {
+    // 1. Add to Website Keywords
+    const ref = await db.collection('users').doc(currentUser.uid)
       .collection('companies').doc(currentCompanyId)
-      .collection('keywords').add({keyword:kw,url,position:pos,change:0,clicks:0,impressions:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      .collection('keywords').add({
+        keyword: kw,
+        url: url,
+        position: pos,
+        change: 0,
+        clicks: 0,
+        impressions: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    if (pos) await saveHistorySnapshot(ref.id, pos, getTodayStr(), 'Initial entry');
+
+    // 2. AUTO-SYNC: Add to Location Keywords
+    try {
+      await db.collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('locationKeywords').doc(ref.id).set({
+          keyword: kw,
+          addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      console.log('Auto-synced to locations');
+    } catch (syncErr) {
+      console.warn('Location sync failed:', syncErr);
+    }
+
+    closeModal('addKeywordModal');
+    showToast('Keyword added to Website & Locations ✅');
+    loadKeywords(); // Refresh Website UI
+    if (typeof loadLocationKeywords === 'function') loadLocationKeywords(); // Refresh Locations UI
+    
+    // Clear inputs
+    document.getElementById('newKeyword').value = '';
+    document.getElementById('newKeywordUrl').value = '';
+    document.getElementById('newKeywordPos').value = '';
+
+  } catch (e) {
+    console.error(e);
+    showToast('Error adding keyword: ' + e.message, true);
+  }
+}
+);
     if(pos)await saveHistorySnapshot(ref.id,pos,getTodayStr(),'Initial entry');
     // Auto-sync to Locations
     try {
@@ -2027,14 +2070,26 @@ async function addKeyword(){
   }catch(e){showToast('Error: '+e.message,true);}
 }
 function openDeleteKeyword(id,name){deleteKeywordId=id;document.getElementById('deleteKeywordName').textContent=name;document.getElementById('deleteModal').classList.add('open');}
-async function confirmDelete(){
-  if(!deleteKeywordId)return;
-  try{
-    const histSnap=await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).collection('keywords').doc(deleteKeywordId).collection('history').get();
-    const batch=db.batch();histSnap.docs.forEach(d=>batch.delete(d.ref));await batch.commit();
+
+async function confirmDelete() {
+  if (!deleteKeywordId) return;
+  try {
+    // Only delete from Website collection
+    const histSnap = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).collection('keywords').doc(deleteKeywordId).collection('history').get();
+    const batch = db.batch();
+    histSnap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+
     await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).collection('keywords').doc(deleteKeywordId).delete();
-    delete historyCache[deleteKeywordId];closeModal('deleteModal');showToast('Deleted ✅');
-  }catch(e){showToast('Error: '+e.message,true);}
+    
+    closeModal('deleteModal');
+    showToast('Keyword removed from Website');
+    loadKeywords();
+  } catch (e) {
+    showToast('Delete failed: ' + e.message, true);
+  }
+}
+catch(e){showToast('Error: '+e.message,true);}
 }
 
 /* ══════════════════════════════
