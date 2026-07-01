@@ -1776,8 +1776,13 @@ async function checkLiveRank(kw, gscPos, btn) {
   btn.disabled = true;
   try {
     var comp = await loadCompSettings();
-    var rawSite = (comp.website || '').replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'').trim();
+    var rawSite = (comp.website || '').toLowerCase().trim();
+    if (rawSite.startsWith('https://')) rawSite = rawSite.slice(8);
+    if (rawSite.startsWith('http://')) rawSite = rawSite.slice(7);
+    if (rawSite.startsWith('www.')) rawSite = rawSite.slice(4);
+    if (rawSite.endsWith('/')) rawSite = rawSite.slice(0,-1);
     var targetDomain = rawSite.split('/')[0].toLowerCase();
+    console.log('DEBUG targetDomain:', targetDomain);
     var city = comp.city || 'Hyderabad';
     var serperKey = await getApiKey('serperKey');
     if (!serperKey) {
