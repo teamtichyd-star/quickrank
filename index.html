@@ -7175,3 +7175,71 @@ async function syncPlannerVolumeToExisting(){
   loadKeywords();
 }
 </script>
+<script>
+// Phase 28A FINAL FIX — parsePlannerCsv using buildKwRow for proper selection tracking
+function parsePlannerCsv(){
+  const fileEl = document.getElementById('kwPlannerCsvInput');
+  if(!fileEl || !fileEl.files[0]) return;
+  const file = fileEl.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const text = e.target.result;
+      const lines = text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+
+      let headerIndex = -1;
+      for(let i=0;i<lines.length;i++){
+        const low = lines[i].toLowerCase();
+        if(low.includes('keyword') && low.includes('avg') && low.includes('monthly')){
+          headerIndex = i;
+          break;
+        }
+      }
+
+      if(headerIndex === -1){
+        document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Cannot find header row. Export Keyword Stats CSV from Google Keyword Planner.</div>';
+        return;
+      }
+
+      const headers = lines[headerIndex].split('\t').map(function(h){return h.replace(/"/g,'').trim();});
+      const kwIdx = headers.findIndex(function(h){return h.toLowerCase()==='keyword';});
+      const volIdx = headers.findIndex(function(h){return h.toLowerCase().includes('avg') && h.toLowerCase().includes('monthly');});
+      const compIdx = headers.findIndex(function(h){return h.toLowerCase()==='competition' && !h.toLowerCase().includes('index');});
+      const cpcLowIdx = headers.findIndex(function(h){return h.toLowerCase().includes('low range');});
+      const cpcHighIdx = headers.findIndex(function(h){return h.toLowerCase().includes('high range');});
+
+      if(kwIdx===-1 || volIdx===-1){
+        document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Missing required columns: Keyword or Avg. monthly searches</div>';
+        return;
+      }
+
+      const dataRows = lines.slice(headerIndex+1);
+      let html = '';
+      let count = 0;
+      const plannerData = [];
+
+      dataRows.forEach(function(row){
+        const cols = row.split('\t').map(function(c){return c.replace(/"/g,'').trim();});
+        if(!cols[kwIdx] || cols[kwIdx].length===0) return;
+        const kw = cols[kwIdx];
+        const vol = parseInt((cols[volIdx]||'').replace(/,/g,'')) || 0;
+        const comp = compIdx>-1 ? (cols[compIdx]||'') : '';
+        const cpcLow = cpcLowIdx>-1 ? (cols[cpcLowIdx]||'') : '';
+        const cpcHigh = cpcHighIdx>-1 ? (cols[cpcHighIdx]||'') : '';
+        plannerData.push({kw:kw, vol:vol, comp:comp, cpcLow:cpcLow, cpcHigh:cpcHigh});
+        html += buildKwRow(kw, vol, cpcLow, 'planner');
+        count++;
+      });
+
+      window._plannerData = plannerData;
+      document.getElementById('kwPlannerList').innerHTML = count ? html : '<div style="color:#aaa;padding:20px;text-align:center;">No keywords found in CSV</div>';
+      document.getElementById('kwSelectedCount').textContent = count + ' keywords loaded — select to add';
+
+    }catch(err){
+      console.error('parsePlannerCsv error:',err);
+      document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;">Error: '+err.message+'</div>';
+    }
+  };
+  reader.readAsText(file);
+}
+</script>
