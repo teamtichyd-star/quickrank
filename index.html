@@ -1956,14 +1956,7 @@ function renderKeywords(kwList){
     const urlDisplay=k.url?'<a href="'+k.url+'" target="_blank" style="color:#0a5c36;font-size:11px;text-decoration:none;white-space:nowrap;">'+(function(){try{return new URL(k.url).pathname.slice(0,20)||'/';}catch(e){return k.url.slice(0,20);}})()+'</a>':'<span style="color:#ccc;font-size:11px;">—</span>';
     const vol = k.volume ? k.volume.toLocaleString() : '<span style="color:#ccc;">—</span>';
     return '<tr '+(k.gscSynced?'class="gsc-kw-row-matched"':'')+'>'
-      +'<td style="position:sticky;left:0;z-index:1;background:#fff;min-width:180px;"><div style="font-weight:600;color:#222;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">'+k.keyword+intentChip+'</div>'+(k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':'')+'</td>'
-      +'<td style="text-align:center;"><span style="background:'+posColor+';color:#fff;border-radius:8px;padding:3px 9px;font-weight:800;font-size:12px;display:inline-block;">'+posLabel+'</span></td>'
-      +'<td style="position:sticky;right:0;z-index:1;background:#fff;"><div style="display:flex;gap:3px;">'
-        +'<button class="ai-btn" style="background:#e8f4fd;border-color:#90caf9;color:#1565c0;padding:3px 7px;font-size:10px;" data-kw="'+k.keyword.replace(/'/g,'')+'" data-pos="'+(pos||0)+'" onclick="checkLiveRank(this.dataset.kw,parseInt(this.dataset.pos)||0,this)">🔴</button>'
-        +'<button class="chart-btn" style="padding:3px 7px;font-size:10px;" onclick="openHistoryModal(\''+k.id+'\',\''+k.keyword.replace(/'/g,"\\'")+'\')">📈</button>'
-        +'<button class="ai-btn" style="padding:3px 7px;font-size:10px;" onclick="openAiPanelForKeyword(\''+k.keyword.replace(/'/g,"\\'")+'\',\''+((k.url||'').replace(/'/g,"\\'"))+'\','+(pos||0)+')">AI</button>'
-        +'<button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;padding:3px 7px;font-size:10px;" onclick="openDeleteKeyword(\''+k.id+'\',\''+k.keyword.replace(/'/g,"\\'")+'\')">🗑</button>'
-      +'</div></td>'
+      +'<td style="position:sticky;left:0;z-index:1;background:#fff;min-width:220px;"><div style="font-weight:600;color:#222;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">'+k.keyword+intentChip+'</div>'+(k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':'')+'</td>'
       +'<td>'+urlDisplay+'</td>'
       +'<td style="text-align:center;"><span style="background:'+posColor+';color:#fff;border-radius:8px;padding:3px 9px;font-weight:800;font-size:12px;display:inline-block;">'+posLabel+'</span></td>'
       +'<td style="text-align:center;font-size:12px;">'+vol+'</td>'
