@@ -7462,7 +7462,7 @@ function filterPlannerList(){
 }
 </script>
 <script>
-// Phase 28B — Single Accurate AI Action Plan
+// Phase 28B — Single Accurate AI Action Plan (ACTIVE)
 function buildUnifiedPrompt(keyword, url, pageData, compSettings, competitorData, kwPosition){
   const pos = kwPosition || window._currentKwPosition || 0;
   const posLabel = pos ? '#'+pos : 'unknown position';
@@ -7544,89 +7544,53 @@ function buildUnifiedPrompt(keyword, url, pageData, compSettings, competitorData
     +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]';
 }
 
-// Override runAI to use unified prompt
+// Phase 28B — Override runAI with unified single action plan
 async function runAI(){
-  const keyword = currentAiKeyword;
-  const url = document.getElementById('fetchUrl').value.trim();
-  const outputEl = document.getElementById('aiOutput');
-  const metaEl = document.getElementById('aiMeta');
+  const provider = document.getElementById('aiProviderSelect').value;
+  const out = document.getElementById('aiOutput');
+  const meta = document.getElementById('aiMeta');
 
-  if(!keyword){ showToast('No keyword selected', true); return; }
-
-  outputEl.innerHTML = '<div style="text-align:center;padding:30px;color:#0a5c36;"><div class="spinner" style="margin:0 auto 12px;"></div>Building accurate action plan...</div>';
-  metaEl.style.display = 'none';
+  out.innerHTML = '<div style="text-align:center;padding:30px;color:#0a5c36;"><div class="spinner" style="margin:0 auto 12px;"></div>Building accurate action plan...</div>';
+  meta.style.display = 'none';
 
   try{
-    // Get competitor data via Serper
-    let competitorData = '';
-    try{
-      const serperKey = await getApiKey('serperKey');
-      const comp = await loadCompSettings();
-      if(serperKey){
-        const city = (comp && comp.city) ? comp.city : '';
-        const searchQ = keyword + (city ? ' ' + city : '');
-        const serpResp = await fetch('https://google.serper.dev/search',{
-          method:'POST',
-          headers:{'X-API-KEY':serperKey,'Content-Type':'application/json'},
-          body:JSON.stringify({q:searchQ,gl:'in',hl:'en',num:10})
-        });
-        const serpData = await serpResp.json();
-        if(serpData.organic && serpData.organic.length){
-          competitorData = serpData.organic.slice(0,10).map(function(r,i){
-            return '#'+(i+1)+': '+r.title+' — '+r.link+(r.snippet?' | "'+r.snippet.slice(0,80)+'"':'');
-          }).join('\n');
-          if(serpData.peopleAlsoAsk && serpData.peopleAlsoAsk.length){
-            competitorData += '\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.slice(0,4).map(function(q){return '- '+q.question;}).join('\n');
-          }
-        }
-      }
-    }catch(serpErr){
-      console.warn('Serper fetch failed in runAI:', serpErr);
+    const keys = await loadAIKeys();
+    const compSettings = await loadCompSettings();
+    const pos = window._currentKwPosition || 0;
+    const site = compSettings ? (compSettings.website||'') : '';
+    const gmbOk = compSettings && compSettings.gmbPlaceId ? true : false;
+    const gmbRev = compSettings ? (compSettings.gmbReviews||0) : 0;
+    const gmbRat = compSettings ? (compSettings.gmbRating||0) : 0;
+
+    // Build verified data block
+    let compData = '\n=== VERIFIED DATA ===\nCurrent Position: '+(pos>0?'#'+pos:'Unknown')+'\nBusiness Site: '+site+'\nGMB: '+(gmbOk?'ALREADY SET UP '+gmbRev+' reviews '+gmbRat+' stars - DO NOT suggest claiming GMB':'Not configured')+'\n=== END ===\n';
+
+    // Fetch real SERP data
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    if(serpData){
+      window._lastSerpData = serpData;
+      const serpText = 'TOP 10 GOOGLE RESULTS for "'+currentAiKeyword+'":\n'
+        +serpData.organic.map(function(r){return '#'+r.position+' '+r.title+' ('+r.link+')\n   '+(r.snippet||'');}).join('\n')
+        +(serpData.peopleAlsoAsk.length?'\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.map(function(q){return '- '+q;}).join('\n'):'')
+        +(serpData.relatedSearches.length?'\n\nRELATED SEARCHES:\n'+serpData.relatedSearches.map(function(q){return '- '+q;}).join('\n'):'')
+        +(serpData.featuredSnippet?'\n\nFEATURED SNIPPET:\n'+(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||''):'');
+      compData = compData + '\n\n' + serpText;
     }
 
-    const comp = await loadCompSettings();
-    const prompt = buildUnifiedPrompt(keyword, url, fetchedPageData, comp, competitorData, window._currentKwPosition);
+    // Build unified prompt
+    const prompt = buildUnifiedPrompt(currentAiKeyword, currentAiUrl, fetchedPageData, compSettings, compData, pos);
 
-    // Get AI key and run
-    const aiKeys = await getAiKeys();
-    const result = await callAI(prompt, aiKeys);
+    // Call AI
+    const r = await callAI(provider, prompt, keys);
 
-    // Parse score
-    const scoreMatch = result.match(/SEO_SCORE:\[?(\d+)\]?/);
-    const issuesMatch = result.match(/CRITICAL_ISSUES:\[?(\d+)\]?/);
-    const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
-    const issues = issuesMatch ? parseInt(issuesMatch[1]) : null;
-
-    // Clean output
-    let clean = result
-      .replace(/SEO_SCORE:\[?\d+\]?/g,'')
-      .replace(/CRITICAL_ISSUES:\[?\d+\]?/g,'')
-      .trim();
-
-    // Format markdown bold
-    clean = clean
-      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-      .replace(/\n/g,'<br>');
-
-    let scoreHtml = '';
-    if(score !== null){
-      const scoreColor = score>=70?'#2ecc71':score>=50?'#e67e22':'#e74c3c';
-      scoreHtml = '<div style="display:flex;align-items:center;gap:16px;margin-top:16px;padding:12px 16px;background:#f9f9f9;border-radius:10px;flex-wrap:wrap;">'
-        +'<div style="font-size:28px;font-weight:900;color:'+scoreColor+';">'+score+'<span style="font-size:14px;color:#888;">/100</span></div>'
-        +'<div><div style="font-weight:700;font-size:13px;">SEO Score</div>'
-        +(issues!==null?'<div style="font-size:12px;color:#e74c3c;">⚠ '+issues+' Critical Issue'+(issues!==1?'s':'')+'</div>':'')
-        +'</div></div>';
-    }
-
-    outputEl.innerHTML = '<div style="font-size:13px;line-height:1.7;color:#222;">'+clean+scoreHtml+'</div>';
-
-    // Show model info
-    metaEl.style.display = 'block';
-    metaEl.innerHTML = 'Action plan generated · Serper live data '+(competitorData?'✅':'❌ not fetched');
+    // Format output
+    out.innerHTML = formatAIOutput(r.text);
+    meta.textContent = 'Model: '+r.model+' · Provider: '+provider;
+    meta.style.display = 'block';
 
   }catch(err){
-    console.error('runAI error:', err);
-    outputEl.innerHTML = '<div style="color:#e74c3c;padding:20px;">Error: '+err.message+'</div>';
+    console.error('runAI Phase28B error:', err);
+    out.innerHTML = '<div style="color:#e74c3c;padding:12px;">❌ Error: '+err.message+'</div>';
   }
 }
 </script>
