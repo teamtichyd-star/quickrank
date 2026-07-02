@@ -1736,10 +1736,18 @@ function loadKeywords(){
 ══════════════════════════════ */
 function getKeywordIntent(kw) {
   const k = (kw || '').toLowerCase();
-  const t = ['contractor','company','firm','hire','cost','price','quote','fitout','turnkey','near me','charges','services','work','build','construct','renovation','project'];
-  const c = ['best','top','compare','vs','review','list','leading','famous','popular','affordable'];
-  if (t.some(w => k.includes(w))) return 'T';
+  const t = [
+    'contractor','contractors','company','firm','hire','cost','price','quote',
+    'fitout','fit-out','turnkey','near me','charges','services','work',
+    'build','construct','renovation','project','designers','decorators',
+    'interiors','interior','office interior','commercial interior'
+  ];
+  const c = [
+    'best','top','compare','vs','review','list','leading','famous',
+    'popular','affordable','luxury','premium'
+  ];
   if (c.some(w => k.includes(w))) return 'C';
+  if (t.some(w => k.includes(w))) return 'T';
   return 'I';
 }
 
