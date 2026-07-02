@@ -176,3 +176,21 @@ Find function: grep -n "functionName" /Users/haritalla/Desktop/quickrank/index.h
 - addSelectedKeywords() (Suggest modal) now saves to both Website + Locations
 - Delete is independent - removing from one tab does not affect the other
 - Both tabs refresh automatically after add
+
+## Phase 27 — Intent + Opportunity Badges (COMPLETED 2 Jul 2026)
+- Intent chips T/C/I added to every keyword (green/orange/yellow)
+- Opportunity badges: 👑 Defend / 🔥 Quick Win / 🎯 Potential / 📉 Recover
+- Rule-based intent detection (no AI cost)
+- Badge logic: Recover (drop 3+), Defend (pos 1-3), Quick Win (pos 4-20), Potential (vol 100+)
+- Clean table: Keyword sticky left, Actions sticky right, horizontal scroll
+- Columns: Keyword | URL | Pos | Vol | Clicks | CTR | Actions | Type | Impr
+- Removed: filter bar, Best Ever, Trend, Sparkline, Update button
+- Compact icon-only action buttons
+
+## Phase 27B — Collapsible Sidebar (COMPLETED 2 Jul 2026)
+- Round toggle button on sidebar edge
+- Collapses sidebar to icon-only mode (55px wide)
+- Text hidden with font-size:0 + display:none rules
+- State saved in localStorage (quickrank_sidebar_collapsed)
+- Auto-restores collapsed state on page reload
+- Main content margin adjusts automatically
