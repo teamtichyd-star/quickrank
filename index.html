@@ -618,7 +618,19 @@ tr:hover td{background:#f9fffe;}
             <button class="add-btn" onclick="openAddKeyword()">+ Add</button>
           </div>
         </div>
-        <div class="table-wrap">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+  <span style="font-size:11px;font-weight:700;color:#888;">FILTER:</span>
+  <button class="kw-opp-filter" data-filter="all" onclick="setKwFilter('opp','all')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#d4f5e2;">All</button>
+  <button class="kw-opp-filter" data-filter="recover" onclick="setKwFilter('opp','recover')" style="padding:4px 10px;border:1.5px solid #fecaca;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">📉 Recover</button>
+  <button class="kw-opp-filter" data-filter="defend" onclick="setKwFilter('opp','defend')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">👑 Defend</button>
+  <button class="kw-opp-filter" data-filter="quickwin" onclick="setKwFilter('opp','quickwin')" style="padding:4px 10px;border:1.5px solid #ffd9b3;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🔥 Quick Win</button>
+  <button class="kw-opp-filter" data-filter="potential" onclick="setKwFilter('opp','potential')" style="padding:4px 10px;border:1.5px solid #90caf9;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🎯 Potential</button>
+  <span style="font-size:11px;font-weight:700;color:#888;margin-left:8px;">INTENT:</span>
+  <button class="kw-intent-filter" data-filter="T" onclick="setKwFilter('intent','T')" style="padding:4px 10px;border:1.5px solid #0a5c36;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#0a5c36;">T</button>
+  <button class="kw-intent-filter" data-filter="C" onclick="setKwFilter('intent','C')" style="padding:4px 10px;border:1.5px solid #e67e22;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#e67e22;">C</button>
+  <button class="kw-intent-filter" data-filter="I" onclick="setKwFilter('intent','I')" style="padding:4px 10px;border:1.5px solid #f1c40f;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#b8860b;">I</button>
+</div>
+<div class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -630,6 +642,8 @@ tr:hover td{background:#f9fffe;}
                 <th class="sortable" onclick="sortByCol('impressions')">Impr. <span id="sort-impressions"></span></th>
                 <th class="sortable" onclick="sortByCol('ctr')">CTR <span id="sort-ctr"></span></th>
                 <th>Trend</th>
+                <th>Opportunity</th>
+                <th>Sparkline</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -807,7 +821,19 @@ tr:hover td{background:#f9fffe;}
               <button class="add-btn" style="background:linear-gradient(135deg,#1a73e8,#4285f4);" onclick="importAllUnmatched()">⬇️ Import Untracked</button>
             </div>
           </div>
-          <div class="table-wrap">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+  <span style="font-size:11px;font-weight:700;color:#888;">FILTER:</span>
+  <button class="kw-opp-filter" data-filter="all" onclick="setKwFilter('opp','all')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#d4f5e2;">All</button>
+  <button class="kw-opp-filter" data-filter="recover" onclick="setKwFilter('opp','recover')" style="padding:4px 10px;border:1.5px solid #fecaca;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">📉 Recover</button>
+  <button class="kw-opp-filter" data-filter="defend" onclick="setKwFilter('opp','defend')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">👑 Defend</button>
+  <button class="kw-opp-filter" data-filter="quickwin" onclick="setKwFilter('opp','quickwin')" style="padding:4px 10px;border:1.5px solid #ffd9b3;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🔥 Quick Win</button>
+  <button class="kw-opp-filter" data-filter="potential" onclick="setKwFilter('opp','potential')" style="padding:4px 10px;border:1.5px solid #90caf9;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🎯 Potential</button>
+  <span style="font-size:11px;font-weight:700;color:#888;margin-left:8px;">INTENT:</span>
+  <button class="kw-intent-filter" data-filter="T" onclick="setKwFilter('intent','T')" style="padding:4px 10px;border:1.5px solid #0a5c36;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#0a5c36;">T</button>
+  <button class="kw-intent-filter" data-filter="C" onclick="setKwFilter('intent','C')" style="padding:4px 10px;border:1.5px solid #e67e22;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#e67e22;">C</button>
+  <button class="kw-intent-filter" data-filter="I" onclick="setKwFilter('intent','I')" style="padding:4px 10px;border:1.5px solid #f1c40f;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#b8860b;">I</button>
+</div>
+<div class="table-wrap">
             <table>
               <thead>
                 <tr>
@@ -832,7 +858,19 @@ tr:hover td{background:#f9fffe;}
             <button style="padding:5px 12px;background:#fff3cd;border:1.5px solid #f39c12;border-radius:7px;color:#856404;font-size:12px;font-weight:600;cursor:pointer;" onclick="importAllUnmatched()">Import All</button>
           </div>
           <div class="table-card">
-            <div class="table-wrap">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+  <span style="font-size:11px;font-weight:700;color:#888;">FILTER:</span>
+  <button class="kw-opp-filter" data-filter="all" onclick="setKwFilter('opp','all')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#d4f5e2;">All</button>
+  <button class="kw-opp-filter" data-filter="recover" onclick="setKwFilter('opp','recover')" style="padding:4px 10px;border:1.5px solid #fecaca;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">📉 Recover</button>
+  <button class="kw-opp-filter" data-filter="defend" onclick="setKwFilter('opp','defend')" style="padding:4px 10px;border:1.5px solid #d4f5e2;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">👑 Defend</button>
+  <button class="kw-opp-filter" data-filter="quickwin" onclick="setKwFilter('opp','quickwin')" style="padding:4px 10px;border:1.5px solid #ffd9b3;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🔥 Quick Win</button>
+  <button class="kw-opp-filter" data-filter="potential" onclick="setKwFilter('opp','potential')" style="padding:4px 10px;border:1.5px solid #90caf9;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:#f0fdf6;">🎯 Potential</button>
+  <span style="font-size:11px;font-weight:700;color:#888;margin-left:8px;">INTENT:</span>
+  <button class="kw-intent-filter" data-filter="T" onclick="setKwFilter('intent','T')" style="padding:4px 10px;border:1.5px solid #0a5c36;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#0a5c36;">T</button>
+  <button class="kw-intent-filter" data-filter="C" onclick="setKwFilter('intent','C')" style="padding:4px 10px;border:1.5px solid #e67e22;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#e67e22;">C</button>
+  <button class="kw-intent-filter" data-filter="I" onclick="setKwFilter('intent','I')" style="padding:4px 10px;border:1.5px solid #f1c40f;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;background:#f0fdf6;color:#b8860b;">I</button>
+</div>
+<div class="table-wrap">
               <table>
                 <thead><tr><th>Keyword</th><th>Position</th><th>Clicks</th><th>Impressions</th><th>Action</th></tr></thead>
                 <tbody id="gscUnmatchedBody"></tbody>
@@ -1692,6 +1730,80 @@ function loadKeywords(){
     });
 }
 
+
+/* ══════════════════════════════
+   INTENT + OPPORTUNITY HELPERS
+══════════════════════════════ */
+function getKeywordIntent(kw) {
+  const k = (kw || '').toLowerCase();
+  const t = ['contractor','company','firm','hire','cost','price','quote','fitout','turnkey','near me','charges','services','work','build','construct','renovation','project'];
+  const c = ['best','top','compare','vs','review','list','leading','famous','popular','affordable'];
+  if (t.some(w => k.includes(w))) return 'T';
+  if (c.some(w => k.includes(w))) return 'C';
+  return 'I';
+}
+
+function getIntentChip(intent) {
+  if (intent === 'T') return '<span style="background:#0a5c36;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:4px;">T</span>';
+  if (intent === 'C') return '<span style="background:#e67e22;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:4px;">C</span>';
+  return '<span style="background:#f1c40f;color:#333;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:4px;">I</span>';
+}
+
+function getOpportunityBadge(pos, change, volume) {
+  const drop = change < 0 ? Math.abs(change) : 0;
+  const vol = volume || 0;
+  if (drop >= 3) return {key:'recover', html:'<span style="background:#e74c3c;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">📉 Recover</span>'};
+  if (pos && pos <= 3) return {key:'defend', html:'<span style="background:#8e44ad;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">👑 Defend</span>'};
+  if (pos && pos >= 4 && pos <= 20) return {key:'quickwin', html:'<span style="background:#e67e22;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">🔥 Quick Win</span>'};
+  if (vol >= 100) return {key:'potential', html:'<span style="background:#1565c0;color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">🎯 Potential</span>'};
+  return {key:'', html:'<span style="color:#ccc;font-size:11px;">—</span>'};
+}
+
+function getSparkline(history) {
+  if (!history || history.length < 2) return '<span style="color:#ccc;font-size:10px;">no data</span>';
+  const max = Math.max(...history);
+  const min = Math.min(...history);
+  const range = max - min || 1;
+  const w = 60, h = 24;
+  const pts = history.slice(-7).map((v, i, arr) => {
+    const x = (i / (arr.length - 1)) * w;
+    const y = h - ((v - min) / range) * h;
+    return x + ',' + y;
+  }).join(' ');
+  const last = history[history.length - 1];
+  const prev = history[history.length - 2];
+  const color = last <= prev ? '#2ecc71' : '#e74c3c';
+  return '<svg width="'+w+'" height="'+h+'" style="vertical-align:middle;">'
+    + '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '</svg>';
+}
+
+let kwOpportunityFilter = 'all';
+let kwIntentFilter = 'all';
+
+function setKwFilter(type, val) {
+  if (type === 'opp') kwOpportunityFilter = val;
+  if (type === 'intent') kwIntentFilter = val;
+  renderKeywordsFiltered();
+  document.querySelectorAll('.kw-opp-filter').forEach(b => b.style.background = '#f0fdf6');
+  document.querySelectorAll('.kw-intent-filter').forEach(b => b.style.background = '#f0fdf6');
+  document.querySelectorAll('[data-filter="'+val+'"]').forEach(b => b.style.background = '#d4f5e2');
+}
+
+function renderKeywordsFiltered() {
+  let list = [...(window._allKeywords || keywords || [])];
+  if (kwOpportunityFilter !== 'all') {
+    list = list.filter(k => {
+      const b = getOpportunityBadge(k.position, k.change || 0, k.volume || 0);
+      return b.key === kwOpportunityFilter;
+    });
+  }
+  if (kwIntentFilter !== 'all') {
+    list = list.filter(k => getKeywordIntent(k.keyword) === kwIntentFilter);
+  }
+  renderKeywords(list);
+}
+
 /* ══════════════════════════════
    KEYWORDS RENDER (with sort)
 ══════════════════════════════ */
@@ -1836,6 +1948,7 @@ async function checkLiveRank(kw, gscPos, btn) {
 }
 
 function renderKeywords(kwList){
+  window._allKeywords = kwList;
   const body=document.getElementById('keywordsBody');
   updateRankTrackerStats(kwList);
   if(!body) return;
@@ -1856,9 +1969,12 @@ function renderKeywords(kwList){
     const ctr=k.ctr?`${(k.ctr*100).toFixed(1)}%`:'—';
     const estTraffic=k.clicks?k.clicks:'—';
     const bestPos=(k.bestPosition && k.bestPosition !== k.position)?`<span style="color:#0a5c36;font-weight:700;">#${k.bestPosition}</span>`:(k.position?`<span style="color:#aaa;font-size:11px;">same</span>`:'—');
-    const oppBadge=(pos && pos>=4 && pos<=20)?'<span style="font-size:9px;background:#fff3cd;color:#b8860b;border:1px solid #ffc107;border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">⚡ WIN</span>':'';
+    const intent = getKeywordIntent(k.keyword);
+    const intentChip = getIntentChip(intent);
+    const oppObj = getOpportunityBadge(pos, change, k.volume || 0);
+    const sparkHtml = getSparkline(k.sparkline || []);
     return `<tr ${k.gscSynced?'class="gsc-kw-row-matched"':''}>
-      <td><div style="font-weight:600;color:#222;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${k.keyword}${oppBadge}</div>${k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':''}</td>
+      <td><div style="font-weight:600;color:#222;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${k.keyword}${intentChip}</div>${k.gscSynced?'<div style="font-size:10px;color:#1a73e8;font-weight:600;">🔗 GSC</div>':''}</td>
       <td>${urlDisplay}</td>
       <td><span style="background:${posColor};color:#fff;border-radius:8px;padding:4px 12px;font-weight:800;font-size:13px;display:inline-block;">${posLabel}</span></td>
       <td>${bestPos}</td>
@@ -1866,16 +1982,20 @@ function renderKeywords(kwList){
       <td style="font-size:12px;color:#888;">${impr}</td>
       <td style="font-size:12px;">${ctr}</td>
       <td>${trendHtml}</td>
+      <td>${oppObj.html}</td>
+      <td>${sparkHtml}</td>
       <td>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <button class="update-rank-btn" onclick="openUpdateRank('${k.id}','${k.keyword.replace(/'/g,"\\'")}',${pos||0})">📍 Update</button>
-          <button class="chart-btn" onclick="openHistoryModal('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">📈 History</button>
+          <button class="update-rank-btn" onclick="openUpdateRank('${k.id}','${k.keyword.replace(/'/g,"\'")}',${pos||0})">📍 Update</button>
+          <button class="chart-btn" onclick="openHistoryModal('${k.id}','${k.keyword.replace(/'/g,"\'")}')">📈 History</button>
           <button class="ai-btn" style="background:#e8f4fd;border-color:#90caf9;color:#1565c0;" data-kw="${k.keyword.replace(/'/g,'')}" data-pos="${pos||0}" onclick="checkLiveRank(this.dataset.kw,parseInt(this.dataset.pos)||0,this)">🔴 Live</button>
-          <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\\'")}','${(k.url||'').replace(/'/g,"\\'")}',${pos||0})">
+          <button class="ai-btn" onclick="openAiPanelForKeyword('${k.keyword.replace(/'/g,"\'")}','${(k.url||'').replace(/'/g,"\'")}',${pos||0})">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>AI
           </button>
-          <button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\\'")}')">🗑️</button>
+          <button class="ai-btn" style="background:#fde8e8;border-color:#fcc;color:#e74c3c;" onclick="openDeleteKeyword('${k.id}','${k.keyword.replace(/'/g,"\'")}')">🗑️</button>
         </div>
+      </td>
+    </tr>`;
       </td>
     </tr>`;
   }).join('');
