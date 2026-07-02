@@ -7571,6 +7571,9 @@ async function runAI(){
       window._lastSerpData = serpData;
       // Filter out own domain from competitor list
       const ownDomain = (site||'').replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      console.log('DEBUG site:', site, 'ownDomain:', ownDomain, 'filtered count:', serpData.organic.filter(function(r){return !r.link.toLowerCase().includes(ownDomain);}).length, 'total:', serpData.organic.length);
+      console.log('DEBUG fetchedPageData:', fetchedPageData ? JSON.stringify(fetchedPageData).slice(0,200) : 'NULL');
+      console.log('DEBUG gscDataFull sample:', typeof gscDataFull !== 'undefined' ? JSON.stringify(gscDataFull.slice(0,2)) : 'UNDEFINED');
       const filteredOrganic = serpData.organic.filter(function(r){
         return !r.link.toLowerCase().includes(ownDomain);
       });
