@@ -7483,13 +7483,16 @@ function buildUnifiedPrompt(keyword, url, pageData, compSettings, competitorData
 
   let gscSection = '';
   if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
-    const gscRow = gscDataFull.find(function(r){ return r.keyword === keyword; });
+    const gscRow = gscDataFull.find(function(r){
+      return (r.keyword||'').toLowerCase().trim() === (keyword||'').toLowerCase().trim();
+    });
     if(gscRow){
       gscSection = '\nGSC DATA:'
         +'\n- GSC Position: #'+Math.round(gscRow.position)
         +'\n- Clicks (28d): '+gscRow.clicks
         +'\n- Impressions (28d): '+gscRow.impressions
-        +'\n- CTR: '+(gscRow.ctr*100).toFixed(1)+'%';
+        +'\n- CTR: '+((gscRow.ctr||0)*100).toFixed(1)+'%'
+        +'\n- Best Position Ever: '+(gscRow.bestPosition||'unknown');
     }
   }
 
@@ -7566,8 +7569,13 @@ async function runAI(){
     const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
     if(serpData){
       window._lastSerpData = serpData;
+      // Filter out own domain from competitor list
+      const ownDomain = (site||'').replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      const filteredOrganic = serpData.organic.filter(function(r){
+        return !r.link.toLowerCase().includes(ownDomain);
+      });
       const serpText = 'TOP 10 GOOGLE RESULTS for "'+currentAiKeyword+'":\n'
-        +serpData.organic.map(function(r){return '#'+r.position+' '+r.title+' ('+r.link+')\n   '+(r.snippet||'');}).join('\n')
+        +filteredOrganic.map(function(r){return '#'+r.position+' '+r.title+' ('+r.link+')\n   '+(r.snippet||'');}).join('\n')
         +(serpData.peopleAlsoAsk.length?'\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.map(function(q){return '- '+q;}).join('\n'):'')
         +(serpData.relatedSearches.length?'\n\nRELATED SEARCHES:\n'+serpData.relatedSearches.map(function(q){return '- '+q;}).join('\n'):'')
         +(serpData.featuredSnippet?'\n\nFEATURED SNIPPET:\n'+(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||''):'');
