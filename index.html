@@ -3558,7 +3558,7 @@ async function loadDashboard(){
       var vol = k.volume || k.impressions || 0;
       return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fafafa;border-radius:8px;">'+
         '<div style="width:34px;height:26px;border-radius:6px;background:'+color+';color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">#'+pos+'</div>'+
-        '<div style="flex:1;min-width:0;"><div style="font-size:12px;color:#222;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+k.keyword+intentChip(getIntent(k.keyword))+'</div>'+
+        '<div style="flex:1;min-width:0;cursor:pointer;" title="Go to keyword in Rank Tracker" onclick="jumpToKeyword(\''+kwEnc+'\')"><div style="font-size:12px;color:#222;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+k.keyword+intentChip(getIntent(k.keyword))+'</div>'+
         (vol?'<div style="font-size:10px;color:#888;">Vol/Impr: '+vol+'</div>':'')+
         '</div>'+
         '<button style="background:#e8f4fd;border:1px solid #90caf9;color:#1565c0;padding:2px 6px;font-size:10px;border-radius:4px;cursor:pointer;" data-kw="'+kwEnc+'" data-pos="'+pos+'" onclick="checkLiveRank(this.dataset.kw,parseInt(this.dataset.pos)||0,this)">LIVE</button>'+
@@ -4590,6 +4590,27 @@ function showPage(page,el){
   if(page==='charts')renderChartsPage();
   if(page==='gsc'&&gscAccessToken&&gscDataFull.length)renderGSCTable(gscDataView);
   if(page==='watchdog') runWatchdog();
+}
+
+
+function jumpToKeyword(kw){
+  showPage('ranktracker', document.getElementById('nav-ranktracker'));
+  setTimeout(function(){
+    var tbody = document.getElementById('keywordsBody');
+    if(!tbody) return;
+    var rows = tbody.querySelectorAll('tr');
+    for(var i=0;i<rows.length;i++){
+      var tdText = rows[i].querySelector('td');
+      if(tdText && tdText.textContent.toLowerCase().indexOf(kw.toLowerCase())!==-1){
+        rows[i].scrollIntoView({behavior:'smooth', block:'center'});
+        var originalBg = rows[i].style.background;
+        rows[i].style.background = '#fff3cd';
+        rows[i].style.transition = 'background 0.5s';
+        setTimeout(function(r){return function(){r.style.background = originalBg;};}(rows[i]), 2500);
+        break;
+      }
+    }
+  }, 400);
 }
 
 function toggleSidebarCollapse(){
