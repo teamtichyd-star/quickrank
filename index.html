@@ -707,11 +707,7 @@ tr:hover td{background:#f9fffe;}
         </div>
         <div class="ai-panel-body">
           <div class="ai-mode-tabs">
-            <button class="ai-mode-tab active" onclick="setAiMode('general',this)">General SEO</button>
-            <button class="ai-mode-tab" onclick="setAiMode('local',this)">Local SEO</button>
-            <button class="ai-mode-tab" onclick="setAiMode('content',this)">Content</button>
-            <button class="ai-mode-tab" onclick="setAiMode('technical',this)">Technical</button>
-            <button class="ai-mode-tab" onclick="setAiMode('competitor',this)">Competitor</button>
+            <span style="font-size:12px;color:#0a5c36;font-weight:700;padding:6px 0;display:inline-block;">⚡ Single Action Plan — covers SEO, content, local, technical & competitors</span>
           </div>
           <div class="fetch-row">
             <input id="fetchUrl" type="url" placeholder="https://yoursite.com/page (optional)">
@@ -7463,5 +7459,174 @@ function filterPlannerList(){
   if(newSearchEl) newSearchEl.value = query;
 
   document.getElementById('kwSelectedCount').textContent = filtered.length + ' of ' + window._plannerData.length + ' keywords';
+}
+</script>
+<script>
+// Phase 28B — Single Accurate AI Action Plan
+function buildUnifiedPrompt(keyword, url, pageData, compSettings, competitorData, kwPosition){
+  const pos = kwPosition || window._currentKwPosition || 0;
+  const posLabel = pos ? '#'+pos : 'unknown position';
+
+  let pageSection = '';
+  if(pageData){
+    pageSection = '\nPAGE AUDIT DATA:'
+      +'\n- URL: '+(url||'not provided')
+      +'\n- Title ('+(pageData.titleLength||0)+' chars): '+(pageData.title||'none')
+      +'\n- Meta Description ('+(pageData.metaLength||0)+' chars): '+(pageData.metaDesc||'none')
+      +'\n- H1: '+(pageData.h1||'none')
+      +'\n- H2s: '+((pageData.h2s||[]).join(' | ')||'none')
+      +'\n- Word Count: '+(pageData.wordCount||0)
+      +'\n- Images Missing Alt: '+(pageData.imgsMissingAlt||0)
+      +'\n- Internal Links: '+(pageData.internalLinks||0)
+      +'\n- External Links: '+(pageData.externalLinks||0);
+  }
+
+  let gscSection = '';
+  if(typeof gscDataFull !== 'undefined' && gscDataFull.length > 0){
+    const gscRow = gscDataFull.find(function(r){ return r.keyword === keyword; });
+    if(gscRow){
+      gscSection = '\nGSC DATA:'
+        +'\n- GSC Position: #'+Math.round(gscRow.position)
+        +'\n- Clicks (28d): '+gscRow.clicks
+        +'\n- Impressions (28d): '+gscRow.impressions
+        +'\n- CTR: '+(gscRow.ctr*100).toFixed(1)+'%';
+    }
+  }
+
+  let competitorSection = '';
+  if(competitorData && competitorData.length > 0){
+    competitorSection = '\nREAL GOOGLE TOP 10 RIGHT NOW:\n'+competitorData;
+  }
+
+  let businessSection = '';
+  if(compSettings){
+    businessSection = '\nBUSINESS CONTEXT:'
+      +'\n- Business: '+(compSettings.name||'')
+      +'\n- Website: '+(compSettings.website||'')
+      +'\n- City: '+(compSettings.city||'')
+      +'\n- Industry: '+(compSettings.industry||'')
+      +'\n- Services: '+(compSettings.services||'')
+      +'\n- GMB: Already set up with '+(compSettings.gmbReviews||'?')+' reviews, '+(compSettings.gmbRating||'?')+' stars'
+      +'\n- Target Areas: '+(compSettings.targetAreas||'');
+  }
+
+  return 'You are a senior SEO strategist. Give a SPECIFIC and ACCURATE action plan for this exact situation. No generic advice. No hallucinations.\n\n'
+    +'KEYWORD: "'+keyword+'"\n'
+    +'CURRENT RANK: '+posLabel+'\n'
+    +'TARGET PAGE: '+(url||'not set')+'\n'
+    +businessSection+'\n'
+    +pageSection+'\n'
+    +gscSection+'\n'
+    +competitorSection+'\n'
+    +'\nCRITICAL RULES - FOLLOW EXACTLY:\n'
+    +'1. GMB is ALREADY SET UP - never say claim or create GMB\n'
+    +'2. Use the EXACT position number provided above - never assume #1\n'
+    +'3. Only name competitors visible in REAL GOOGLE DATA above - never invent names\n'
+    +'4. Only flag technical issues confirmed in PAGE AUDIT DATA above\n'
+    +'5. Every recommendation must reference a specific number, URL, or data point\n'
+    +'6. If page word count is above 1000 - do NOT say add more content unless specific gap exists\n'
+    +'7. If 0 images missing alt - do NOT mention alt tags\n'
+    +'\nOUTPUT FORMAT - use exactly this structure:\n\n'
+    +'**📊 Situation**\n'
+    +'(2-3 lines: current rank, page fit, biggest opportunity. Use real numbers.)\n\n'
+    +'**⚡ Top Actions** (do these first)\n'
+    +'1. (specific action with exact copy or number — e.g. exact title tag to use)\n'
+    +'2. (specific action)\n'
+    +'3. (specific action)\n'
+    +'4. (specific action)\n'
+    +'5. (specific action)\n\n'
+    +'**🏆 Competitor Gap**\n'
+    +'(name real competitors from SERP data above, what they have that you dont. If no SERP data, say "Run live check first")\n\n'
+    +'**📍 Local SEO**\n'
+    +'(only if keyword has local intent — specific action for '+(compSettings?compSettings.city||'your city':'your city')+'. Skip if not local keyword.)\n\n'
+    +'**📄 Page Decision**\n'
+    +'Keep optimizing this page OR Create new page at [suggested-slug] because [reason]\n\n'
+    +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]';
+}
+
+// Override runAI to use unified prompt
+async function runAI(){
+  const keyword = currentAiKeyword;
+  const url = document.getElementById('fetchUrl').value.trim();
+  const outputEl = document.getElementById('aiOutput');
+  const metaEl = document.getElementById('aiMeta');
+
+  if(!keyword){ showToast('No keyword selected', true); return; }
+
+  outputEl.innerHTML = '<div style="text-align:center;padding:30px;color:#0a5c36;"><div class="spinner" style="margin:0 auto 12px;"></div>Building accurate action plan...</div>';
+  metaEl.style.display = 'none';
+
+  try{
+    // Get competitor data via Serper
+    let competitorData = '';
+    try{
+      const serperKey = await getApiKey('serperKey');
+      const comp = await loadCompSettings();
+      if(serperKey){
+        const city = (comp && comp.city) ? comp.city : '';
+        const searchQ = keyword + (city ? ' ' + city : '');
+        const serpResp = await fetch('https://google.serper.dev/search',{
+          method:'POST',
+          headers:{'X-API-KEY':serperKey,'Content-Type':'application/json'},
+          body:JSON.stringify({q:searchQ,gl:'in',hl:'en',num:10})
+        });
+        const serpData = await serpResp.json();
+        if(serpData.organic && serpData.organic.length){
+          competitorData = serpData.organic.slice(0,10).map(function(r,i){
+            return '#'+(i+1)+': '+r.title+' — '+r.link+(r.snippet?' | "'+r.snippet.slice(0,80)+'"':'');
+          }).join('\n');
+          if(serpData.peopleAlsoAsk && serpData.peopleAlsoAsk.length){
+            competitorData += '\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.slice(0,4).map(function(q){return '- '+q.question;}).join('\n');
+          }
+        }
+      }
+    }catch(serpErr){
+      console.warn('Serper fetch failed in runAI:', serpErr);
+    }
+
+    const comp = await loadCompSettings();
+    const prompt = buildUnifiedPrompt(keyword, url, fetchedPageData, comp, competitorData, window._currentKwPosition);
+
+    // Get AI key and run
+    const aiKeys = await getAiKeys();
+    const result = await callAI(prompt, aiKeys);
+
+    // Parse score
+    const scoreMatch = result.match(/SEO_SCORE:\[?(\d+)\]?/);
+    const issuesMatch = result.match(/CRITICAL_ISSUES:\[?(\d+)\]?/);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+    const issues = issuesMatch ? parseInt(issuesMatch[1]) : null;
+
+    // Clean output
+    let clean = result
+      .replace(/SEO_SCORE:\[?\d+\]?/g,'')
+      .replace(/CRITICAL_ISSUES:\[?\d+\]?/g,'')
+      .trim();
+
+    // Format markdown bold
+    clean = clean
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
+
+    let scoreHtml = '';
+    if(score !== null){
+      const scoreColor = score>=70?'#2ecc71':score>=50?'#e67e22':'#e74c3c';
+      scoreHtml = '<div style="display:flex;align-items:center;gap:16px;margin-top:16px;padding:12px 16px;background:#f9f9f9;border-radius:10px;flex-wrap:wrap;">'
+        +'<div style="font-size:28px;font-weight:900;color:'+scoreColor+';">'+score+'<span style="font-size:14px;color:#888;">/100</span></div>'
+        +'<div><div style="font-weight:700;font-size:13px;">SEO Score</div>'
+        +(issues!==null?'<div style="font-size:12px;color:#e74c3c;">⚠ '+issues+' Critical Issue'+(issues!==1?'s':'')+'</div>':'')
+        +'</div></div>';
+    }
+
+    outputEl.innerHTML = '<div style="font-size:13px;line-height:1.7;color:#222;">'+clean+scoreHtml+'</div>';
+
+    // Show model info
+    metaEl.style.display = 'block';
+    metaEl.innerHTML = 'Action plan generated · Serper live data '+(competitorData?'✅':'❌ not fetched');
+
+  }catch(err){
+    console.error('runAI error:', err);
+    outputEl.innerHTML = '<div style="color:#e74c3c;padding:20px;">Error: '+err.message+'</div>';
+  }
 }
 </script>
