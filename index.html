@@ -7311,3 +7311,157 @@ function parsePlannerCsv(){
   reader.readAsText(file, 'UTF-16');
 }
 </script>
+<script>
+// Phase 28A — Planner CSV: Search + Sort headers
+function parsePlannerCsv(){
+  const fileEl = document.getElementById('kwPlannerCsvInput');
+  if(!fileEl || !fileEl.files[0]) return;
+  const file = fileEl.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const text = e.target.result;
+      const lines = text.split('\n').map(function(l){return l.replace(/\r/g,'').trim();}).filter(function(l){return l.length>0;});
+
+      let headerIndex = -1;
+      for(let i=0;i<lines.length;i++){
+        const low = lines[i].toLowerCase();
+        if(low.includes('keyword') && low.includes('avg') && low.includes('monthly')){
+          headerIndex = i;
+          break;
+        }
+      }
+
+      if(headerIndex === -1){
+        document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;text-align:center;">Cannot find header row.</div>';
+        return;
+      }
+
+      const headers = lines[headerIndex].split('\t').map(function(h){return h.replace(/"/g,'').trim();});
+      const kwIdx = headers.findIndex(function(h){return h.toLowerCase()==='keyword';});
+      const volIdx = headers.findIndex(function(h){return h.toLowerCase().includes('avg') && h.toLowerCase().includes('monthly');});
+      const compIdx = headers.findIndex(function(h){return h.toLowerCase()==='competition' && !h.toLowerCase().includes('index');});
+      const cpcLowIdx = headers.findIndex(function(h){return h.toLowerCase().includes('low range');});
+      const cpcHighIdx = headers.findIndex(function(h){return h.toLowerCase().includes('high range');});
+
+      if(kwIdx===-1 || volIdx===-1){
+        document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;">Missing columns</div>';
+        return;
+      }
+
+      const dataRows = lines.slice(headerIndex+1);
+      const plannerData = [];
+
+      dataRows.forEach(function(row){
+        const cols = row.split('\t').map(function(c){return c.replace(/"/g,'').trim();});
+        if(!cols[kwIdx] || cols[kwIdx].length===0) return;
+        plannerData.push({
+          kw: cols[kwIdx],
+          vol: parseInt((cols[volIdx]||'').replace(/,/g,'')) || 0,
+          comp: compIdx>-1 ? (cols[compIdx]||'') : '',
+          cpcLow: cpcLowIdx>-1 ? (cols[cpcLowIdx]||'') : '',
+          cpcHigh: cpcHighIdx>-1 ? (cols[cpcHighIdx]||'') : ''
+        });
+      });
+
+      window._plannerData = plannerData;
+      window._plannerSortCol = 'vol';
+      window._plannerSortAsc = false;
+      renderPlannerList(plannerData);
+      document.getElementById('kwSelectedCount').textContent = plannerData.length + ' keywords loaded';
+
+    }catch(err){
+      console.error('parsePlannerCsv error:',err);
+      document.getElementById('kwPlannerList').innerHTML = '<div style="color:#e74c3c;padding:20px;">Error: '+err.message+'</div>';
+    }
+  };
+  reader.readAsText(file, 'UTF-16');
+}
+
+function renderPlannerList(data){
+  const sortCol = window._plannerSortCol || 'vol';
+  const sortAsc = window._plannerSortAsc || false;
+
+  const sorted = data.slice().sort(function(a,b){
+    if(sortCol === 'kw'){
+      return sortAsc ? a.kw.localeCompare(b.kw) : b.kw.localeCompare(a.kw);
+    }
+    if(sortCol === 'vol'){
+      return sortAsc ? a.vol - b.vol : b.vol - a.vol;
+    }
+    if(sortCol === 'comp'){
+      return sortAsc ? a.comp.localeCompare(b.comp) : b.comp.localeCompare(a.comp);
+    }
+    return 0;
+  });
+
+  const arrow = function(col){
+    if(sortCol !== col) return ' ↕';
+    return sortAsc ? ' ↑' : ' ↓';
+  };
+
+  let html = '';
+
+  // Search bar
+  html += '<div style="margin-bottom:10px;">';
+  html += '<input type="text" id="plannerSearch" placeholder="🔍 Search keywords..." oninput="filterPlannerList()" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;">';
+  html += '</div>';
+
+  // Sortable header
+  html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;background:#f0fdf6;border-radius:6px;margin-bottom:4px;font-weight:700;font-size:12px;color:#0a5c36;cursor:pointer;">';
+  html += '<div style="width:30px;"></div>';
+  html += '<div style="flex:1;" onclick="sortPlannerCol(\'kw\')">Keyword'+arrow('kw')+'</div>';
+  html += '<div style="width:80px;text-align:right;" onclick="sortPlannerCol(\'vol\')">Volume'+arrow('vol')+'</div>';
+  html += '<div style="width:70px;text-align:center;" onclick="sortPlannerCol(\'comp\')">Comp'+arrow('comp')+'</div>';
+  html += '<div style="width:70px;text-align:right;">CPC</div>';
+  html += '</div>';
+
+  // Rows
+  html += '<div id="plannerRows" style="max-height:350px;overflow-y:auto;">';
+  sorted.forEach(function(p){
+    const kwLower = p.kw.toLowerCase();
+    const isTracked = typeof kwTrackedSet !== 'undefined' && kwTrackedSet.has(kwLower);
+    const attrKw = kwLower.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+    html += '<div class="planner-row" data-kw="'+kwLower+'" style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid #f5f5f5;font-size:13px;">';
+    html += '<input type="checkbox" '+(isTracked?'disabled':'')+' onchange="toggleKwSelect(\''+attrKw+'\',this.checked)" style="width:16px;height:16px;cursor:pointer;">';
+    html += '<div style="flex:1;">'+p.kw+(isTracked?' <span style="color:#2ecc71;font-size:11px;">✅</span>':'')+'</div>';
+    html += '<div style="width:80px;text-align:right;color:#0a5c36;font-weight:600;">'+p.vol.toLocaleString()+'</div>';
+    html += '<div style="width:70px;text-align:center;"><span style="font-size:11px;padding:2px 6px;border-radius:4px;background:'+(p.comp==='High'?'#fde8e8':p.comp==='Medium'?'#fef3cd':'#d4f5e2')+';color:'+(p.comp==='High'?'#e74c3c':p.comp==='Medium'?'#e67e22':'#0a5c36')+';">'+p.comp+'</span></div>';
+    html += '<div style="width:70px;text-align:right;font-size:11px;color:#888;">'+(p.cpcLow?'₹'+p.cpcLow:'—')+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('kwPlannerList').innerHTML = html;
+}
+
+function sortPlannerCol(col){
+  if(window._plannerSortCol === col){
+    window._plannerSortAsc = !window._plannerSortAsc;
+  } else {
+    window._plannerSortCol = col;
+    window._plannerSortAsc = (col === 'kw');
+  }
+  filterPlannerList();
+}
+
+function filterPlannerList(){
+  const searchEl = document.getElementById('plannerSearch');
+  const query = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+  if(!window._plannerData) return;
+
+  const filtered = query
+    ? window._plannerData.filter(function(p){ return p.kw.toLowerCase().includes(query); })
+    : window._plannerData;
+
+  renderPlannerList(filtered);
+
+  // Restore search value after re-render
+  const newSearchEl = document.getElementById('plannerSearch');
+  if(newSearchEl) newSearchEl.value = query;
+
+  document.getElementById('kwSelectedCount').textContent = filtered.length + ' of ' + window._plannerData.length + ' keywords';
+}
+</script>
