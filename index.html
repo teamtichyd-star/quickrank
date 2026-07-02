@@ -7602,8 +7602,8 @@ async function runAI(){
       const filteredOrganic = serpData.organic.filter(function(r){
         return !r.link.toLowerCase().includes(ownDomain);
       });
-      const serpText = 'TOP 10 GOOGLE RESULTS for "'+currentAiKeyword+'":\n'
-        +filteredOrganic.map(function(r){return '#'+r.position+' '+r.title+' ('+r.link+')\n   '+(r.snippet||'');}).join('\n')
+      const serpText = 'TOP COMPETITOR RESULTS for "'+currentAiKeyword+'" (your domain excluded):\n'
+        +filteredOrganic.map(function(r,i){return 'Rank '+(i+1)+' (Google pos #'+r.position+'): '+r.title+'\nURL: '+r.link+'\nSnippet: '+(r.snippet||'');}).join('\n\n')
         +(serpData.peopleAlsoAsk.length?'\n\nPEOPLE ALSO ASK:\n'+serpData.peopleAlsoAsk.map(function(q){return '- '+q;}).join('\n'):'')
         +(serpData.relatedSearches.length?'\n\nRELATED SEARCHES:\n'+serpData.relatedSearches.map(function(q){return '- '+q;}).join('\n'):'')
         +(serpData.featuredSnippet?'\n\nFEATURED SNIPPET:\n'+(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||''):'');
