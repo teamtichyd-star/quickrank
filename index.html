@@ -7565,12 +7565,40 @@ async function runAI(){
     // Build verified data block
     let compData = '\n=== VERIFIED DATA ===\nCurrent Position: '+(pos>0?'#'+pos:'Unknown')+'\nBusiness Site: '+site+'\nGMB: '+(gmbOk?'ALREADY SET UP '+gmbRev+' reviews '+gmbRat+' stars - DO NOT suggest claiming GMB':'Not configured')+'\n=== END ===\n';
 
+    // Fix: ensure gscDataFull is populated
+    if(typeof gscDataFull === 'undefined' || !gscDataFull || gscDataFull.length === 0){
+      try{
+        const kwSnap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('keywords').get();
+        if(!kwSnap.empty){
+          window.gscDataFull = kwSnap.docs.map(function(d){
+            const dd = d.data();
+            return {
+              keyword: dd.keyword||'',
+              position: dd.position||0,
+              clicks: dd.clicks||0,
+              impressions: dd.impressions||0,
+              ctr: dd.ctr||0,
+              bestPosition: dd.bestPosition||0,
+              url: dd.url||''
+            };
+          });
+          console.log('runAI: loaded gscDataFull from Firebase:', window.gscDataFull.length);
+        }
+      }catch(gscErr){
+        console.warn('runAI: could not load gscDataFull', gscErr);
+      }
+    }
+
     // Fetch real SERP data
     const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
     if(serpData){
       window._lastSerpData = serpData;
       // Filter out own domain from competitor list
-      const ownDomain = (site||'').replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      const ownSite = (compSettings && compSettings.website ? compSettings.website : site) || '';
+      const ownDomain = ownSite.replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      console.log('ownDomain:', ownDomain);
       console.log('DEBUG site:', site, 'ownDomain:', ownDomain, 'filtered count:', serpData.organic.filter(function(r){return !r.link.toLowerCase().includes(ownDomain);}).length, 'total:', serpData.organic.length);
       console.log('DEBUG fetchedPageData:', fetchedPageData ? JSON.stringify(fetchedPageData).slice(0,200) : 'NULL');
       console.log('DEBUG gscDataFull sample:', typeof gscDataFull !== 'undefined' ? JSON.stringify(gscDataFull.slice(0,2)) : 'UNDEFINED');
