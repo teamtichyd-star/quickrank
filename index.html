@@ -7628,3 +7628,163 @@ async function runAI(){
   }
 }
 </script>
+<script>
+// Phase 28B — Deep Report with pre-processed data
+async function runDeepReport(){
+  const provider = document.getElementById('aiProviderSelect').value;
+  const out = document.getElementById('aiOutput');
+  const meta = document.getElementById('aiMeta');
+
+  out.innerHTML = '<div style="text-align:center;padding:30px;color:#8e44ad;"><div class="spinner" style="margin:0 auto 12px;"></div>Running deep analysis — fetching live SERP + page data...</div>';
+  meta.style.display = 'none';
+
+  try{
+    const keys = await loadAIKeys();
+    const compSettings = await loadCompSettings();
+    const pos = window._currentKwPosition || 0;
+    const site = compSettings ? (compSettings.website||'') : '';
+
+    // Load GSC data if empty
+    if(typeof gscDataFull === 'undefined' || !gscDataFull || gscDataFull.length === 0){
+      try{
+        const kwSnap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('keywords').get();
+        if(!kwSnap.empty){
+          gscDataFull = kwSnap.docs.map(function(d){
+            const dd = d.data();
+            return {
+              keyword: dd.keyword||'',
+              position: dd.position||0,
+              clicks: dd.clicks||0,
+              impressions: dd.impressions||0,
+              ctr: dd.ctr||0,
+              bestPosition: dd.bestPosition||0,
+              url: dd.url||''
+            };
+          });
+        }
+      }catch(e){ console.warn('Deep report GSC load failed', e); }
+    }
+
+    // Get GSC row for this keyword
+    const gscRow = gscDataFull ? gscDataFull.find(function(r){
+      return (r.keyword||'').toLowerCase().trim() === (currentAiKeyword||'').toLowerCase().trim();
+    }) : null;
+
+    // Pre-calculate page fit
+    const intent = typeof getKeywordIntent === 'function' ? getKeywordIntent(currentAiKeyword) : 'T';
+    const intentLabel = intent === 'T' ? 'Transactional' : intent === 'C' ? 'Commercial' : 'Informational';
+    const urlMatch = currentAiUrl && currentAiUrl.toLowerCase().includes(
+      currentAiKeyword.toLowerCase().split(' ')[0]
+    ) ? 'Yes' : 'No';
+
+    const pageFitBlock = 'PAGE FIT PRE-ANALYSIS:\n'
+      +'- Keyword Intent: '+intentLabel+'\n'
+      +'- Current URL: '+(currentAiUrl||'not set')+'\n'
+      +'- URL contains primary keyword word: '+urlMatch+'\n'
+      +'- GSC Position: '+(gscRow?'#'+Math.round(gscRow.position):'not found')+'\n'
+      +'- GSC Clicks 28d: '+(gscRow?gscRow.clicks:'?')+'\n'
+      +'- GSC Impressions 28d: '+(gscRow?gscRow.impressions:'?')+'\n'
+      +'- GSC CTR: '+(gscRow?((gscRow.ctr||0)*100).toFixed(2)+'%':'?')+'\n';
+
+    // Fetch SERP with full snippets
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    let competitorBlock = '';
+    let paaBlock = '';
+
+    if(serpData){
+      const ownDomain = site.replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      const filtered = serpData.organic.filter(function(r){
+        return !r.link.toLowerCase().includes(ownDomain);
+      });
+
+      competitorBlock = 'TOP COMPETITORS (your domain excluded):\n'
+        +filtered.slice(0,5).map(function(r,i){
+          return 'Competitor '+(i+1)+' (Google #'+r.position+'):\n'
+            +'  Title: '+r.title+'\n'
+            +'  URL: '+r.link+'\n'
+            +'  Snippet: '+(r.snippet||'').slice(0,200);
+        }).join('\n\n');
+
+      if(serpData.peopleAlsoAsk && serpData.peopleAlsoAsk.length){
+        paaBlock = 'PEOPLE ALSO ASK — ADD THESE AS H2 HEADINGS ON YOUR PAGE:\n'
+          +serpData.peopleAlsoAsk.map(function(q,i){ return (i+1)+'. '+q; }).join('\n');
+      }
+
+      if(serpData.featuredSnippet){
+        paaBlock += '\n\nFEATURED SNIPPET OPPORTUNITY:\n'
+          +(serpData.featuredSnippet.answer||serpData.featuredSnippet.snippet||'');
+      }
+    }
+
+    // Page audit block
+    let pageBlock = '';
+    if(fetchedPageData){
+      pageBlock = 'PAGE AUDIT:\n'
+        +'- Title ('+fetchedPageData.titleLen+' chars): '+fetchedPageData.title+'\n'
+        +'- Meta ('+(fetchedPageData.metaLength||0)+' chars): '+(fetchedPageData.metaDesc||'none')+'\n'
+        +'- H1: '+(fetchedPageData.h1||'none')+'\n'
+        +'- H2s: '+((fetchedPageData.h2s||[]).join(' | ')||'none')+'\n'
+        +'- Word Count: '+(fetchedPageData.wordCount||0)+'\n'
+        +'- Images Missing Alt: '+(fetchedPageData.imgsMissingAlt||0)+'\n';
+    }
+
+    // Business block
+    const bizBlock = 'BUSINESS:\n'
+      +'- Name: '+(compSettings?compSettings.name:'')+'\n'
+      +'- City: '+(compSettings?compSettings.city:'')+'\n'
+      +'- Services: '+(compSettings?compSettings.services:'')+'\n'
+      +'- GMB: ALREADY SET UP — '+(compSettings?compSettings.gmbReviews:'')+' reviews, '+(compSettings?compSettings.gmbRating:'')+' stars\n'
+      +'- Target Areas: '+(compSettings?compSettings.targetAreas:'')+'\n';
+
+    // Build deep prompt
+    const deepPrompt = 'You are a ruthless SEO auditor. Use ONLY the data below. Every recommendation must quote a specific number, URL, or data point from the bundle.\n\n'
+      +'=== DATA BUNDLE ===\n'
+      +'Keyword: "'+currentAiKeyword+'"\n'
+      +bizBlock+'\n'
+      +pageFitBlock+'\n'
+      +pageBlock+'\n'
+      +competitorBlock+'\n\n'
+      +paaBlock+'\n\n'
+      +'=== AUDIT RULES ===\n'
+      +'1. GMB is SET UP — never mention claiming or verifying GMB\n'
+      +'2. If word count > 1000 — do NOT say add more content unless PAA gap exists\n'
+      +'3. If alt tags = 0 missing — do NOT mention alt tags\n'
+      +'4. Internal links are navigation — NOT an issue — never mention link count\n'
+      +'5. Quote exact competitor URLs from DATA BUNDLE — never invent names\n'
+      +'6. Use CTR and clicks from GSC data — never say no data if provided\n'
+      +'7. Quote exact PAA questions as H2 recommendations\n\n'
+      +'=== REQUIRED OUTPUT ===\n\n'
+      +'**📊 Situation**\n'
+      +'Rank: [exact number] | CTR: [exact %] | Clicks: [exact] | Impressions: [exact]\n'
+      +'Page fit: [Yes/No + one specific reason based on URL and intent]\n'
+      +'Biggest gap: [one specific thing from competitor data]\n\n'
+      +'**⚡ Top Actions**\n'
+      +'1. [TITLE] Exact new title: "[write full title here]"\n'
+      +'2. [H2 ADD] Add this exact H2 from PAA: "[exact question]"\n'
+      +'3. [H2 ADD] Add this exact H2 from PAA: "[exact question]"\n'
+      +'4. [COMPETITOR GAP] Competitor [URL] covers "[specific topic]" — add this section\n'
+      +'5. [QUICK WIN] One specific action under 1 hour\n\n'
+      +'**🏆 Competitor Analysis**\n'
+      +'- Competitor 1 URL: [exact URL]\n'
+      +'  Why they rank higher: [specific reason]\n'
+      +'- Competitor 2 URL: [exact URL]\n'
+      +'  Why they rank higher: [specific reason]\n\n'
+      +'**📍 Local SEO** (only if keyword has local intent)\n'
+      +'One specific action for '+(compSettings?compSettings.city:'your city')+'\n\n'
+      +'**📄 Page Decision**\n'
+      +'KEEP or CREATE /new-slug/ — one sentence with data reason\n\n'
+      +'SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]';
+
+    const r = await callAI(provider, deepPrompt, keys);
+    out.innerHTML = formatAIOutput(r.text);
+    meta.textContent = '📋 Deep Report · Model: '+r.model+' · Provider: '+provider;
+    meta.style.display = 'block';
+
+  }catch(err){
+    console.error('runDeepReport error:', err);
+    out.innerHTML = '<div style="color:#e74c3c;padding:12px;">❌ Error: '+err.message+'</div>';
+  }
+}
+</script>
