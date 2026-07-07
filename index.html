@@ -7601,7 +7601,9 @@ async function runAI(){
       const ownSite = (compSettings && compSettings.website ? compSettings.website : site) || '';
       const ownDomain = ownSite.replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
       const filteredOrganic = serpData.organic.filter(function(r){
-        return !r.link.toLowerCase().includes(ownDomain);
+        const link = r.link.toLowerCase();
+        const junk = ['justdial.com','indiamart.com','sulekha.com','facebook.com','yelp.com','youtube.com','instagram.com'];
+        return !link.includes(ownDomain) && !junk.some(j => link.includes(j));
       });
       const serpText = 'TOP COMPETITOR RESULTS for "'+currentAiKeyword+'" (your domain excluded):\n'
         +filteredOrganic.map(function(r,i){return 'Rank '+(i+1)+' (Google pos #'+r.position+'): '+r.title+'\nURL: '+r.link+'\nSnippet: '+(r.snippet||'');}).join('\n\n')
@@ -7698,7 +7700,9 @@ async function runDeepReport(){
     if(serpData){
       const ownDomain = site.replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
       const filtered = serpData.organic.filter(function(r){
-        return !r.link.toLowerCase().includes(ownDomain);
+        const link = r.link.toLowerCase();
+        const junk = ['justdial.com','indiamart.com','sulekha.com','facebook.com','yelp.com','youtube.com','instagram.com'];
+        return !link.includes(ownDomain) && !junk.some(j => link.includes(j));
       });
 
       competitorBlock = 'TOP COMPETITORS (your domain excluded):\n'
@@ -7741,7 +7745,7 @@ async function runDeepReport(){
       +'- Target Areas: '+(compSettings?compSettings.targetAreas:'')+'\n';
 
     // Build deep prompt
-    const deepPrompt = 'You are a ruthless SEO auditor. Use ONLY the data below. Every recommendation must quote a specific number, URL, or data point from the bundle.\n\n'
+    const deepPrompt = 'You are a HIGHLY SPECIFIC SEO AUDITOR. NEVER suggest GMB claiming (it is already done). NEVER suggest Alt tags (0 are missing). NEVER mention internal link counts. If PAA is missing, suggest H2s that answer 'Process', 'Pricing', and 'Timeline' for the keyword. Every recommendation must quote a specific number, URL, or data point from the bundle.\n\n'
       +'=== DATA BUNDLE ===\n'
       +'Keyword: "'+currentAiKeyword+'"\n'
       +bizBlock+'\n'
