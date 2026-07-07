@@ -7691,6 +7691,7 @@ async function runDeepReport(){
 
     // Fetch SERP with full snippets
     const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    window._lastSerpData = serpData;
     let competitorBlock = '';
     let paaBlock = '';
 
