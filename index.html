@@ -6595,7 +6595,7 @@ async function loadAISuggestions() {
     const compSnap = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).get();
     const comp = compSnap.exists ? compSnap.data() : {};
     const prompt = `Generate 25 SEO keywords for ${comp.name || 'interior contractors'} in Hyderabad. Return JSON array: [{"keyword":"...","volume":"...","cpc":"..."}]`;
-    const result = await callAI('groq', prompt, keys);
+    const result = await callAI('gemini', prompt, keys);
     let clean = (result.text || result || '').replace(/```json/gi,'').replace(/```/g,'').trim();
     const list = JSON.parse(clean.substring(clean.indexOf('['), clean.lastIndexOf(']')+1));
     container.innerHTML = list.map(r => buildKwRow(r.keyword, r.volume, r.cpc, 'ai')).join('');
