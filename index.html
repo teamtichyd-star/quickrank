@@ -3100,7 +3100,7 @@ async function runAI(){
     var _biz='\n=== VERIFIED DATA ===\nCurrent Position: '+((_pos>0)?'#'+_pos:'Unknown')+'\nBusiness Site: '+_site+'\nGMB: '+(_gmbOk?'ALREADY SET UP '+_gmbRev+' reviews '+_gmbRat+' stars - DO NOT suggest claiming GMB':'Not configured')+'\n=== END ===\n';
     compData=_biz+(compData||'');
     // Fetch real SERP data via Serper if available
-    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):''); window._lastSerpData = serpData;
     if(serpData){
       window._lastSerpData = serpData;
       const serpText = 'TOP 10 GOOGLE RESULTS for "'+currentAiKeyword+'":\n'+
@@ -7594,7 +7594,7 @@ async function runAI(){
     }
 
     // Fetch real SERP data
-    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):''); window._lastSerpData = serpData;
     if(serpData){
       window._lastSerpData = serpData;
       // Filter out own domain from competitor list
@@ -7690,7 +7690,7 @@ async function runDeepReport(){
       +'- GSC CTR: '+(gscRow?((gscRow.ctr||0)*100).toFixed(2)+'%':'?')+'\n';
 
     // Fetch SERP with full snippets
-    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):''); window._lastSerpData = serpData;
     window._lastSerpData = serpData;
     let competitorBlock = '';
     let paaBlock = '';
