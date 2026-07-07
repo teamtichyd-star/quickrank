@@ -717,7 +717,7 @@ tr:hover td{background:#f9fffe;}
           <div class="page-preview" id="pagePreview"></div>
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <button class="btn-primary" style="font-size:13px;padding:9px 18px;" onclick="runAI()">⚡ Quick Analysis</button>
-            <button class="btn-primary" style="font-size:13px;padding:9px 18px;background:linear-gradient(135deg,#8e44ad,#9b59b6);" onclick="runDeepReport()">📋 Deep Report</button>
+            <button class="btn-primary" style="font-size:13px;padding:9px 18px;background:linear-gradient(135deg,#8e44ad,#9b59b6);" onclick="runDeepReport('gemini')">📋 Deep Report</button>
             <select id="aiProviderSelect" style="padding:8px 12px;border:1.5px solid #d4f5e2;border-radius:8px;font-size:13px;color:#333;background:#fff;">
               <option value="groq">Groq (Fastest)</option>
               <option value="openai">OpenAI</option>
@@ -7795,3 +7795,69 @@ async function runDeepReport(){
 }
 </script>
 <!-- Phase 28B rebuild -->
+
+<script>
+
+async function runDeepReport(forcedProvider){
+  const provider = forcedProvider || document.getElementById('aiProviderSelect').value;
+  const out = document.getElementById('aiOutput');
+  const meta = document.getElementById('aiMeta');
+
+  out.innerHTML = '<div style="text-align:center;padding:30px;color:#8e44ad;"><div class="spinner" style="margin:0 auto 12px;"></div><strong>Deep Report Analysis</strong><br><span style="font-size:11px;">Comparing your page against real Google competitors...</span></div>';
+  meta.style.display = 'none';
+
+  try{
+    const keys = await loadAIKeys();
+    const compSettings = await loadCompSettings();
+    const pos = window._currentKwPosition || 0;
+    const site = compSettings ? (compSettings.website||'') : '';
+
+    if(typeof gscDataFull === 'undefined' || !gscDataFull || gscDataFull.length === 0){
+        const kwSnap = await db.collection('users').doc(currentUser.uid).collection('companies').doc(currentCompanyId).collection('keywords').get();
+        gscDataFull = kwSnap.docs.map(d => ({...d.data(), id: d.id}));
+    }
+
+    const gscRow = gscDataFull.find(r => (r.keyword||'').toLowerCase() === (currentAiKeyword||'').toLowerCase());
+    const serpData = await fetchSERP(currentAiKeyword, compSettings?(compSettings.city+', India'):'');
+    window._lastSerpData = serpData;
+
+    let competitorBlock = 'NO LIVE COMPETITOR DATA FOUND.';
+    let paaBlock = '';
+    if(serpData){
+      const ownDomain = site.replace(/https?:\/\//,'').replace(/www\./,'').split('/')[0].toLowerCase();
+      const filtered = serpData.organic.filter(r => {
+        const link = r.link.toLowerCase();
+        const junk = ['justdial','indiamart','sulekha','facebook','yelp','instagram','listing','directory'];
+        return !link.includes(ownDomain) && !junk.some(j => link.includes(j));
+      });
+
+      competitorBlock = filtered.slice(0,5).map((r,i) => {
+        return `RANK ${i+1} (Google Pos #${r.position}):\nURL: ${r.link}\nTitle: ${r.title}\nSnippet: ${(r.snippet||'').slice(0,200)}`;
+      }).join('\n\n');
+
+      if(serpData.peopleAlsoAsk && serpData.peopleAlsoAsk.length){
+        paaBlock = '\nCONTENT GAPS (People Also Ask):\n' + serpData.peopleAlsoAsk.map(q => '- '+q).join('\n');
+      }
+    }
+
+    const prompt = `Act as a Senior SEO Consultant for ${compSettings.name}. Analyze "${currentAiKeyword}" vs Rank #1.\n\n`
+      + `BUSINESS: ${compSettings.name} in ${compSettings.city}\n`
+      + `CURRENT POSITION: #${pos}\n`
+      + `GSC DATA: Clicks=${gscRow?.clicks||0}, Impressions=${gscRow?.impressions||0}, CTR=${((gscRow?.ctr||0)*100).toFixed(2)}%\n\n`
+      + `[LIVE COMPETITORS]\n${competitorBlock}\n\n`
+      + `[PAGE DATA]\nTitle: ${fetchedPageData?.title}\nWord Count: ${fetchedPageData?.wordCount}\nAlt Tags: ${fetchedPageData?.imgsMissingAlt} missing\n\n`
+      + `STRICT RULES:\n1. GMB IS SET UP. Never suggest claiming it.\n2. ALT TAGS ARE OK. Never suggest adding alts.\n3. QUOTE EXACT COMPETITOR URLS.\n4. Provide EXACT new Title tag.\n5. Provide 3 exact H2 headings to add based on gaps.\n\n`
+      + `**Situation**\n(2 sentences max)\n\n**Top 3 Action Items**\n1. [TITLE] ...\n2. [CONTENT] ...\n3. [COMPETITOR] ...\n\n**Final Recommendation**\n(Keep/Move)\n\nSEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`;
+
+    const r = await callAI(provider, prompt, keys);
+    out.innerHTML = formatAIOutput(r.text);
+    meta.textContent = '📋 Deep Report · Model: Gemini 1.5 · Provider: '+provider;
+    meta.style.display = 'block';
+
+  }catch(err){
+    console.error('Deep Report Error:', err);
+    out.innerHTML = '<div style="color:red;padding:15px;">Deep Report Error: '+err.message+'</div>';
+  }
+}
+
+</script>
