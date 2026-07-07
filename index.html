@@ -7888,7 +7888,7 @@ SEO_SCORE:[0-100] CRITICAL_ISSUES:[n]`;
 
     const r = await callAI(provider, prompt, keys);
     out.innerHTML = formatAIOutput(r.text);
-    meta.textContent = '📋 Deep Report · Model: Gemini 1.5 · Provider: '+provider;
+    meta.textContent = '📋 Deep Report · Model: '+r.model+' · Provider: '+provider;
     meta.style.display = 'block';
 
   }catch(err){
