@@ -2869,7 +2869,7 @@ async function callAISingle(provider,prompt,keys){
     groq:{url:'https://api.groq.com/openai/v1/chat/completions',key:keys.groq,model:model||'llama-3.3-70b-versatile'},
     openai:{url:'https://api.openai.com/v1/chat/completions',key:keys.openai,model:model||'gpt-4o-mini'},
     anthropic:{url:'https://api.anthropic.com/v1/messages',key:keys.anthropic,model:model||'claude-3-haiku-20240307',special:true},
-    gemini:{url:`https://generativelanguage.googleapis.com/v1/models/${'gemini-1.5-flash'}:generateContent?key=${keys.gemini}`,key:keys.gemini,gemini:true},
+    gemini:{url:`https://generativelanguage.googleapis.com/v1beta/models/${'gemini-1.5-flash'}:generateContent?key=${keys.gemini}`,key:keys.gemini,gemini:true},
     mistral:{url:'https://api.mistral.ai/v1/chat/completions',key:keys.mistral,model:model||'mistral-large-latest'},
     cohere:{url:'https://api.cohere.ai/v1/chat',key:keys.cohere,model:model||'command-r',cohere:true},
     together:{url:'https://api.together.xyz/v1/chat/completions',key:keys.together,model:model||'meta-llama/Llama-3.3-70B-Instruct-Turbo'}
@@ -2877,7 +2877,7 @@ async function callAISingle(provider,prompt,keys){
   const cfg=configs[provider];if(!cfg?.key)throw new Error(`No ${provider} API key`);
   let resp,body;
   if(cfg.gemini){
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${cfg.key}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cfg.key}`;
       resp = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -6193,7 +6193,7 @@ Be brutally specific. Use the actual numbers above. No generic advice.`;
     } else {
       const key = await getAIKey('gemini');
       if (!key) throw new Error('Gemini key missing in Settings');
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
