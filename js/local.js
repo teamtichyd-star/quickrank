@@ -414,27 +414,7 @@
   } catch(e) {
     return {rank:21,total:0,area:areaName,places:[]};
   }
-}ync function fetchLocalRank(keyword, lat, lng, siteUrl, apiKey) {
-    if (!apiKey) return 0;
-    try {
-      const domain = siteUrl.replace(/https?:\/\//, '').replace(/\/.*/, '');
-      const res = await fetch('https://google.serper.dev/search', {
-        method: 'POST',
-        headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          q: keyword, gl: 'in', hl: 'en', num: 20,
-          location: lat.toFixed(4) + ',' + lng.toFixed(4)
-        })
-      });
-      const data = await res.json();
-      const results = data.organic || [];
-      for (let i = 0; i < results.length; i++) {
-        if (results[i].link?.includes(domain)) return i + 1;
-      }
-      return 0;
-    } catch (e) { console.error('fetchLocalRank:', e); return 0; }
-  }
-
+}
   // ── Save History ─────────────────────────────────────────
   async function saveHistory(kwId, keyword, results) {
     if (!currentCompanyId) return;
