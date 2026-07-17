@@ -252,8 +252,9 @@
     for (let i = 0; i < points.length; i++) {
       const pt = points[i];
       if (runText) runText.textContent = `Checking point ${i + 1} of ${totalPoints}...`;
-      const position = await fetchLocalRank(selectedKeyword.keyword, pt.lat, pt.lng, website, serperKey);
-      results.push({ ...pt, position });
+      const rankResult = await fetchLocalRank(selectedKeyword.keyword, pt.lat, pt.lng, website, serperKey);
+      const position = typeof rankResult === "object" ? (rankResult.rank || 21) : (rankResult || 21);
+      results.push({ ...pt, position, area: rankResult.area || "" });
       addResultMarker(pt, position);
       await sleep(800);
     }
