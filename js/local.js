@@ -17,20 +17,46 @@
   const centerLng = compSettings?.lng || DEFAULT_CENTER.lng;
   const website = compSettings?.website || '';
 
+  // Init map first, then load keywords
+  initLeafletMap();
   await loadLocalKeywords();
 
-  // Wait for Leaflet + DOM to be ready then init map
-  waitForLeaflet();
-
-  function waitForLeaflet(attempts) {
-    attempts = attempts || 0;
-    if (attempts > 30) { console.error('Leaflet never loaded'); return; }
+  // ── Init Leaflet Map ─────────────────────────────────────
+  function initLeafletMap() {
     const mapEl = document.getElementById('geo-map');
-    if (window.L && mapEl && mapEl.offsetWidth > 0) {
-      initLeafletMap();
-    } else {
-      setTimeout(() => waitForLeaflet(attempts + 1), 200);
-    }
+    if (!mapEl || !window.L || map) return;
+
+    map = L.map('geo-map', {
+      center: [centerLat, centerLng],
+      zoom: 12,
+      zoomControl: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Business center marker
+    const centerIcon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:16px;height:16px;
+        background:#0a5c36;
+        border:3px solid #fff;
+        border-radius:50%;
+        box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.4);
+      "></div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+
+    L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
+      .addTo(map)
+      .bindPopup('<strong>' + (compSettings?.name || 'Your Business') + '</strong><br>📍 Business Location');
+
+    setTimeout(() => { if(map) map.invalidateSize(); }, 300);
+    console.log('✅ Map initialized');
   }
 
   // ── Load Keywords ────────────────────────────────────────
@@ -59,7 +85,11 @@
       const countEl = document.getElementById('kw-count');
       if (countEl) countEl.textContent = allKeywords.length + ' keywords';
       renderKeywordList(allKeywords);
-      if (allKeywords.length > 0) selectKeyword(allKeywords[0]);
+
+      // Auto-select first keyword AND load its last scan
+      if (allKeywords.length > 0) {
+        await selectKeyword(allKeywords[0]);
+      }
     } catch (e) { console.error(e); }
   }
 
@@ -91,12 +121,12 @@
     renderKeywordList(allKeywords.filter(k => k.keyword.toLowerCase().includes(q)));
   };
 
-  window.selectKeywordById = function (id) {
+  window.selectKeywordById = async function (id) {
     const kw = allKeywords.find(k => k.id === id);
-    if (kw) selectKeyword(kw);
+    if (kw) await selectKeyword(kw);
   };
 
-  function selectKeyword(kw) {
+  async function selectKeyword(kw) {
     selectedKeyword = kw;
     document.querySelectorAll('.kw-item').forEach(el => el.classList.remove('active'));
     const item = document.getElementById('kwitem-' + kw.id);
@@ -105,65 +135,101 @@
     if (label) label.textContent = kw.keyword;
     const title = document.getElementById('grid-title');
     if (title) title.textContent = '"' + kw.keyword + '" — Geo-Grid';
-    const sub = document.getElementById('grid-sub');
-    if (sub) sub.textContent = 'Click "Run Geo-Grid" to scan';
-    loadHistory(kw.id);
+
+    // Load history and auto-replay latest scan
+    await loadHistory(kw.id, true);
   }
 
-  // ── Init Leaflet Map ─────────────────────────────────────
-  function initLeafletMap() {
-    const mapEl = document.getElementById('geo-map');
-    if (!mapEl || !window.L) return;
-    if (map) return; // already init
-
+  // ── Load History + Auto Replay Latest ───────────────────
+  async function loadHistory(kwId, autoReplay) {
+    const el = document.getElementById('history-list');
+    if (!el || !currentCompanyId) return;
     try {
-      map = L.map('geo-map', {
-        center: [centerLat, centerLng],
-        zoom: 12,
-        zoomControl: true
-      });
+      let snap;
+      try {
+        snap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('localScans')
+          .where('keywordId', '==', kwId)
+          .orderBy('scannedAt', 'desc')
+          .limit(10).get();
+      } catch (e) {
+        snap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('localScans')
+          .where('keywordId', '==', kwId)
+          .limit(10).get();
+      }
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
-        maxZoom: 18
-      }).addTo(map);
+      if (snap.empty) {
+        el.innerHTML = '<div class="history-empty">No scans yet — click "Run Geo-Grid"</div>';
+        const sub = document.getElementById('grid-sub');
+        if (sub) sub.textContent = 'No scans yet — click "Run Geo-Grid"';
+        // Clear map markers
+        mapMarkers.forEach(m => map && map.removeLayer(m));
+        mapMarkers = [];
+        return;
+      }
 
-      // Business location marker
-      const html = `<div style="
-        width:20px;height:20px;
-        background:#0a5c36;
-        border:3px solid #fff;
-        border-radius:50%;
-        box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.4);
-      "></div>`;
+      // Render history list
+      el.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const date = d.scannedAt?.toDate ? d.scannedAt.toDate().toLocaleDateString() : 'Unknown';
+        const avg = d.avgPosition ? '#' + d.avgPosition : '--';
+        const color = !d.avgPosition ? '#999'
+          : d.avgPosition <= 3 ? '#1b5e20'
+          : d.avgPosition <= 10 ? '#1565c0'
+          : d.avgPosition <= 20 ? '#e65100'
+          : '#b71c1c';
+        return `
+          <div class="history-item" onclick="replayHistoryScan('${doc.id}')">
+            <div class="history-date">📅 ${date}</div>
+            <div class="history-kw">${d.keyword} · ${d.gridSize}×${d.gridSize} · ${d.radius}km</div>
+            <div class="history-avg" style="color:${color};">${avg}</div>
+          </div>`;
+      }).join('');
 
-      const centerIcon = L.divIcon({
-        className: '',
-        html: html,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-      });
-
-      L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
-        .addTo(map)
-        .bindPopup('<strong>' + (compSettings?.name || 'Your Business') + '</strong><br>📍 Business Location');
-
-      // Force re-render
-      setTimeout(() => map.invalidateSize(), 100);
-      setTimeout(() => map.invalidateSize(), 500);
-      setTimeout(() => map.invalidateSize(), 1000);
-
-      console.log('Leaflet map initialized ✅');
+      // Auto replay latest scan on map
+      if (autoReplay && snap.docs.length > 0) {
+        const latest = snap.docs[0].data();
+        clearMarkers();
+        if (latest.results && latest.results.length > 0) {
+          latest.results.forEach(r => addResultMarker(r, r.position));
+          showGridStats(latest.results);
+          const timeEl = document.getElementById('grid-time');
+          if (timeEl && latest.scannedAt?.toDate) {
+            timeEl.textContent = 'Last scan: ' + latest.scannedAt.toDate().toLocaleString();
+          }
+          const sub = document.getElementById('grid-sub');
+          if (sub) sub.textContent = `Showing last scan — ${latest.gridSize}×${latest.gridSize} grid, ${latest.radius}km radius`;
+        }
+      }
     } catch (e) {
-      console.error('Map init error:', e);
+      console.error('loadHistory error:', e);
+      el.innerHTML = '<div class="history-empty">No scan history</div>';
     }
   }
+
+  // ── Replay Scan ──────────────────────────────────────────
+  window.replayHistoryScan = async function (scanId) {
+    try {
+      const doc = await db.collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('localScans').doc(scanId).get();
+      if (!doc.exists) return;
+      const d = doc.data();
+      clearMarkers();
+      d.results.forEach(r => addResultMarker(r, r.position));
+      showGridStats(d.results);
+      showToast('Showing scan from ' + (d.scannedAt?.toDate()?.toLocaleDateString() || 'unknown'));
+    } catch (e) { showToast('Error loading scan', true); }
+  };
 
   // ── Run Geo Grid ─────────────────────────────────────────
   window.runGeoGrid = async function () {
     if (!selectedKeyword) { showToast('Select a keyword first', true); return; }
     if (!serperKey) { showToast('No Serper API key — add in Settings', true); return; }
-    if (!map) { showToast('Map not loaded yet, please wait', true); return; }
+    if (!map) { showToast('Map not loaded yet', true); return; }
 
     const gridSize = getGridSize();
     const radius = getRadius();
@@ -178,9 +244,7 @@
     if (overlay) overlay.style.display = 'flex';
     if (runSub) runSub.textContent = 'Checking ' + totalPoints + ' locations...';
 
-    // Clear old markers
-    mapMarkers.forEach(m => map.removeLayer(m));
-    mapMarkers = [];
+    clearMarkers();
 
     const points = generateGridPoints(centerLat, centerLng, gridSize, radius);
     const results = [];
@@ -197,15 +261,21 @@
     if (overlay) overlay.style.display = 'none';
     showGridStats(results);
     await saveHistory(selectedKeyword.id, selectedKeyword.keyword, results);
-    await loadHistory(selectedKeyword.id);
+    await loadHistory(selectedKeyword.id, false);
 
     if (btn) { btn.disabled = false; btn.textContent = '🗺️ Run Geo-Grid'; }
     showToast('Geo-grid scan complete! ✅');
   };
 
+  // ── Clear Markers ────────────────────────────────────────
+  function clearMarkers() {
+    mapMarkers.forEach(m => { if(map) map.removeLayer(m); });
+    mapMarkers = [];
+  }
+
   // ── Add Result Marker ────────────────────────────────────
   function addResultMarker(pt, position) {
-    if (!map) return;
+    if (!map || !window.L) return;
 
     const color = position === 0 ? '#757575'
       : position <= 3  ? '#1b5e20'
@@ -215,7 +285,7 @@
 
     const label = position === 0 ? '✕' : String(position);
     const size = pt.isCenter ? 44 : 36;
-    const extraStyle = pt.isCenter
+    const border = pt.isCenter
       ? 'border:3px solid #fff;box-shadow:0 0 0 3px #0a5c36,0 3px 10px rgba(0,0,0,0.4);'
       : 'border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.25);';
 
@@ -226,7 +296,7 @@
         background:${color};color:#fff;
         display:flex;align-items:center;justify-content:center;
         font-weight:800;font-size:${pt.isCenter ? 15 : 13}px;
-        ${extraStyle}
+        ${border}
       ">${label}</div>`,
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2]
@@ -237,7 +307,7 @@
       zIndexOffset: pt.isCenter ? 500 : 0
     }).addTo(map).bindPopup(`
       <div style="font-family:-apple-system,sans-serif;min-width:160px;">
-        <div style="font-weight:800;font-size:13px;margin-bottom:4px;">${selectedKeyword?.keyword || ''}</div>
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px;">${selectedKeyword?.keyword || pt.keyword || ''}</div>
         <div style="font-size:13px;color:${color};font-weight:800;">
           ${position === 0 ? 'Not in top 100' : 'Position #' + position}
         </div>
@@ -284,8 +354,6 @@
     s('gs-none', results.filter(r => r.position === 0).length);
     const statsEl = document.getElementById('grid-stats');
     if (statsEl) statsEl.style.display = 'grid';
-    const timeEl = document.getElementById('grid-time');
-    if (timeEl) timeEl.textContent = 'Last scan: ' + new Date().toLocaleString();
   }
 
   // ── Fetch Local Rank ─────────────────────────────────────
@@ -322,74 +390,18 @@
         .collection('companies').doc(currentCompanyId)
         .collection('localScans').add({
           keywordId: kwId, keyword,
-          results: results.map(r => ({ lat: r.lat, lng: r.lng, position: r.position, isCenter: r.isCenter || false })),
-          avgPosition: avg, gridSize: getGridSize(), radius: getRadius(),
+          results: results.map(r => ({
+            lat: r.lat, lng: r.lng,
+            position: r.position,
+            isCenter: r.isCenter || false
+          })),
+          avgPosition: avg,
+          gridSize: getGridSize(),
+          radius: getRadius(),
           scannedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
     } catch (e) { console.error('saveHistory:', e); }
   }
-
-  // ── Load History ─────────────────────────────────────────
-  async function loadHistory(kwId) {
-    const el = document.getElementById('history-list');
-    if (!el || !currentCompanyId) return;
-    try {
-      let snap;
-      try {
-        snap = await db.collection('users').doc(currentUser.uid)
-          .collection('companies').doc(currentCompanyId)
-          .collection('localScans')
-          .where('keywordId', '==', kwId)
-          .orderBy('scannedAt', 'desc')
-          .limit(10).get();
-      } catch (e) {
-        snap = await db.collection('users').doc(currentUser.uid)
-          .collection('companies').doc(currentCompanyId)
-          .collection('localScans')
-          .where('keywordId', '==', kwId)
-          .limit(10).get();
-      }
-
-      if (snap.empty) {
-        el.innerHTML = '<div class="history-empty">No scans yet for this keyword</div>';
-        return;
-      }
-
-      el.innerHTML = snap.docs.map(doc => {
-        const d = doc.data();
-        const date = d.scannedAt?.toDate ? d.scannedAt.toDate().toLocaleDateString() : 'Unknown';
-        const avg = d.avgPosition ? '#' + d.avgPosition : '--';
-        const color = !d.avgPosition ? '#999'
-          : d.avgPosition <= 3 ? '#1b5e20'
-          : d.avgPosition <= 10 ? '#1565c0'
-          : d.avgPosition <= 20 ? '#e65100'
-          : '#b71c1c';
-        return `
-          <div class="history-item" onclick="replayHistoryScan('${doc.id}')">
-            <div class="history-date">📅 ${date}</div>
-            <div class="history-kw">${d.keyword} · ${d.gridSize}×${d.gridSize} · ${d.radius}km</div>
-            <div class="history-avg" style="color:${color};">${avg}</div>
-          </div>`;
-      }).join('');
-    } catch (e) {
-      el.innerHTML = '<div class="history-empty">No scan history</div>';
-    }
-  }
-
-  window.replayHistoryScan = async function (scanId) {
-    try {
-      const doc = await db.collection('users').doc(currentUser.uid)
-        .collection('companies').doc(currentCompanyId)
-        .collection('localScans').doc(scanId).get();
-      if (!doc.exists) return;
-      const d = doc.data();
-      mapMarkers.forEach(m => map.removeLayer(m));
-      mapMarkers = [];
-      d.results.forEach(r => addResultMarker(r, r.position));
-      showGridStats(d.results);
-      showToast('Showing scan from ' + (d.scannedAt?.toDate()?.toLocaleDateString() || 'unknown'));
-    } catch (e) { showToast('Error loading scan', true); }
-  };
 
   // ── Add Keyword ──────────────────────────────────────────
   window.showAddKeywordModal = function () {
@@ -417,7 +429,7 @@
       renderKeywordList(allKeywords);
       closeLocalModal();
       showToast('Keyword added!');
-      selectKeyword(allKeywords[0]);
+      await selectKeyword(allKeywords[0]);
     } catch (e) { showToast('Error: ' + e.message, true); }
     if (btn) { btn.disabled = false; btn.textContent = 'Add Keyword'; }
   };
