@@ -404,21 +404,17 @@
     const places = data.places || [];
     const domain = siteUrl.replace(/https?:\/\//, '').replace(/www\./, '').split('/')[0].toLowerCase();
     let rank = null;
-    console.log('Searching for domain:', domain, 'in', places.length, 'places');
     places.forEach((p,i) => {
       const title = (p.title||'').toLowerCase();
       const website = (p.website||'').toLowerCase();
       const address = (p.address||'').toLowerCase();
-      if(i<5) console.log('Place', i+1, ':', p.title, '|', p.website);
-      const domainMatch = domain && website.includes(domain);
+        const domainMatch = domain && website.includes(domain);
       const titleMatch = title.includes('turnkey interior') || title.includes('tic (turnkey') || title.includes('sb interior');
-      const addressMatch = address.includes('jayabheri') || address.includes('gachibowli');
+      const addressMatch = false; // disabled - causes false matches
       if(!rank && (domainMatch || titleMatch || addressMatch)) {
         rank = i+1;
-        console.log('FOUND at position', rank, ':', p.title);
-      }
+          }
     });
-    if(!rank) console.log('Not found in results for area:', areaName);
     return {rank:rank||21,total:places.length,area:areaName,places:places.slice(0,3)};
   } catch(e) {
     return {rank:21,total:0,area:areaName,places:[]};
