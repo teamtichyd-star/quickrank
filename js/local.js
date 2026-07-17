@@ -18,7 +18,20 @@
   const website = compSettings?.website || '';
 
   await loadLocalKeywords();
-  initLeafletMap();
+
+  // Wait for Leaflet + DOM to be ready then init map
+  waitForLeaflet();
+
+  function waitForLeaflet(attempts) {
+    attempts = attempts || 0;
+    if (attempts > 30) { console.error('Leaflet never loaded'); return; }
+    const mapEl = document.getElementById('geo-map');
+    if (window.L && mapEl && mapEl.offsetWidth > 0) {
+      initLeafletMap();
+    } else {
+      setTimeout(() => waitForLeaflet(attempts + 1), 200);
+    }
+  }
 
   // ── Load Keywords ────────────────────────────────────────
   async function loadLocalKeywords() {
@@ -43,7 +56,8 @@
         return 0;
       });
 
-      document.getElementById('kw-count').textContent = allKeywords.length + ' keywords';
+      const countEl = document.getElementById('kw-count');
+      if (countEl) countEl.textContent = allKeywords.length + ' keywords';
       renderKeywordList(allKeywords);
       if (allKeywords.length > 0) selectKeyword(allKeywords[0]);
     } catch (e) { console.error(e); }
@@ -100,32 +114,56 @@
   function initLeafletMap() {
     const mapEl = document.getElementById('geo-map');
     if (!mapEl || !window.L) return;
+    if (map) return; // already init
 
-    map = L.map('geo-map').setView([centerLat, centerLng], 12);
+    try {
+      map = L.map('geo-map', {
+        center: [centerLat, centerLng],
+        zoom: 12,
+        zoomControl: true
+      });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 18
+      }).addTo(map);
 
-    // Center marker (business location)
-    const centerIcon = L.divIcon({
-      className: '',
-      html: `<div style="width:20px;height:20px;background:#0a5c36;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.3);"></div>`,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-    L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
-      .addTo(map)
-      .bindPopup('<strong>' + (compSettings?.name || 'Your Business') + '</strong><br>📍 Business Location');
+      // Business location marker
+      const html = `<div style="
+        width:20px;height:20px;
+        background:#0a5c36;
+        border:3px solid #fff;
+        border-radius:50%;
+        box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.4);
+      "></div>`;
 
-    // Fix leaflet render issue in dynamic tabs
-    setTimeout(() => { map.invalidateSize(); }, 300);
+      const centerIcon = L.divIcon({
+        className: '',
+        html: html,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+
+      L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
+        .addTo(map)
+        .bindPopup('<strong>' + (compSettings?.name || 'Your Business') + '</strong><br>📍 Business Location');
+
+      // Force re-render
+      setTimeout(() => map.invalidateSize(), 100);
+      setTimeout(() => map.invalidateSize(), 500);
+      setTimeout(() => map.invalidateSize(), 1000);
+
+      console.log('Leaflet map initialized ✅');
+    } catch (e) {
+      console.error('Map init error:', e);
+    }
   }
 
   // ── Run Geo Grid ─────────────────────────────────────────
   window.runGeoGrid = async function () {
     if (!selectedKeyword) { showToast('Select a keyword first', true); return; }
     if (!serperKey) { showToast('No Serper API key — add in Settings', true); return; }
+    if (!map) { showToast('Map not loaded yet, please wait', true); return; }
 
     const gridSize = getGridSize();
     const radius = getRadius();
@@ -150,13 +188,9 @@
     for (let i = 0; i < points.length; i++) {
       const pt = points[i];
       if (runText) runText.textContent = `Checking point ${i + 1} of ${totalPoints}...`;
-
       const position = await fetchLocalRank(selectedKeyword.keyword, pt.lat, pt.lng, website, serperKey);
       results.push({ ...pt, position });
-
-      // Add marker to map
       addResultMarker(pt, position);
-
       await sleep(800);
     }
 
@@ -164,6 +198,7 @@
     showGridStats(results);
     await saveHistory(selectedKeyword.id, selectedKeyword.keyword, results);
     await loadHistory(selectedKeyword.id);
+
     if (btn) { btn.disabled = false; btn.textContent = '🗺️ Run Geo-Grid'; }
     showToast('Geo-grid scan complete! ✅');
   };
@@ -179,8 +214,10 @@
       : '#b71c1c';
 
     const label = position === 0 ? '✕' : String(position);
-    const size = pt.isCenter ? 42 : 36;
-    const border = pt.isCenter ? 'border:3px solid #fff;box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.4);' : 'border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.3);';
+    const size = pt.isCenter ? 44 : 36;
+    const extraStyle = pt.isCenter
+      ? 'border:3px solid #fff;box-shadow:0 0 0 3px #0a5c36,0 3px 10px rgba(0,0,0,0.4);'
+      : 'border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.25);';
 
     const icon = L.divIcon({
       className: '',
@@ -188,22 +225,27 @@
         width:${size}px;height:${size}px;border-radius:50%;
         background:${color};color:#fff;
         display:flex;align-items:center;justify-content:center;
-        font-weight:800;font-size:${pt.isCenter ? 14 : 12}px;
-        ${border}cursor:pointer;
+        font-weight:800;font-size:${pt.isCenter ? 15 : 13}px;
+        ${extraStyle}
       ">${label}</div>`,
       iconSize: [size, size],
-      iconAnchor: [size/2, size/2]
+      iconAnchor: [size / 2, size / 2]
     });
 
-    const marker = L.marker([pt.lat, pt.lng], { icon, zIndexOffset: pt.isCenter ? 500 : 0 })
-      .addTo(map)
-      .bindPopup(`
-        <div style="font-family:-apple-system,sans-serif;">
-          <strong>${selectedKeyword?.keyword || ''}</strong><br>
-          <span style="color:${color};font-weight:800;">Position: ${position === 0 ? 'Not in top 100' : '#' + position}</span><br>
-          <span style="font-size:11px;color:#888;">${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</span>
+    const marker = L.marker([pt.lat, pt.lng], {
+      icon,
+      zIndexOffset: pt.isCenter ? 500 : 0
+    }).addTo(map).bindPopup(`
+      <div style="font-family:-apple-system,sans-serif;min-width:160px;">
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px;">${selectedKeyword?.keyword || ''}</div>
+        <div style="font-size:13px;color:${color};font-weight:800;">
+          ${position === 0 ? 'Not in top 100' : 'Position #' + position}
         </div>
-      `);
+        <div style="font-size:11px;color:#888;margin-top:4px;">
+          ${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}
+        </div>
+      </div>
+    `);
 
     mapMarkers.push(marker);
   }
@@ -214,7 +256,6 @@
     const half = Math.floor(gridSize / 2);
     const stepLat = (radiusKm / 111) / half;
     const stepLng = (radiusKm / (111 * Math.cos(cLat * Math.PI / 180))) / half;
-
     for (let row = -half; row <= half; row++) {
       for (let col = -half; col <= half; col++) {
         points.push({
@@ -232,8 +273,10 @@
   // ── Show Stats ───────────────────────────────────────────
   function showGridStats(results) {
     const ranked = results.filter(r => r.position > 0);
-    const avg = ranked.length ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1) : '--';
-    const s = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    const avg = ranked.length
+      ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)
+      : '--';
+    const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     s('gs-avg', avg !== '--' ? '#' + avg : '--');
     s('gs-top3', results.filter(r => r.position > 0 && r.position <= 3).length);
     s('gs-top10', results.filter(r => r.position > 0 && r.position <= 10).length);
@@ -253,7 +296,10 @@
       const res = await fetch('https://google.serper.dev/search', {
         method: 'POST',
         headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q: keyword, gl: 'in', hl: 'en', num: 20, location: lat.toFixed(4) + ',' + lng.toFixed(4) })
+        body: JSON.stringify({
+          q: keyword, gl: 'in', hl: 'en', num: 20,
+          location: lat.toFixed(4) + ',' + lng.toFixed(4)
+        })
       });
       const data = await res.json();
       const results = data.organic || [];
@@ -268,7 +314,9 @@
   async function saveHistory(kwId, keyword, results) {
     if (!currentCompanyId) return;
     const ranked = results.filter(r => r.position > 0);
-    const avg = ranked.length ? parseFloat((ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)) : 0;
+    const avg = ranked.length
+      ? parseFloat((ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1))
+      : 0;
     try {
       await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(currentCompanyId)
@@ -294,8 +342,7 @@
           .where('keywordId', '==', kwId)
           .orderBy('scannedAt', 'desc')
           .limit(10).get();
-      } catch(e) {
-        // Fallback without orderBy
+      } catch (e) {
         snap = await db.collection('users').doc(currentUser.uid)
           .collection('companies').doc(currentCompanyId)
           .collection('localScans')
@@ -312,7 +359,11 @@
         const d = doc.data();
         const date = d.scannedAt?.toDate ? d.scannedAt.toDate().toLocaleDateString() : 'Unknown';
         const avg = d.avgPosition ? '#' + d.avgPosition : '--';
-        const color = !d.avgPosition ? '#999' : d.avgPosition <= 3 ? '#1b5e20' : d.avgPosition <= 10 ? '#1565c0' : d.avgPosition <= 20 ? '#e65100' : '#b71c1c';
+        const color = !d.avgPosition ? '#999'
+          : d.avgPosition <= 3 ? '#1b5e20'
+          : d.avgPosition <= 10 ? '#1565c0'
+          : d.avgPosition <= 20 ? '#e65100'
+          : '#b71c1c';
         return `
           <div class="history-item" onclick="replayHistoryScan('${doc.id}')">
             <div class="history-date">📅 ${date}</div>
