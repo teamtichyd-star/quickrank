@@ -46,6 +46,7 @@ auth.onAuthStateChanged(async user => {
     currentUser = user;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    initSidebar();
     document.getElementById('user-avatar').textContent = user.displayName ? user.displayName[0].toUpperCase() : 'U';
     await loadCompanies();
     navigateTo('home');
