@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head><title>Debug Firebase</title></head>
+<body>
+<h2>Debugging Firebase Data...</h2>
+<div id="status" style="font-family:monospace;white-space:pre-wrap;"></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCzA50bHzBaIuI2OJINFHMQyFG62wiSp48",
+  authDomain: "quickrank-10647.firebaseapp.com",
+  projectId: "quickrank-10647",
+  storageBucket: "quickrank-10647.firebasestorage.app",
+  messagingSenderId: "391145481120",
+  appId: "1:391145481120:web:92615a12d1371cb47d3ac5"
+});
+const db = firebase.firestore();
+const log = msg => document.getElementById('status').innerHTML += msg + '\n';
+
+firebase.auth().onAuthStateChanged(async user => {
+  if (!user) { log('❌ Not logged in'); return; }
+  log('✅ User: ' + user.email);
+  log('UID: ' + user.uid);
+
+  // Check companies
+  const compSnap = await db.collection('users').doc(user.uid).collection('companies').get();
+  log('\n📦 Companies: ' + compSnap.size);
+  compSnap.forEach(doc => {
+    log('  Company ID: ' + doc.id);
+    log('  Data: ' + JSON.stringify(doc.data()).substring(0, 200));
+  });
+
+  // Check keywords for each company
+  for (const compDoc of compSnap.docs) {
+    log('\n🔑 Keywords for company: ' + compDoc.id);
+    const kwSnap = await db.collection('users').doc(user.uid)
+      .collection('companies').doc(compDoc.id)
+      .collection('keywords').get();
+    log('  Total keywords: ' + kwSnap.size);
+    let count = 0;
+    kwSnap.forEach(doc => {
+      if (count < 5) {
+        const d = doc.data();
+        log('  [' + doc.id + '] ' + JSON.stringify({
+          keyword: d.keyword,
+          term: d.term,
+          kw: d.kw,
+          position: d.position,
+          rank: d.rank,
+          volume: d.volume
+        }));
+      }
+      count++;
+    });
+    if (kwSnap.size > 5) log('  ... and ' + (kwSnap.size - 5) + ' more');
+  }
+
+  // Check if keywords exist at root level (old app structure)
+  log('\n🔍 Checking root-level keywords collection...');
+  try {
+    const rootKw = await db.collection('keywords').limit(5).get();
+    log('  Root keywords: ' + rootKw.size);
+    rootKw.forEach(doc => {
+      log('  [' + doc.id + '] ' + JSON.stringify(doc.data()).substring(0, 150));
+    });
+  } catch(e) { log('  Error: ' + e.message); }
+
+  // Check old app structure
+  log('\n🔍 Checking old structure: users/{uid}/keywords...');
+  try {
+    const oldKw = await db.collection('users').doc(user.uid).collection('keywords').limit(5).get();
+    log('  Old keywords: ' + oldKw.size);
+    oldKw.forEach(doc => {
+      log('  [' + doc.id + '] ' + JSON.stringify(doc.data()).substring(0, 150));
+    });
+  } catch(e) { log('  Error: ' + e.message); }
+
+  // Check companies/{companyId}/keywords
+  log('\n🔍 Checking: companies/turnkey-interior-contractors/keywords...');
+  try {
+    const altKw = await db.collection('companies').doc('turnkey-interior-contractors').collection('keywords').limit(5).get();
+    log('  Alt keywords: ' + altKw.size);
+    altKw.forEach(doc => {
+      log('  [' + doc.id + '] ' + JSON.stringify(doc.data()).substring(0, 150));
+    });
+  } catch(e) { log('  Error: ' + e.message); }
+
+  log('\n✅ Debug complete');
+});
+</script>
+</body>
+</html>
