@@ -8,7 +8,7 @@
   let compSettings = null;
   let serperKey = null;
 
-  const DEFAULT_CENTER = { lat: 17.4401, lng: 78.3489 };
+  const DEFAULT_CENTER = { lat: 17.4401, lng: 78.3489 }; // Gachibowli TIC office
 
   compSettings = await loadCompSettings();
   serperKey = await getApiKey('serperKey');
