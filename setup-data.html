@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head><title>QuickRank Setup</title></head>
+<body>
+<h2>Setting up Firebase data...</h2>
+<div id="status"></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCzA50bHzBaIuI2OJINFHMQyFG62wiSp48",
+  authDomain: "quickrank-10647.firebaseapp.com",
+  projectId: "quickrank-10647",
+  storageBucket: "quickrank-10647.firebasestorage.app",
+  messagingSenderId: "391145481120",
+  appId: "1:391145481120:web:92615a12d1371cb47d3ac5"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const log = msg => {
+  document.getElementById('status').innerHTML += '<p>' + msg + '</p>';
+};
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    log('❌ Not logged in — please login first at the main app');
+    return;
+  }
+  log('✅ Logged in as: ' + user.email);
+  log('UID: ' + user.uid);
+
+  const uid = user.uid;
+  const companyId = 'turnkey-interior-contractors';
+
+  try {
+    // Create company
+    await db.collection('users').doc(uid)
+      .collection('companies').doc(companyId).set({
+        name: 'Turnkey Interior Contractors',
+        website: 'https://turnkeyinteriorcontractors.com',
+        gmbPlaceId: 'ChIJxfKa-NuQyzsRZo3TiDBGjdw',
+        reviewCount: 17,
+        rating: 4.5,
+        city: 'Hyderabad',
+        category: 'Interior Contractors',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    log('✅ Company created: Turnkey Interior Contractors');
+
+    // Create main location
+    await db.collection('users').doc(uid)
+      .collection('companies').doc(companyId)
+      .collection('locations').doc('hyderabad-main').set({
+        name: 'Hyderabad - Main',
+        city: 'Hyderabad',
+        state: 'Telangana',
+        country: 'India',
+        gmbPlaceId: 'ChIJxfKa-NuQyzsRZo3TiDBGjdw',
+        lat: 17.3850,
+        lng: 78.4867,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    log('✅ Location created: Hyderabad - Main');
+
+    // Create sample keywords
+    const keywords = [
+      { keyword: 'interior contractors hyderabad', position: 8, volume: 1200 },
+      { keyword: 'interior design hyderabad', position: 14, volume: 3400 },
+      { keyword: 'turnkey interior contractors', position: 3, volume: 480 },
+      { keyword: 'office interior designers hyderabad', position: 11, volume: 890 },
+      { keyword: 'home interior contractors hyderabad', position: 6, volume: 720 }
+    ];
+
+    for (const kw of keywords) {
+      await db.collection('users').doc(uid)
+        .collection('companies').doc(companyId)
+        .collection('keywords').add({
+          ...kw,
+          url: 'https://turnkeyinteriorcontractors.com',
+          lastChecked: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+    log('✅ 5 sample keywords created');
+
+    // Create API settings
+    await db.collection('users').doc(uid)
+      .collection('settings').doc('apis').set({
+        serperKey: 'b957e064c924f6d647ce53b2dd73f400cfa7d32e',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    log('✅ Serper API key saved');
+
+    log('<br><strong>🎉 ALL DONE! Go back to main app and refresh.</strong>');
+    log('<a href="https://teamtichyd-star.github.io/quickrank/" target="_blank">👉 Open QuickRank</a>');
+
+  } catch(e) {
+    log('❌ Error: ' + e.message);
+  }
+});
+</script>
+</body>
+</html>
