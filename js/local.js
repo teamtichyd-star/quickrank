@@ -28,7 +28,7 @@
 
     map = L.map('geo-map', {
       center: [centerLat, centerLng],
-      zoom: 12,
+      zoom: 13,
       zoomControl: true
     });
 
