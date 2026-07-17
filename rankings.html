@@ -1,0 +1,222 @@
+<style>
+.rankings-wrap{padding:24px;max-width:1400px;margin:0 auto;}
+.rankings-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:gap;}
+.rankings-title h1{font-size:22px;font-weight:800;color:#0f1117;}
+.rankings-title p{font-size:13px;color:#888;margin-top:4px;}
+.rankings-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+/* Buttons */
+.btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.btn-primary{background:#0a5c36;color:#fff;}
+.btn-primary:hover{background:#0d7a48;}
+.btn-secondary{background:#fff;color:#0a5c36;border:1.5px solid #0a5c36;}
+.btn-secondary:hover{background:#f0fdf6;}
+.btn-danger{background:#fff;color:#e74c3c;border:1.5px solid #e74c3c;}
+.btn-danger:hover{background:#fff5f5;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* Stats strip */
+.rank-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.rank-stat{background:#fff;border-radius:12px;padding:14px 16px;border:1.5px solid #e8f0e9;text-align:center;}
+.rank-stat-val{font-size:22px;font-weight:800;color:#0f1117;}
+.rank-stat-label{font-size:11px;color:#888;margin-top:2px;font-weight:600;}
+
+/* Filter bar */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-input{padding:8px 14px;border:1.5px solid #e0e8e4;border-radius:10px;font-size:13px;width:240px;outline:none;}
+.search-input:focus{border-color:#0a5c36;}
+.filter-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e0e8e4;background:#fff;color:#666;transition:all 0.15s;}
+.filter-btn.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
+
+/* Table */
+.table-wrap{background:#fff;border-radius:14px;border:1.5px solid #e8f0e9;overflow:hidden;}
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#f8fafb;border-bottom:1.5px solid #e8f0e9;}
+th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+td{padding:14px 16px;border-bottom:1px solid #f5f5f5;font-size:13px;color:#333;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafffe;}
+
+/* Position badge */
+.pos-badge{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-weight:800;font-size:14px;}
+.pos-top3{background:#e8f5e9;color:#1b5e20;}
+.pos-top10{background:#e3f2fd;color:#0d47a1;}
+.pos-top20{background:#fff8e1;color:#e65100;}
+.pos-low{background:#fce4ec;color:#b71c1c;}
+.pos-none{background:#f5f5f5;color:#999;}
+
+/* Change arrow */
+.change{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:700;}
+.change-up{color:#2ecc71;}
+.change-down{color:#e74c3c;}
+.change-flat{color:#999;}
+
+/* Keyword cell */
+.kw-cell{display:flex;flex-direction:column;gap:2px;}
+.kw-main{font-weight:700;color:#0f1117;}
+.kw-url{font-size:11px;color:#0a5c36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+
+/* Volume bar */
+.vol-bar{display:flex;align-items:center;gap:8px;}
+.vol-num{font-weight:600;min-width:40px;}
+.vol-bg{flex:1;height:4px;background:#f0f0f0;border-radius:2px;min-width:40px;}
+.vol-fill{height:100%;background:#0a5c36;border-radius:2px;}
+
+/* Row actions */
+.row-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s;}
+tr:hover .row-actions{opacity:1;}
+
+/* Check btn */
+.check-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #0a5c36;color:#0a5c36;background:#fff;transition:all 0.15s;}
+.check-btn:hover{background:#0a5c36;color:#fff;}
+.check-btn.checking{border-color:#ccc;color:#ccc;cursor:not-allowed;}
+
+/* Empty */
+.table-empty{padding:60px 20px;text-align:center;}
+.table-empty-icon{font-size:48px;margin-bottom:12px;}
+.table-empty-title{font-size:16px;font-weight:700;color:#333;margin-bottom:6px;}
+.table-empty-sub{font-size:13px;color:#888;margin-bottom:20px;}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,0.2);}
+.modal-title{font-size:18px;font-weight:800;color:#0f1117;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:#888;margin-bottom:24px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:12px;font-weight:700;color:#333;margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid #e0e8e4;border-radius:10px;font-size:13px;outline:none;transition:border 0.15s;}
+.form-input:focus{border-color:#0a5c36;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+
+/* Bulk check progress */
+.bulk-progress{background:#f0fdf6;border:1.5px solid #0a5c36;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:none;align-items:center;gap:12px;}
+.bulk-progress.show{display:flex;}
+.progress-bar-bg{flex:1;height:6px;background:#c8e6d9;border-radius:3px;}
+.progress-bar-fill{height:100%;background:#0a5c36;border-radius:3px;transition:width 0.3s;}
+.progress-text{font-size:12px;font-weight:700;color:#0a5c36;white-space:nowrap;}
+</style>
+
+<div class="rankings-wrap">
+  <!-- Header -->
+  <div class="rankings-header">
+    <div class="rankings-title">
+      <h1>📈 Rankings</h1>
+      <p id="rankings-sub">Track your keyword positions</p>
+    </div>
+    <div class="rankings-actions">
+      <button class="btn btn-secondary" onclick="checkAllRankings()" id="check-all-btn">
+        🔄 Check All
+      </button>
+      <button class="btn btn-primary" onclick="showAddKeyword()">
+        + Add Keyword
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Strip -->
+  <div class="rank-stats">
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-total">--</div>
+      <div class="rank-stat-label">Total Keywords</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-top3" style="color:#1b5e20;">--</div>
+      <div class="rank-stat-label">Top 3</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-top10" style="color:#0d47a1;">--</div>
+      <div class="rank-stat-label">Top 10</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-top20" style="color:#e65100;">--</div>
+      <div class="rank-stat-label">Top 20</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-unranked" style="color:#b71c1c;">--</div>
+      <div class="rank-stat-label">Not Ranked</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs-avg">--</div>
+      <div class="rank-stat-label">Avg Position</div>
+    </div>
+  </div>
+
+  <!-- Bulk progress -->
+  <div class="bulk-progress" id="bulk-progress">
+    <span>🔄</span>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">Checking...</div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <input class="search-input" type="text" placeholder="🔍 Search keywords..." id="kw-search" oninput="renderTable()">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('top3',this)">Top 3</button>
+    <button class="filter-btn" onclick="setFilter('top10',this)">Top 10</button>
+    <button class="filter-btn" onclick="setFilter('top20',this)">Top 20</button>
+    <button class="filter-btn" onclick="setFilter('unranked',this)">Not Ranked</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table id="rankings-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Keyword</th>
+            <th>Position</th>
+            <th>Change</th>
+            <th>Volume</th>
+            <th>Top Page</th>
+            <th>Last Checked</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rankings-tbody">
+          <tr><td colspan="8">
+            <div class="table-empty">
+              <div class="spinner" style="margin:0 auto;"></div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Keyword Modal -->
+<div class="modal-overlay" id="add-modal" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Add Keyword</div>
+    <div class="modal-sub">Track a new keyword for your website</div>
+    <div class="form-group">
+      <label class="form-label">Keyword *</label>
+      <input class="form-input" id="kw-input" placeholder="e.g. interior contractors hyderabad">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Search Volume</label>
+        <input class="form-input" id="vol-input" type="number" placeholder="e.g. 1200">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target URL</label>
+        <input class="form-input" id="url-input" placeholder="e.g. /services">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Location (optional)</label>
+      <input class="form-input" id="loc-input" placeholder="e.g. Hyderabad, India">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addKeyword()" id="save-kw-btn">Save & Check Rank</button>
+    </div>
+  </div>
+</div>
