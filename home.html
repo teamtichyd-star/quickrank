@@ -1,0 +1,140 @@
+<style>
+.home-wrap{padding:24px;max-width:1200px;margin:0 auto;}
+.home-header{margin-bottom:24px;}
+.home-header h1{font-size:22px;font-weight:800;color:#0f1117;}
+.home-header p{font-size:13px;color:#888;margin-top:4px;}
+
+/* Stats Row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:14px;padding:20px;border:1.5px solid #e8f0e9;display:flex;flex-direction:column;gap:6px;}
+.stat-label{font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.stat-value{font-size:28px;font-weight:800;color:#0f1117;}
+.stat-sub{font-size:12px;color:#2ecc71;font-weight:600;}
+.stat-sub.red{color:#e74c3c;}
+.stat-sub.gray{color:#888;}
+
+/* Action List */
+.section-title{font-size:15px;font-weight:800;color:#0f1117;margin-bottom:12px;}
+.action-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.action-card{
+  background:#fff;border-radius:12px;padding:16px 20px;
+  border:1.5px solid #e8f0e9;display:flex;align-items:center;gap:16px;
+  cursor:pointer;transition:all 0.15s;
+}
+.action-card:hover{border-color:#0a5c36;box-shadow:0 4px 12px rgba(10,92,54,0.08);}
+.action-priority{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;min-width:32px;
+}
+.priority-high{background:#fff0f0;}
+.priority-med{background:#fff8e6;}
+.priority-low{background:#f0fdf6;}
+.action-body{flex:1;}
+.action-title{font-size:13px;font-weight:700;color:#0f1117;margin-bottom:2px;}
+.action-desc{font-size:12px;color:#888;}
+.action-badge{
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;
+  white-space:nowrap;
+}
+.badge-high{background:#fff0f0;color:#e74c3c;}
+.badge-med{background:#fff8e6;color:#f39c12;}
+.badge-low{background:#f0fdf6;color:#0a5c36;}
+
+/* Two col layout */
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr;}}
+
+/* Review card */
+.review-card{background:#fff;border-radius:14px;padding:20px;border:1.5px solid #e8f0e9;}
+.review-stars{font-size:22px;margin-bottom:4px;}
+.review-score{font-size:32px;font-weight:800;color:#0f1117;}
+.review-count{font-size:13px;color:#888;margin-top:2px;}
+.review-bar-row{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.review-bar-label{font-size:12px;color:#888;width:30px;}
+.review-bar-bg{flex:1;height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;}
+.review-bar-fill{height:100%;background:#2ecc71;border-radius:3px;}
+
+/* Recent activity */
+.activity-card{background:#fff;border-radius:14px;padding:20px;border:1.5px solid #e8f0e9;}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f5;}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;min-width:8px;}
+.dot-green{background:#2ecc71;}
+.dot-red{background:#e74c3c;}
+.dot-orange{background:#f39c12;}
+.activity-text{font-size:13px;color:#333;font-weight:500;}
+.activity-time{font-size:11px;color:#aaa;margin-top:2px;}
+
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+</style>
+
+<div class="home-wrap">
+  <div class="home-header">
+    <h1 id="home-greeting">Good morning ⚡</h1>
+    <p id="home-subtext">Here's what needs your attention today</p>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">GMB Reviews</div>
+      <div class="stat-value" id="stat-reviews">--</div>
+      <div class="stat-sub gray" id="stat-reviews-sub">Loading...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Rating</div>
+      <div class="stat-value" id="stat-rating">--</div>
+      <div class="stat-sub gray" id="stat-rating-sub">Loading...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Keywords Tracked</div>
+      <div class="stat-value" id="stat-keywords">--</div>
+      <div class="stat-sub gray" id="stat-keywords-sub">Loading...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Position</div>
+      <div class="stat-value" id="stat-position">--</div>
+      <div class="stat-sub gray" id="stat-position-sub">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Priority Actions -->
+  <div class="section-title">🎯 Priority Actions</div>
+  <div class="action-list" id="action-list">
+    <div class="action-card">
+      <div class="skeleton" style="width:32px;height:32px;border-radius:8px;"></div>
+      <div class="action-body">
+        <div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:11px;width:40%;"></div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="skeleton" style="width:32px;height:32px;border-radius:8px;"></div>
+      <div class="action-body">
+        <div class="skeleton" style="height:14px;width:70%;margin-bottom:6px;"></div>
+        <div class="skeleton" style="height:11px;width:50%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid -->
+  <div class="home-grid">
+    <!-- Reviews -->
+    <div class="review-card">
+      <div class="section-title">⭐ GMB Reviews</div>
+      <div id="review-body">
+        <div class="skeleton" style="height:80px;width:100%;"></div>
+      </div>
+    </div>
+    <!-- Activity -->
+    <div class="activity-card">
+      <div class="section-title">🕐 Recent Activity</div>
+      <div id="activity-body">
+        <div class="skeleton" style="height:120px;width:100%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
