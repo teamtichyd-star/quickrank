@@ -26,63 +26,12 @@
     ? 'Tracking rankings for ' + website
     : 'Add your website in Settings';
 
-  await loadKeywords();
-
-  // ── Load Keywords ──────────────────────────────────────
-  async function loadKeywords() {
-    const tbody = document.getElementById('rankings-tbody');
-    try {
-      const snap = await db
-        .collection('users').doc(currentUser.uid)
-        .collection('companies').doc(currentCompanyId)
-        .collection('keywords').get();
-
-      keywords = snap.docs.map(d => {
-        const data = d.data();
-        return {
-          id: d.id,
-          keyword: data.keyword || data.term || data.kw || d.id,
-          position: Number(data.position) || 0,
-          prevPosition: Number(data.prevPosition) || 0,
-          volume: Number(data.volume) || 0,
-          url: data.url || data.targetUrl || data.topPage || website,
-          location: data.location || 'Hyderabad, India',
-          lastChecked: data.lastChecked || null
-        };
-      });
-
-      // Sort by position (ranked first, then unranked)
-      keywords.sort((a, b) => {
-        if (a.position > 0 && b.position > 0) return a.position - b.position;
-        if (a.position > 0) return -1;
-        if (b.position > 0) return 1;
-        return 0;
-      });
-
-    } catch (e) {
-      console.error('loadKeywords error:', e);
-      if (tbody) tbody.innerHTML = `
-        <tr><td colspan="8">
-          <div class="table-empty">
-            <div class="table-empty-icon">❌</div>
-            <div class="table-empty-title">Error loading keywords</div>
-            <div class="table-empty-sub">${e.message}</div>
-          </div>
-        </td></tr>`;
-      return;
-    }
-
-    updateStats();
-    renderTable();
-  }
-
   // ── Stats ──────────────────────────────────────────────
   function updateStats() {
     const ranked = keywords.filter(k => k.position > 0);
     const avg = ranked.length
       ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)
       : '--';
-
     const s = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
     s('rs-total', keywords.length);
     s('rs-top3', ranked.filter(k => k.position <= 3).length);
@@ -92,16 +41,8 @@
     s('rs-avg', avg !== '--' ? '#' + avg : '--');
   }
 
-  // ── Filter ─────────────────────────────────────────────
-  window.setFilter = function (filter, btn) {
-    activeFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    renderTable();
-  };
-
   // ── Render Table ───────────────────────────────────────
-  window.renderTable = function () {
+  function renderTable() {
     const tbody = document.getElementById('rankings-tbody');
     if (!tbody) return;
 
@@ -203,7 +144,18 @@
         </td>
       </tr>`;
     }).join('');
+  }
+
+  // ── Filter ─────────────────────────────────────────────
+  window.setFilter = function (filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderTable();
   };
+
+  // ── window.renderTable for search input oninput ────────
+  window.renderTable = renderTable;
 
   // ── Add Keyword ────────────────────────────────────────
   window.showAddKeyword = function () {
@@ -220,8 +172,7 @@
   };
 
   window.addKeyword = async function () {
-    const kwEl = document.getElementById('kw-input');
-    const kw = kwEl?.value?.trim();
+    const kw = document.getElementById('kw-input')?.value?.trim();
     if (!kw) { showToast('Enter a keyword', true); return; }
 
     const vol = parseInt(document.getElementById('vol-input')?.value) || 0;
@@ -242,15 +193,14 @@
           lastChecked: null
         });
 
-      keywords.unshift({ id: docRef.id, keyword: kw, volume: vol, url, location: loc, position: 0, prevPosition: 0, lastChecked: null });
+      keywords.unshift({ id: docRef.id, keyword: kw, volume: vol, url, location: loc,
+        position: 0, prevPosition: 0, lastChecked: null });
       updateStats();
       renderTable();
       closeModal();
       showToast('Keyword added! Checking rank...');
       await checkSingleRank(docRef.id);
-    } catch (e) {
-      showToast('Error: ' + e.message, true);
-    }
+    } catch (e) { showToast('Error: ' + e.message, true); }
 
     if (btn) { btn.disabled = false; btn.textContent = 'Save & Check Rank'; }
   };
@@ -296,7 +246,9 @@
       }
       updateStats();
       renderTable();
-      showToast(position > 0 ? `"${kw.keyword}" ranked #${position} ✅` : `"${kw.keyword}" not in top 100`);
+      showToast(position > 0
+        ? `"${kw.keyword}" ranked #${position} ✅`
+        : `"${kw.keyword}" not in top 100`);
     } catch (e) { showToast('Error saving rank', true); }
 
     if (btn) { btn.textContent = 'Check'; btn.classList.remove('checking'); btn.disabled = false; }
@@ -365,6 +317,53 @@
     } catch (e) { console.error('fetchRank error:', e); return 0; }
   }
 
+  // ── Load Keywords ──────────────────────────────────────
+  async function loadKeywords() {
+    const tbody = document.getElementById('rankings-tbody');
+    try {
+      const snap = await db
+        .collection('users').doc(currentUser.uid)
+        .collection('companies').doc(currentCompanyId)
+        .collection('keywords').get();
+
+      keywords = snap.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          keyword: data.keyword || data.term || data.kw || d.id,
+          position: Number(data.position) || 0,
+          prevPosition: Number(data.prevPosition) || 0,
+          volume: Number(data.volume) || 0,
+          url: data.url || data.targetUrl || data.topPage || website,
+          location: data.location || 'Hyderabad, India',
+          lastChecked: data.lastChecked || null
+        };
+      });
+
+      keywords.sort((a, b) => {
+        if (a.position > 0 && b.position > 0) return a.position - b.position;
+        if (a.position > 0) return -1;
+        if (b.position > 0) return 1;
+        return 0;
+      });
+
+    } catch (e) {
+      console.error('loadKeywords error:', e);
+      if (tbody) tbody.innerHTML = `
+        <tr><td colspan="8">
+          <div class="table-empty">
+            <div class="table-empty-icon">❌</div>
+            <div class="table-empty-title">Error loading keywords</div>
+            <div class="table-empty-sub">${e.message}</div>
+          </div>
+        </td></tr>`;
+      return;
+    }
+
+    updateStats();
+    renderTable();
+  }
+
   // ── Helpers ────────────────────────────────────────────
   function timeAgo(date) {
     const s = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -375,9 +374,14 @@
   }
 
   function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ── START ──────────────────────────────────────────────
+  await loadKeywords();
 
 })();
