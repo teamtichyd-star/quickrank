@@ -6,7 +6,6 @@
   let activeFilter = 'all';
   let compSettings = null;
 
-  // Load company settings
   compSettings = await loadCompSettings();
   const website = compSettings?.website || '';
   const serperKey = await getApiKey('serperKey');
@@ -26,28 +25,34 @@
   document.getElementById('rankings-sub').textContent =
     website ? 'Tracking rankings for ' + website : 'Add your website in Settings';
 
-  // Pre-fill URL input
-  if (document.getElementById('url-input')) {
-    document.getElementById('url-input').placeholder = website || 'https://yoursite.com';
-  }
-
   await loadKeywords();
 
   // ── Load Keywords ────────────────────────────────────────
   async function loadKeywords() {
     try {
+      // No orderBy — works with any data structure
       const snap = await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(currentCompanyId)
-        .collection('keywords').orderBy('createdAt', 'desc').get();
-      keywords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        .collection('keywords').get();
+
+      keywords = snap.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          keyword: data.keyword || data.term || data.kw || d.id,
+          position: data.position || data.rank || data.currentPosition || 0,
+          prevPosition: data.prevPosition || data.previousPosition || 0,
+          volume: data.volume || data.searchVolume || 0,
+          url: data.url || data.targetUrl || data.topPage || website,
+          location: data.location || 'Hyderabad, India',
+          lastChecked: data.lastChecked || data.updatedAt || null
+        };
+      });
+
+      console.log('Loaded keywords:', keywords.length, keywords.slice(0,3));
     } catch (e) {
-      // Try without orderBy if index missing
-      try {
-        const snap = await db.collection('users').doc(currentUser.uid)
-          .collection('companies').doc(currentCompanyId)
-          .collection('keywords').get();
-        keywords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (e2) { console.error(e2); }
+      console.error('loadKeywords error:', e);
+      showToast('Error loading keywords: ' + e.message, true);
     }
     updateStats();
     renderTable();
@@ -86,7 +91,7 @@
     const search = document.getElementById('kw-search')?.value?.toLowerCase() || '';
 
     filteredKeywords = keywords.filter(k => {
-      const matchSearch = !search || k.keyword?.toLowerCase().includes(search);
+      const matchSearch = !search || (k.keyword || '').toLowerCase().includes(search);
       let matchFilter = true;
       if (activeFilter === 'top3') matchFilter = k.position > 0 && k.position <= 3;
       else if (activeFilter === 'top10') matchFilter = k.position > 0 && k.position <= 10;
@@ -103,8 +108,12 @@
           <div class="table-empty">
             <div class="table-empty-icon">🔑</div>
             <div class="table-empty-title">${keywords.length === 0 ? 'No keywords yet' : 'No results'}</div>
-            <div class="table-empty-sub">${keywords.length === 0 ? 'Click "Add Keyword" to start tracking' : 'Try a different search or filter'}</div>
-            ${keywords.length === 0 ? '<button class="btn btn-primary" onclick="showAddKeyword()">+ Add Keyword</button>' : ''}
+            <div class="table-empty-sub">${keywords.length === 0
+              ? 'Click "Add Keyword" to start tracking'
+              : 'Try a different search or filter'}</div>
+            ${keywords.length === 0
+              ? '<button class="btn btn-primary" onclick="showAddKeyword()">+ Add Keyword</button>'
+              : ''}
           </div>
         </td></tr>`;
       return;
@@ -114,11 +123,15 @@
 
     tbody.innerHTML = filteredKeywords.map((k, i) => {
       const pos = k.position || 0;
-      const posClass = pos === 0 ? 'pos-none' : pos <= 3 ? 'pos-top3' : pos <= 10 ? 'pos-top10' : pos <= 20 ? 'pos-top20' : 'pos-low';
+      const posClass = pos === 0 ? 'pos-none'
+        : pos <= 3 ? 'pos-top3'
+        : pos <= 10 ? 'pos-top10'
+        : pos <= 20 ? 'pos-top20'
+        : 'pos-low';
       const posText = pos === 0 ? '--' : '#' + pos;
 
       const prev = k.prevPosition || 0;
-      let changeHTML = '<span class="change change-flat">— —</span>';
+      let changeHTML = '<span class="change change-flat">—</span>';
       if (pos > 0 && prev > 0) {
         const diff = prev - pos;
         if (diff > 0) changeHTML = `<span class="change change-up">▲ ${diff}</span>`;
@@ -129,16 +142,22 @@
       const vol = k.volume || 0;
       const volPct = Math.round((vol / maxVol) * 100);
       const volHTML = vol
-        ? `<div class="vol-bar"><span class="vol-num">${vol >= 1000 ? (vol/1000).toFixed(1)+'k' : vol}</span>
-           <div class="vol-bg"><div class="vol-fill" style="width:${volPct}%"></div></div></div>`
+        ? `<div class="vol-bar">
+             <span class="vol-num">${vol >= 1000 ? (vol/1000).toFixed(1)+'k' : vol}</span>
+             <div class="vol-bg"><div class="vol-fill" style="width:${volPct}%"></div></div>
+           </div>`
         : '<span style="color:#ccc">--</span>';
 
-      const url = k.url || k.topPage || '';
+      const url = k.url || '';
       const urlShort = url.replace(/https?:\/\/[^/]+/, '') || '/';
 
-      const lastChecked = k.lastChecked?.toDate
-        ? timeAgo(k.lastChecked.toDate())
-        : 'Never';
+      let lastCheckedText = 'Never';
+      if (k.lastChecked) {
+        try {
+          const d = k.lastChecked.toDate ? k.lastChecked.toDate() : new Date(k.lastChecked);
+          lastCheckedText = timeAgo(d);
+        } catch(e) { lastCheckedText = 'Unknown'; }
+      }
 
       return `
         <tr>
@@ -152,10 +171,12 @@
           <td><span class="pos-badge ${posClass}">${posText}</span></td>
           <td>${changeHTML}</td>
           <td>${volHTML}</td>
-          <td style="font-size:12px;color:#0a5c36;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-            ${url ? `<a href="${url}" target="_blank" style="color:#0a5c36;text-decoration:none;">${urlShort}</a>` : '--'}
+          <td style="font-size:12px;color:#0a5c36;">
+            ${url
+              ? `<a href="${url}" target="_blank" style="color:#0a5c36;text-decoration:none;max-width:140px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${urlShort}</a>`
+              : '--'}
           </td>
-          <td style="font-size:12px;color:#888;">${lastChecked}</td>
+          <td style="font-size:12px;color:#888;">${lastCheckedText}</td>
           <td>
             <div class="row-actions">
               <button class="check-btn" onclick="checkSingleRank('${k.id}')" id="check-${k.id}">Check</button>
@@ -169,7 +190,7 @@
   // ── Add Keyword Modal ────────────────────────────────────
   window.showAddKeyword = function () {
     document.getElementById('add-modal').style.display = 'flex';
-    document.getElementById('kw-input').focus();
+    setTimeout(() => document.getElementById('kw-input').focus(), 100);
   };
 
   window.closeModal = function () {
@@ -206,13 +227,21 @@
           lastChecked: null
         });
 
-      keywords.unshift({ id: docRef.id, keyword: kw, volume: vol, url, location: loc, position: 0 });
+      keywords.unshift({
+        id: docRef.id,
+        keyword: kw,
+        volume: vol,
+        url,
+        location: loc,
+        position: 0,
+        prevPosition: 0,
+        lastChecked: null
+      });
+
       updateStats();
       renderTable();
       closeModal();
       showToast('Keyword added! Checking rank...');
-
-      // Auto check rank
       await checkSingleRank(docRef.id);
     } catch (e) {
       showToast('Error: ' + e.message, true);
@@ -240,6 +269,8 @@
 
   // ── Check Single Rank ────────────────────────────────────
   window.checkSingleRank = async function (id) {
+    if (!serperKey) { showToast('No Serper API key — add in Settings', true); return; }
+
     const kw = keywords.find(k => k.id === id);
     if (!kw) return;
 
@@ -248,7 +279,6 @@
 
     const position = await fetchRank(kw.keyword, website, serperKey);
 
-    // Save to Firebase
     try {
       const prevPos = kw.position || 0;
       await db.collection('users').doc(currentUser.uid)
@@ -259,7 +289,6 @@
           lastChecked: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-      // Update local
       const idx = keywords.findIndex(k => k.id === id);
       if (idx !== -1) {
         keywords[idx].prevPosition = keywords[idx].position;
@@ -268,7 +297,9 @@
       }
       updateStats();
       renderTable();
-      showToast(position > 0 ? `"${kw.keyword}" ranked #${position}` : `"${kw.keyword}" not in top 100`);
+      showToast(position > 0
+        ? `"${kw.keyword}" ranked #${position} ✅`
+        : `"${kw.keyword}" not in top 100`);
     } catch (e) {
       showToast('Error saving rank', true);
     }
@@ -278,14 +309,8 @@
 
   // ── Check All Rankings ───────────────────────────────────
   window.checkAllRankings = async function () {
-    if (!serperKey) {
-      showToast('No Serper API key — add in Settings', true);
-      return;
-    }
-    if (keywords.length === 0) {
-      showToast('No keywords to check', true);
-      return;
-    }
+    if (!serperKey) { showToast('No Serper API key — add in Settings', true); return; }
+    if (keywords.length === 0) { showToast('No keywords to check', true); return; }
 
     const btn = document.getElementById('check-all-btn');
     btn.disabled = true;
@@ -313,19 +338,18 @@
         keywords[i].prevPosition = keywords[i].position;
         keywords[i].position = position;
         keywords[i].lastChecked = { toDate: () => new Date() };
-      } catch (e) {}
+      } catch (e) { console.error(e); }
 
-      // Small delay between requests
       await sleep(1200);
     }
 
     fill.style.width = '100%';
-    text.textContent = 'Done!';
+    text.textContent = '✅ Done!';
     setTimeout(() => progress.classList.remove('show'), 2000);
 
     updateStats();
     renderTable();
-    showToast('All rankings updated!');
+    showToast('All rankings updated! ✅');
 
     btn.disabled = false;
     btn.textContent = '🔄 Check All';
