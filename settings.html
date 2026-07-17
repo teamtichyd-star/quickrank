@@ -1,0 +1,216 @@
+<div class="settings-wrap">
+
+  <!-- Tabs -->
+  <div class="settings-tabs">
+    <button class="stab active" onclick="switchSettingsTab('company',this)">🏢 Company</button>
+    <button class="stab" onclick="switchSettingsTab('locations',this)">📍 Locations</button>
+    <button class="stab" onclick="switchSettingsTab('apikeys',this)">🔑 API Keys</button>
+    <button class="stab" onclick="switchSettingsTab('profile',this)">👤 Profile</button>
+  </div>
+
+  <!-- Company Tab -->
+  <div id="stab-company" class="stab-content active">
+    <div class="settings-card">
+      <div class="settings-card-title">Company Details</div>
+      <div class="sform-row">
+        <label>Company Name</label>
+        <input type="text" id="s-name" placeholder="e.g. Turnkey Interior Contractors">
+      </div>
+      <div class="sform-row">
+        <label>Website URL</label>
+        <input type="url" id="s-website" placeholder="https://yoursite.com">
+      </div>
+      <div class="sform-row">
+        <label>Industry / Business Type</label>
+        <input type="text" id="s-industry" placeholder="e.g. Interior Contractor">
+      </div>
+      <div class="sform-row">
+        <label>City</label>
+        <input type="text" id="s-city" placeholder="e.g. Hyderabad">
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-title">Google Business Profile</div>
+      <div class="sform-row">
+        <label>GMB Business Name</label>
+        <input type="text" id="s-gmbname" placeholder="e.g. TIC (TURNKEY INTERIOR CONTRACTORS)">
+      </div>
+      <div class="sform-row">
+        <label>GMB Place ID <span style="font-size:11px;color:#888;">— from Google Maps URL</span></label>
+        <input type="text" id="s-placeid" placeholder="e.g. ChIJxfKa-NuQyzsRZo3TiDBGjdw">
+      </div>
+      <div class="sform-row">
+        <label>Business Latitude <span style="font-size:11px;color:#888;">— for geo-grid center</span></label>
+        <input type="number" id="s-lat" placeholder="e.g. 17.4401" step="0.0001">
+      </div>
+      <div class="sform-row">
+        <label>Business Longitude</label>
+        <input type="number" id="s-lng" placeholder="e.g. 78.3489" step="0.0001">
+      </div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px;">
+        💡 Find lat/lng: Open Google Maps → right-click your office → copy coordinates
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="s-btn-primary" onclick="saveCompanySettings()">💾 Save Company</button>
+      <button class="s-btn-danger" onclick="confirmDeleteCompany()">🗑 Delete Company</button>
+      <button class="s-btn-secondary" onclick="addNewCompany()">＋ Add New Company</button>
+    </div>
+  </div>
+
+  <!-- Locations Tab -->
+  <div id="stab-locations" class="stab-content">
+    <div class="settings-card">
+      <div class="settings-card-title">Locations for <span id="loc-company-name">this company</span></div>
+      <div id="locations-list">
+        <div style="color:#888;font-size:13px;padding:20px 0;">Loading locations...</div>
+      </div>
+      <button class="s-btn-primary" style="margin-top:16px;" onclick="showAddLocationForm()">＋ Add Location</button>
+    </div>
+
+    <!-- Add/Edit Location Form -->
+    <div id="location-form" class="settings-card" style="display:none;">
+      <div class="settings-card-title" id="loc-form-title">Add Location</div>
+      <input type="hidden" id="loc-edit-id">
+      <div class="sform-row">
+        <label>Location Name</label>
+        <input type="text" id="loc-name" placeholder="e.g. Gachibowli Office">
+      </div>
+      <div class="sform-row">
+        <label>GMB Place ID (optional)</label>
+        <input type="text" id="loc-placeid" placeholder="e.g. ChIJxfKa-NuQyzsRZo3TiDBGjdw">
+      </div>
+      <div class="sform-row">
+        <label>Latitude</label>
+        <input type="number" id="loc-lat" placeholder="e.g. 17.4401" step="0.0001">
+      </div>
+      <div class="sform-row">
+        <label>Longitude</label>
+        <input type="number" id="loc-lng" placeholder="e.g. 78.3489" step="0.0001">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="s-btn-primary" onclick="saveLocation()">💾 Save Location</button>
+        <button class="s-btn-secondary" onclick="document.getElementById('location-form').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Keys Tab -->
+  <div id="stab-apikeys" class="stab-content">
+    <div class="settings-card">
+      <div class="settings-card-title">API Keys</div>
+      <div style="font-size:13px;color:#555;margin-bottom:20px;">
+        Keys are stored securely in your account. Never shared.
+      </div>
+
+      <div class="api-key-row">
+        <div class="api-key-info">
+          <div class="api-key-name">🚀 Serper.dev</div>
+          <div class="api-key-desc">Google SERP results — rankings + geo-grid</div>
+          <div class="api-key-free">2,500 free searches/month</div>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" id="key-serper" placeholder="Paste your Serper API key">
+          <button class="s-btn-test" onclick="testApiKey('serper')">Test</button>
+        </div>
+        <div id="test-serper" class="api-test-result"></div>
+      </div>
+
+      <div class="api-key-row">
+        <div class="api-key-info">
+          <div class="api-key-name">📍 Google Places</div>
+          <div class="api-key-desc">GMB reviews, ratings, business details</div>
+          <div class="api-key-free">$200 free credit/month</div>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" id="key-places" placeholder="Paste your Google Places API key">
+          <button class="s-btn-test" onclick="testApiKey('places')">Test</button>
+        </div>
+        <div id="test-places" class="api-test-result"></div>
+      </div>
+
+      <div class="api-key-row">
+        <div class="api-key-info">
+          <div class="api-key-name">🤖 Groq AI</div>
+          <div class="api-key-desc">Fast AI recommendations — free tier</div>
+          <div class="api-key-free">Free tier available</div>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" id="key-groq" placeholder="Paste your Groq API key">
+          <button class="s-btn-test" onclick="testApiKey('groq')">Test</button>
+        </div>
+        <div id="test-groq" class="api-test-result"></div>
+      </div>
+
+    </div>
+    <button class="s-btn-primary" onclick="saveApiKeys()">💾 Save All Keys</button>
+  </div>
+
+  <!-- Profile Tab -->
+  <div id="stab-profile" class="stab-content">
+    <div class="settings-card">
+      <div class="settings-card-title">Profile</div>
+      <div class="sform-row">
+        <label>Name</label>
+        <input type="text" id="p-name" placeholder="Your name" readonly style="background:#f8fafb;">
+      </div>
+      <div class="sform-row">
+        <label>Email</label>
+        <input type="text" id="p-email" placeholder="Your email" readonly style="background:#f8fafb;">
+      </div>
+      <div class="sform-row">
+        <label>User ID</label>
+        <input type="text" id="p-uid" placeholder="UID" readonly style="background:#f8fafb;font-size:11px;">
+      </div>
+    </div>
+    <button class="s-btn-danger" onclick="signOut()">Sign Out</button>
+  </div>
+
+</div>
+
+<style>
+.settings-wrap{max-width:720px;margin:0 auto;padding:24px 20px;}
+.settings-tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
+.stab{padding:9px 18px;border:1.5px solid #e0e8e4;border-radius:10px;background:#fff;
+  font-size:13px;font-weight:600;color:#555;cursor:pointer;transition:all 0.15s;}
+.stab:hover{border-color:#0a5c36;color:#0a5c36;}
+.stab.active{background:#0a5c36;color:#fff;border-color:#0a5c36;}
+.stab-content{display:none;}
+.stab-content.active{display:block;}
+.settings-card{background:#fff;border:1.5px solid #e8f0e9;border-radius:14px;
+  padding:24px;margin-bottom:16px;}
+.settings-card-title{font-size:15px;font-weight:700;color:#0f1117;margin-bottom:20px;}
+.sform-row{margin-bottom:16px;}
+.sform-row label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:6px;}
+.sform-row input{width:100%;padding:10px 14px;border:1.5px solid #e0e8e4;
+  border-radius:10px;font-size:13px;color:#333;outline:none;transition:border 0.15s;}
+.sform-row input:focus{border-color:#0a5c36;}
+.s-btn-primary{padding:10px 22px;background:#0a5c36;color:#fff;border:none;
+  border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;}
+.s-btn-primary:hover{background:#0d7a48;}
+.s-btn-secondary{padding:10px 22px;background:#f0fdf6;color:#0a5c36;
+  border:1.5px solid #d4f5e2;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;}
+.s-btn-danger{padding:10px 22px;background:#fff5f5;color:#e74c3c;
+  border:1.5px solid #fecaca;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;}
+.s-btn-danger:hover{background:#e74c3c;color:#fff;}
+.api-key-row{padding:16px 0;border-bottom:1px solid #f0f0f0;margin-bottom:8px;}
+.api-key-name{font-size:14px;font-weight:700;color:#0f1117;margin-bottom:2px;}
+.api-key-desc{font-size:12px;color:#666;margin-bottom:4px;}
+.api-key-free{font-size:11px;color:#2ecc71;font-weight:600;margin-bottom:10px;}
+.api-key-input-wrap{display:flex;gap:8px;margin-bottom:6px;}
+.api-key-input-wrap input{flex:1;padding:9px 14px;border:1.5px solid #e0e8e4;
+  border-radius:10px;font-size:13px;}
+.s-btn-test{padding:9px 16px;background:#f0fdf6;color:#0a5c36;
+  border:1.5px solid #d4f5e2;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;}
+.api-test-result{font-size:12px;min-height:18px;}
+.loc-item{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:#f8fafb;border:1.5px solid #e8f0e9;
+  border-radius:10px;margin-bottom:8px;}
+.loc-item-name{font-size:13px;font-weight:700;color:#0f1117;}
+.loc-item-coords{font-size:11px;color:#888;margin-top:2px;}
+.loc-item-actions{display:flex;gap:6px;}
+.loc-btn{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1.5px solid #e0e8e4;background:#fff;}
+</style>
