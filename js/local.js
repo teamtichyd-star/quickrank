@@ -1,15 +1,13 @@
-// ── local.js ──────────────────────────────────────────────
+// ── local.js — Leaflet version ───────────────────────────
 (async function () {
 
   let allKeywords = [];
   let selectedKeyword = null;
   let map = null;
-  let markers = [];
-  let currentScanResults = [];
+  let mapMarkers = [];
   let compSettings = null;
   let serperKey = null;
 
-  // Center: Hyderabad
   const DEFAULT_CENTER = { lat: 17.3850, lng: 78.4867 };
 
   compSettings = await loadCompSettings();
@@ -19,15 +17,8 @@
   const centerLng = compSettings?.lng || DEFAULT_CENTER.lng;
   const website = compSettings?.website || '';
 
-  // Load keywords
   await loadLocalKeywords();
-
-  // Init map
-  if (window.mapReady) {
-    initGeoMap();
-  } else {
-    window.mapReadyCb = initGeoMap;
-  }
+  initLeafletMap();
 
   // ── Load Keywords ────────────────────────────────────────
   async function loadLocalKeywords() {
@@ -43,32 +34,26 @@
           id: d.id,
           keyword: data.keyword || d.id,
           position: Number(data.position) || 0,
-          volume: Number(data.volume) || 0,
-          lastScan: data.lastLocalScan || null
+          volume: Number(data.volume) || 0
         };
       }).sort((a, b) => {
         if (a.position > 0 && b.position > 0) return a.position - b.position;
         if (a.position > 0) return -1;
         if (b.position > 0) return 1;
-        return a.keyword.localeCompare(b.keyword);
+        return 0;
       });
 
       document.getElementById('kw-count').textContent = allKeywords.length + ' keywords';
       renderKeywordList(allKeywords);
-
-      // Auto-select first
       if (allKeywords.length > 0) selectKeyword(allKeywords[0]);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   }
 
-  // ── Render Keyword List ──────────────────────────────────
   function renderKeywordList(list) {
     const el = document.getElementById('local-kw-list');
     if (!el) return;
     if (list.length === 0) {
-      el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:13px;">No keywords found</div>';
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;font-size:13px;">No keywords</div>';
       return;
     }
     el.innerHTML = list.map(k => {
@@ -77,81 +62,64 @@
       const pillText = pos === 0 ? '--' : '#' + pos;
       const isActive = selectedKeyword?.id === k.id;
       return `
-        <div class="kw-item ${isActive ? 'active' : ''}" onclick="selectKeyword(${JSON.stringify(k).replace(/"/g,'&quot;')}, this)" id="kwitem-${k.id}">
+        <div class="kw-item ${isActive ? 'active' : ''}" onclick="selectKeywordById('${k.id}')" id="kwitem-${k.id}">
           <div class="kw-item-left">
             <div class="kw-item-text">${k.keyword}</div>
-            <div class="kw-item-vol">${k.volume ? k.volume.toLocaleString() + ' searches/mo' : 'No volume data'}</div>
+            <div class="kw-item-vol">${k.volume ? k.volume.toLocaleString() + ' /mo' : 'No volume'}</div>
           </div>
-          <div class="kw-item-pos">
-            <span class="pos-pill ${pillClass}">${pillText}</span>
-          </div>
+          <div class="kw-item-pos"><span class="pos-pill ${pillClass}">${pillText}</span></div>
         </div>`;
     }).join('');
   }
 
-  // ── Filter Keywords ──────────────────────────────────────
   window.filterLocalKeywords = function () {
-    const q = document.getElementById('local-kw-search')?.value?.toLowerCase() || '';
-    const filtered = allKeywords.filter(k => k.keyword.toLowerCase().includes(q));
-    renderKeywordList(filtered);
+    const q = (document.getElementById('local-kw-search')?.value || '').toLowerCase();
+    renderKeywordList(allKeywords.filter(k => k.keyword.toLowerCase().includes(q)));
   };
 
-  // ── Select Keyword ───────────────────────────────────────
-  window.selectKeyword = function (kw) {
-    selectedKeyword = typeof kw === 'string' ? JSON.parse(kw) : kw;
+  window.selectKeywordById = function (id) {
+    const kw = allKeywords.find(k => k.id === id);
+    if (kw) selectKeyword(kw);
+  };
 
-    // Update active state
+  function selectKeyword(kw) {
+    selectedKeyword = kw;
     document.querySelectorAll('.kw-item').forEach(el => el.classList.remove('active'));
-    const item = document.getElementById('kwitem-' + selectedKeyword.id);
+    const item = document.getElementById('kwitem-' + kw.id);
     if (item) item.classList.add('active');
-
-    // Update label
     const label = document.getElementById('selected-kw-label');
-    if (label) label.textContent = selectedKeyword.keyword;
-
-    // Update grid title
+    if (label) label.textContent = kw.keyword;
     const title = document.getElementById('grid-title');
-    if (title) title.textContent = '"' + selectedKeyword.keyword + '" — Geo-Grid';
-
+    if (title) title.textContent = '"' + kw.keyword + '" — Geo-Grid';
     const sub = document.getElementById('grid-sub');
-    if (sub) sub.textContent = 'Click "Run Geo-Grid" to scan ' + getGridSize() + '×' + getGridSize() + ' locations';
+    if (sub) sub.textContent = 'Click "Run Geo-Grid" to scan';
+    loadHistory(kw.id);
+  }
 
-    // Load history for this keyword
-    loadHistory(selectedKeyword.id);
-  };
-
-  // ── Init Google Map ──────────────────────────────────────
-  function initGeoMap() {
+  // ── Init Leaflet Map ─────────────────────────────────────
+  function initLeafletMap() {
     const mapEl = document.getElementById('geo-map');
-    if (!mapEl || !window.google) return;
+    if (!mapEl || !window.L) return;
 
-    map = new google.maps.Map(mapEl, {
-      center: { lat: centerLat, lng: centerLng },
-      zoom: 12,
-      styles: [
-        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-      ],
-      disableDefaultUI: false,
-      zoomControl: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true
-    });
+    map = L.map('geo-map').setView([centerLat, centerLng], 12);
 
-    // Center marker
-    new google.maps.Marker({
-      position: { lat: centerLat, lng: centerLng },
-      map: map,
-      title: compSettings?.name || 'Your Business',
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: '#0a5c36',
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 3
-      }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Center marker (business location)
+    const centerIcon = L.divIcon({
+      className: '',
+      html: `<div style="width:20px;height:20px;background:#0a5c36;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
     });
+    L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
+      .addTo(map)
+      .bindPopup('<strong>' + (compSettings?.name || 'Your Business') + '</strong><br>📍 Business Location');
+
+    // Fix leaflet render issue in dynamic tabs
+    setTimeout(() => { map.invalidateSize(); }, 300);
   }
 
   // ── Run Geo Grid ─────────────────────────────────────────
@@ -166,59 +134,92 @@
     const btn = document.getElementById('run-grid-btn');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Running...'; }
 
-    // Show overlay
     const overlay = document.getElementById('running-overlay');
     const runText = document.getElementById('running-text');
     const runSub = document.getElementById('running-sub');
     if (overlay) overlay.style.display = 'flex';
     if (runSub) runSub.textContent = 'Checking ' + totalPoints + ' locations...';
 
-    // Clear old markers from overlay
-    document.getElementById('grid-overlay').innerHTML = '';
-    currentScanResults = [];
+    // Clear old markers
+    mapMarkers.forEach(m => map.removeLayer(m));
+    mapMarkers = [];
 
-    // Generate grid points
     const points = generateGridPoints(centerLat, centerLng, gridSize, radius);
+    const results = [];
 
-    // Check each point
     for (let i = 0; i < points.length; i++) {
       const pt = points[i];
       if (runText) runText.textContent = `Checking point ${i + 1} of ${totalPoints}...`;
 
       const position = await fetchLocalRank(selectedKeyword.keyword, pt.lat, pt.lng, website, serperKey);
-      currentScanResults.push({ ...pt, position, keyword: selectedKeyword.keyword });
+      results.push({ ...pt, position });
 
-      // Draw marker immediately
-      drawGridMarker(pt, position, gridSize, radius, i);
+      // Add marker to map
+      addResultMarker(pt, position);
 
       await sleep(800);
     }
 
     if (overlay) overlay.style.display = 'none';
-
-    // Show stats
-    showGridStats(currentScanResults);
-
-    // Save to history
-    await saveHistory(selectedKeyword.id, selectedKeyword.keyword, currentScanResults);
+    showGridStats(results);
+    await saveHistory(selectedKeyword.id, selectedKeyword.keyword, results);
     await loadHistory(selectedKeyword.id);
-
     if (btn) { btn.disabled = false; btn.textContent = '🗺️ Run Geo-Grid'; }
     showToast('Geo-grid scan complete! ✅');
   };
 
+  // ── Add Result Marker ────────────────────────────────────
+  function addResultMarker(pt, position) {
+    if (!map) return;
+
+    const color = position === 0 ? '#757575'
+      : position <= 3  ? '#1b5e20'
+      : position <= 10 ? '#1565c0'
+      : position <= 20 ? '#e65100'
+      : '#b71c1c';
+
+    const label = position === 0 ? '✕' : String(position);
+    const size = pt.isCenter ? 42 : 36;
+    const border = pt.isCenter ? 'border:3px solid #fff;box-shadow:0 0 0 3px #0a5c36,0 2px 8px rgba(0,0,0,0.4);' : 'border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.3);';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:${size}px;height:${size}px;border-radius:50%;
+        background:${color};color:#fff;
+        display:flex;align-items:center;justify-content:center;
+        font-weight:800;font-size:${pt.isCenter ? 14 : 12}px;
+        ${border}cursor:pointer;
+      ">${label}</div>`,
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2]
+    });
+
+    const marker = L.marker([pt.lat, pt.lng], { icon, zIndexOffset: pt.isCenter ? 500 : 0 })
+      .addTo(map)
+      .bindPopup(`
+        <div style="font-family:-apple-system,sans-serif;">
+          <strong>${selectedKeyword?.keyword || ''}</strong><br>
+          <span style="color:${color};font-weight:800;">Position: ${position === 0 ? 'Not in top 100' : '#' + position}</span><br>
+          <span style="font-size:11px;color:#888;">${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</span>
+        </div>
+      `);
+
+    mapMarkers.push(marker);
+  }
+
   // ── Generate Grid Points ─────────────────────────────────
-  function generateGridPoints(centerLat, centerLng, gridSize, radiusKm) {
+  function generateGridPoints(cLat, cLng, gridSize, radiusKm) {
     const points = [];
     const half = Math.floor(gridSize / 2);
     const stepLat = (radiusKm / 111) / half;
-    const stepLng = (radiusKm / (111 * Math.cos(centerLat * Math.PI / 180))) / half;
+    const stepLng = (radiusKm / (111 * Math.cos(cLat * Math.PI / 180))) / half;
 
     for (let row = -half; row <= half; row++) {
       for (let col = -half; col <= half; col++) {
         points.push({
-          lat: centerLat + (row * stepLat),
-          lng: centerLng + (col * stepLng),
+          lat: cLat + (row * stepLat),
+          lng: cLng + (col * stepLng),
           row: row + half,
           col: col + half,
           isCenter: row === 0 && col === 0
@@ -228,73 +229,18 @@
     return points;
   }
 
-  // ── Draw Grid Marker on Map ──────────────────────────────
-  function drawGridMarker(pt, position, gridSize, radius, index) {
-    if (!map || !window.google) return;
-
-    const color = position === 0 ? '#757575'
-      : position <= 3  ? '#1b5e20'
-      : position <= 10 ? '#1565c0'
-      : position <= 20 ? '#e65100'
-      : '#b71c1c';
-
-    const label = position === 0 ? '✕' : String(position);
-
-    const marker = new google.maps.Marker({
-      position: { lat: pt.lat, lng: pt.lng },
-      map: map,
-      label: {
-        text: label,
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: pt.isCenter ? '14px' : '12px'
-      },
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: pt.isCenter ? 22 : 18,
-        fillColor: color,
-        fillOpacity: 1,
-        strokeColor: pt.isCenter ? '#0a5c36' : 'rgba(255,255,255,0.8)',
-        strokeWeight: pt.isCenter ? 4 : 2
-      },
-      title: `Position: ${position === 0 ? 'Not ranked' : '#' + position}\nLat: ${pt.lat.toFixed(4)}, Lng: ${pt.lng.toFixed(4)}`,
-      zIndex: pt.isCenter ? 100 : index
-    });
-
-    // Info window on click
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div style="font-family:-apple-system,sans-serif;padding:4px;">
-          <div style="font-weight:800;font-size:13px;margin-bottom:4px;">${selectedKeyword?.keyword || ''}</div>
-          <div style="font-size:12px;color:#555;">Position: <strong style="color:${color}">${position === 0 ? 'Not in top 100' : '#' + position}</strong></div>
-          <div style="font-size:11px;color:#888;margin-top:4px;">${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}</div>
-        </div>`
-    });
-
-    marker.addListener('click', () => {
-      infoWindow.open(map, marker);
-    });
-
-    markers.push(marker);
-  }
-
-  // ── Show Grid Stats ──────────────────────────────────────
+  // ── Show Stats ───────────────────────────────────────────
   function showGridStats(results) {
     const ranked = results.filter(r => r.position > 0);
-    const avg = ranked.length
-      ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)
-      : '--';
-
+    const avg = ranked.length ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1) : '--';
     const s = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
     s('gs-avg', avg !== '--' ? '#' + avg : '--');
     s('gs-top3', results.filter(r => r.position > 0 && r.position <= 3).length);
     s('gs-top10', results.filter(r => r.position > 0 && r.position <= 10).length);
     s('gs-top20', results.filter(r => r.position > 10 && r.position <= 20).length);
     s('gs-none', results.filter(r => r.position === 0).length);
-
     const statsEl = document.getElementById('grid-stats');
     if (statsEl) statsEl.style.display = 'grid';
-
     const timeEl = document.getElementById('grid-time');
     if (timeEl) timeEl.textContent = 'Last scan: ' + new Date().toLocaleString();
   }
@@ -307,13 +253,7 @@
       const res = await fetch('https://google.serper.dev/search', {
         method: 'POST',
         headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          q: keyword,
-          gl: 'in',
-          hl: 'en',
-          num: 100,
-          location: `${lat},${lng}`
-        })
+        body: JSON.stringify({ q: keyword, gl: 'in', hl: 'en', num: 20, location: lat.toFixed(4) + ',' + lng.toFixed(4) })
       });
       const data = await res.json();
       const results = data.organic || [];
@@ -321,56 +261,47 @@
         if (results[i].link?.includes(domain)) return i + 1;
       }
       return 0;
-    } catch (e) {
-      console.error('fetchLocalRank error:', e);
-      return 0;
-    }
+    } catch (e) { console.error('fetchLocalRank:', e); return 0; }
   }
 
   // ── Save History ─────────────────────────────────────────
   async function saveHistory(kwId, keyword, results) {
     if (!currentCompanyId) return;
     const ranked = results.filter(r => r.position > 0);
-    const avg = ranked.length
-      ? (ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)
-      : 0;
-
+    const avg = ranked.length ? parseFloat((ranked.reduce((a, b) => a + b.position, 0) / ranked.length).toFixed(1)) : 0;
     try {
       await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(currentCompanyId)
         .collection('localScans').add({
-          keywordId: kwId,
-          keyword: keyword,
+          keywordId: kwId, keyword,
           results: results.map(r => ({ lat: r.lat, lng: r.lng, position: r.position, isCenter: r.isCenter || false })),
-          avgPosition: parseFloat(avg),
-          gridSize: getGridSize(),
-          radius: getRadius(),
+          avgPosition: avg, gridSize: getGridSize(), radius: getRadius(),
           scannedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-
-      // Update keyword's last scan
-      await db.collection('users').doc(currentUser.uid)
-        .collection('companies').doc(currentCompanyId)
-        .collection('keywords').doc(kwId).update({
-          lastLocalScan: firebase.firestore.FieldValue.serverTimestamp(),
-          localAvgPosition: parseFloat(avg)
-        });
-    } catch (e) { console.error('saveHistory error:', e); }
+    } catch (e) { console.error('saveHistory:', e); }
   }
 
   // ── Load History ─────────────────────────────────────────
   async function loadHistory(kwId) {
     const el = document.getElementById('history-list');
     if (!el || !currentCompanyId) return;
-
     try {
-      const snap = await db.collection('users').doc(currentUser.uid)
-        .collection('companies').doc(currentCompanyId)
-        .collection('localScans')
-        .where('keywordId', '==', kwId)
-        .orderBy('scannedAt', 'desc')
-        .limit(10)
-        .get();
+      let snap;
+      try {
+        snap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('localScans')
+          .where('keywordId', '==', kwId)
+          .orderBy('scannedAt', 'desc')
+          .limit(10).get();
+      } catch(e) {
+        // Fallback without orderBy
+        snap = await db.collection('users').doc(currentUser.uid)
+          .collection('companies').doc(currentCompanyId)
+          .collection('localScans')
+          .where('keywordId', '==', kwId)
+          .limit(10).get();
+      }
 
       if (snap.empty) {
         el.innerHTML = '<div class="history-empty">No scans yet for this keyword</div>';
@@ -381,75 +312,55 @@
         const d = doc.data();
         const date = d.scannedAt?.toDate ? d.scannedAt.toDate().toLocaleDateString() : 'Unknown';
         const avg = d.avgPosition ? '#' + d.avgPosition : '--';
-        const color = !d.avgPosition ? '#999'
-          : d.avgPosition <= 3 ? '#1b5e20'
-          : d.avgPosition <= 10 ? '#1565c0'
-          : d.avgPosition <= 20 ? '#e65100'
-          : '#b71c1c';
+        const color = !d.avgPosition ? '#999' : d.avgPosition <= 3 ? '#1b5e20' : d.avgPosition <= 10 ? '#1565c0' : d.avgPosition <= 20 ? '#e65100' : '#b71c1c';
         return `
-          <div class="history-item" onclick="replayHistory('${doc.id}')">
+          <div class="history-item" onclick="replayHistoryScan('${doc.id}')">
             <div class="history-date">📅 ${date}</div>
             <div class="history-kw">${d.keyword} · ${d.gridSize}×${d.gridSize} · ${d.radius}km</div>
             <div class="history-avg" style="color:${color};">${avg}</div>
           </div>`;
       }).join('');
     } catch (e) {
-      // Index might not exist yet — show empty
-      el.innerHTML = '<div class="history-empty">No scan history yet</div>';
+      el.innerHTML = '<div class="history-empty">No scan history</div>';
     }
   }
 
-  // ── Replay History ───────────────────────────────────────
-  window.replayHistory = async function (scanId) {
+  window.replayHistoryScan = async function (scanId) {
     try {
       const doc = await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(currentCompanyId)
         .collection('localScans').doc(scanId).get();
-
       if (!doc.exists) return;
       const d = doc.data();
-
-      // Clear old markers
-      markers.forEach(m => m.setMap(null));
-      markers = [];
-
-      // Replay markers
-      d.results.forEach((r, i) => {
-        drawGridMarker(r, r.position, d.gridSize, d.radius, i);
-      });
-
+      mapMarkers.forEach(m => map.removeLayer(m));
+      mapMarkers = [];
+      d.results.forEach(r => addResultMarker(r, r.position));
       showGridStats(d.results);
-      showToast('Showing scan from ' + d.scannedAt?.toDate()?.toLocaleDateString());
+      showToast('Showing scan from ' + (d.scannedAt?.toDate()?.toLocaleDateString() || 'unknown'));
     } catch (e) { showToast('Error loading scan', true); }
   };
 
-  // ── Add Keyword Modal ────────────────────────────────────
+  // ── Add Keyword ──────────────────────────────────────────
   window.showAddKeywordModal = function () {
     const m = document.getElementById('local-add-modal');
     if (m) { m.style.display = 'flex'; setTimeout(() => document.getElementById('local-kw-input')?.focus(), 100); }
   };
-
   window.closeLocalModal = function () {
     const m = document.getElementById('local-add-modal');
     if (m) m.style.display = 'none';
-    ['local-kw-input','local-vol-input'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   };
-
   window.addLocalKeyword = async function () {
     const kw = document.getElementById('local-kw-input')?.value?.trim();
     if (!kw) { showToast('Enter a keyword', true); return; }
     const vol = parseInt(document.getElementById('local-vol-input')?.value) || 0;
-
     const btn = document.getElementById('save-local-kw-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
-
     try {
       const docRef = await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(currentCompanyId)
         .collection('keywords').add({
           keyword: kw, volume: vol, position: 0, prevPosition: 0,
-          url: website,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          url: website, createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       allKeywords.unshift({ id: docRef.id, keyword: kw, volume: vol, position: 0 });
       renderKeywordList(allKeywords);
@@ -457,7 +368,6 @@
       showToast('Keyword added!');
       selectKeyword(allKeywords[0]);
     } catch (e) { showToast('Error: ' + e.message, true); }
-
     if (btn) { btn.disabled = false; btn.textContent = 'Add Keyword'; }
   };
 
