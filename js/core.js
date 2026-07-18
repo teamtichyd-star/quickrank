@@ -116,7 +116,7 @@ async function loadLocations(companyId) {
       const compDoc = await db.collection('users').doc(currentUser.uid)
         .collection('companies').doc(companyId).get();
       const comp = compDoc.data();
-      if (comp && comp.gmbPlaceId) {
+      if (comp) {
         allLocations = [{ id: companyId, name: comp.city ? (comp.city + ' - Main') : (comp.gmbName || comp.name || 'Main Location'), ...comp }];
       }
     }
