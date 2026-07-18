@@ -117,7 +117,7 @@ async function loadLocations(companyId) {
         .collection('companies').doc(companyId).get();
       const comp = compDoc.data();
       if (comp && comp.gmbPlaceId) {
-        allLocations = [{ id: companyId, name: comp.name || 'Main Location', ...comp }];
+        allLocations = [{ id: companyId, name: comp.city ? (comp.city + ' - Main') : (comp.gmbName || comp.name || 'Main Location'), ...comp }];
       }
     }
 
